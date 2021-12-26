@@ -1,0 +1,71 @@
+defmodule ReceptarWeb.RecipeLive do
+  use ReceptarWeb, :live_view
+
+  alias Receptar.Orderables
+  alias Receptar.Recipes
+  alias ReceptarWeb.Helpers
+
+  alias ReceptarWeb.RecipeView
+  import ReceptarWeb.RecipeController
+
+  def render(assigns) do
+    RecipeView.render("edit.html", assigns)
+  end
+
+  def mount(params, _session, socket) do
+    language = Helpers.determine_language(params)
+    recipe = query_recipe(params)
+
+    socket = socket
+    |> assign(language: language)
+    |> assign(recipe: recipe)
+    |> assign(edit_ingredients: [])
+    |> assign(edit_instructions: [])
+
+    {:ok, socket}
+  end
+
+  def handle_info({:submit_ingredient, attrs}, socket) do
+    #IO.inspect(attrs.ingredient)
+    ingredient = %{
+      amount: attrs.ingredient.amount,
+      unit: attrs.ingredient.unit,
+      substance: %{
+	name: attrs.ingredient.name,
+	kind: attrs.ingredient.substance_kind
+      },
+      number: attrs.ingredient.number
+    }
+    ingredients = [ingredient | socket.assigns.recipe.ingredients]
+    language = socket.assigns.language
+
+    change_attrs = %{ingredients: ingredients, language: language}
+
+    {:ok, recipe} = Recipes.update_recipe(socket.assigns.recipe, change_attrs)
+
+    recipe =
+      Recipes.get_recipe!(recipe.id)
+      |> Recipes.translate("eo")
+
+    {:noreply, socket |> assign(recipe: recipe)}
+  end
+
+  def handle_info({:submit_instruction, attrs}, socket) do
+    %{instructions: instructions} = attrs
+    language = socket.assigns.language
+
+    change_attrs = %{instructions: instructions, language: language}
+    {:ok, recipe} = Recipes.update_recipe(socket.assigns.recipe, change_attrs)
+
+    {:noreply, socket |> assign(recipe: recipe |> Recipes.translate(language))}
+  end
+
+  def handle_info({:delete_instruction, attrs}, socket) do
+    %{number: number, edit_instructions: edit_instructions} = attrs
+
+    instructions = Orderables.delete(socket.assigns.recipe.instructions, %{number: number})
+
+    recipe = %{socket.assigns.recipe | instructions: instructions}
+    {:noreply, socket |> assign(recipe: recipe)}
+  end
+end

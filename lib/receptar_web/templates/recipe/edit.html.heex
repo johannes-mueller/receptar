@@ -1,0 +1,11 @@
+<h1><%= tr(@recipe.title) %></h1>
+<.live_component
+  module={IngredientsLive},
+  id="ingredients"
+  ingredients={@recipe.ingredients}
+  edit_ingredients={@edit_ingredients}/>
+<.live_component
+  module={InstructionsLive},
+  id="instructions"
+  instructions={@recipe.instructions}
+  edit_instructions={@edit_instructions}/>

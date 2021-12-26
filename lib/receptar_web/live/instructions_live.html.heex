@@ -1,0 +1,34 @@
+<div id="instructions">
+  <ul class="instructions-list">
+    <%= for instruction <- @instructions do %>
+	<li class="instruction-list-entry">
+          <%= if instruction.number in @edit_instructions do %>
+          <form phx-submit={idfy("submit-instruction", instruction.number)} phx-target={@myself}>
+            <textarea name="instruction-content"><%= instruction.content %></textarea>
+            <button type="submit">Save</button>
+          </form>
+          <% else %>
+          <span id={idfy("instruction", instruction.number)}
+                phx-click="edit-instruction"
+                phx-target={@myself}
+                phx-value-number={instruction.number}>
+            <%= tr(instruction.content) %>
+          </span>
+          <% end %>
+          <a href="#"
+             id={idfy("delete-instruction", instruction.number)}
+             phx-click="delete-instruction"
+             phx-target={@myself}
+             phx-value-number={instruction.number}>
+            Delete
+          </a>
+        </li>
+        <% end %>
+  </ul>
+  <a href="#"
+     id="append-instruction"
+     phx-click="append-instruction"
+     phx-target={@myself}>
+    Append instruction
+  </a>
+</div>

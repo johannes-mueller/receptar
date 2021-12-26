@@ -1,0 +1,35 @@
+<form phx-submit="submit" phx-target={@myself} phx-change="make-suggestion">
+  <input id={idfy("amount-input", @id)}
+         name="amount"
+         phx-debounce="700"
+         autocomplete="off"
+         type="number"
+         value={@amount_value}>
+  <input id={idfy("substance-input", @id)}
+         name="substance-name"
+         phx-debounce="700"
+         autocomplete="off"
+         list={idfy("substance-suggestions", @id)}
+         value={@substance_name_value}>
+  <datalist id={idfy("substance-suggestions", @id)}>
+    <%= for suggestion <- @substance_suggestions do %>
+        <option value={suggestion}></option>
+    <% end %>
+  </datalist>
+  <input id={idfy("unit-input", @id)}
+         name="unit-name"
+         phx-debounce="700"
+         autocomplete="off"
+         list={idfy("unit-suggestions", @id)}
+         value={@unit_name_value}>
+  <datalist id={idfy("unit-suggestions", @id)}>
+    <%= for suggestion <- @unit_suggestions do %>
+        <option value={suggestion}></option>
+    <% end %>
+  </datalist>
+  <input type="radio" class="vegan-rb" value="vegan" name="substance-kind">
+  <input type="radio" class="vegetarian-rb" value="vegetarian" name="substance-kind">
+  <input type="radio" class="meat-rb" value="meat" name="substance-kind">
+  <input type="hidden" class="ingredient-number-input" value={@id} name="number">
+  <button type="submit">Submit</button>
+</form>

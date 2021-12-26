@@ -1,0 +1,14 @@
+<section class="phx-hero">
+    <h1><%= search_result_title(length(@recipes)) %></h1>
+    <ul class="search-result">
+	<%= for recipe <- @recipes do %>
+	    <li class="recipe-list-entry">
+		<%=
+		link recipe.title,
+		to: "/recipe/#{recipe.id}",
+		class: "recipe-link"
+		%>
+	    </li>
+	<% end %>
+    </ul>
+</section>

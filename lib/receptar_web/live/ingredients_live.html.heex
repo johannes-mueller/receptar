@@ -1,0 +1,25 @@
+<div id="ingredients">
+  <ul class="ingredients-list">
+    <%= for ingredient <- @ingredients do %>
+        <li class="ingredient-list-entry">
+          <%= if ingredient.number in @edit_ingredients do %>
+          <.live_component
+            module={IngredientLive}
+            id={idfy("ingredient", ingredient.number)}
+            ingredient={ingredient}
+            language={@language}/>
+          <% else %>
+          <span class="amount-quantity"><%= render_amount(ingredient) %></span>
+          <span class="amount-unit"><%= tr(ingredient.unit.name) %></span>
+          <span class="ingredient-substance"><%= tr(ingredient.name) %></span>
+          <% end %>
+        </li>
+        <% end %>
+  </ul>
+  <a href="#"
+     id="append-ingredient"
+     phx-click="append-ingredient"
+     phx-target={@myself}>
+    Append ingredient
+  </a>
+</div>
