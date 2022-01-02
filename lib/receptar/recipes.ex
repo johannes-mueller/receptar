@@ -129,13 +129,17 @@ defmodule Receptar.Recipes do
   def create_recipe(attrs) do
     %Recipe{}
     |> Recipe.changeset(attrs)
+    #|> IO.inspect(label: "create_recipe")
     |> Repo.insert
   end
 
   def update_recipe(%Recipe{} = recipe, attrs) do
+    attrs = Map.put_new(attrs, :language, nil)
+
     recipe
-    |> Recipe.changeset(attrs)
+    |> Recipe.update_changeset(attrs)
     |> Repo.update
+
   end
 
   def delete_recipe(recipe) do

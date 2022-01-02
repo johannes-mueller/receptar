@@ -227,6 +227,25 @@ defmodule Receptar.RecipeTest do
       ] = recipe.ingredients
     end
 
+    test "create an empty recipe" do
+      assert {:ok, %Recipe{id: id}} = Recipes.create_recipe(%{})
+
+      assert %{
+	translations: [],
+	ingredients: [],
+	instructions: []
+      } = Recipes.get_recipe!(id)
+    end
+
+    test "translate an empty recipe" do
+      {:ok, recipe} = Recipes.create_recipe(%{})
+
+      assert recipe
+      |> Repo.preload([:translations])
+      |> Recipes.translate("eo")
+      |> then(& &1.title) == :translation_missing
+    end
+
     test "create recipe actually adds it" do
       substance_1 = Substances.search("pasto", "eo") |> List.first
       substance_2 = Substances.search("fromago", "eo") |> List.first
@@ -269,6 +288,56 @@ defmodule Receptar.RecipeTest do
 	  %Instruction{recipe_id: ^id, number: 3, translations: [%{content: "baki ĉion"}]}
 	]
       } = recipe
+    end
+
+    test "update recipe with empty change attrs changes nothing" do
+      recipe = Recipes.search(%{"title" => "granda kino"}, "eo")
+      |> List.first
+
+      assert Recipes.update_recipe(recipe, %{}) == {:ok, recipe}
+    end
+
+    test "update recipe title" do
+      recipe = Recipes.search(%{"title" => "granda kino"}, "eo")
+      |> List.first
+
+      {:ok, updated} = Recipes.update_recipe(recipe, %{title: "grandega kino", language: "eo"})
+      assert updated
+      |> Recipes.translate("eo")
+      |> then(& &1.title) == "grandega kino"
+
+      assert updated
+      |> Recipes.translate("de")
+      |> then(& &1.title) == "Großes Kino"
+
+      old_translation_ids = recipe.translations
+      |> Enum.map(& &1.id)
+
+      updated_translation_ids = updated.translations
+      |> Enum.map(& &1.id)
+
+      assert_lists_equal updated_translation_ids, old_translation_ids
+    end
+
+    for {language, title} <- [{"eo", "Grandega kino"}, {"de", "Epochales Theater"}] do
+      test "change title (#{language}) of recipe" do
+	language = unquote(language)
+	title = unquote(title)
+
+	recipe = Recipes.search(%{"title" => "granda kino"}, "eo")
+	|> List.first
+	|> Recipes.translate(language)
+
+	Recipes.update_recipe(recipe, %{title: title, language: language})
+
+	new_recipe = Recipes.get_recipe!(recipe.id)
+	|> Recipes.translate(language)
+
+	assert new_recipe.title == title
+
+	assert new_recipe.ingredients == recipe.ingredients
+
+      end
     end
 
     test "add ingredient with known substance actually adds it" do
@@ -428,31 +497,6 @@ defmodule Receptar.RecipeTest do
       refute substance_id in substances
       assert length(substances) == length(recipe.ingredients) - 1
 
-    end
-
-    test "add instruction to recipe actually adds it" do
-      recipe = Recipes.search(%{"title" => "granda kino"}, "eo") |> List.first
-      id = recipe.id
-
-      recipe = Recipes.get_recipe!(id)
-      |> Recipes.translate("eo")
-
-      new_instruction = %{
-	translations: [%{language: "eo", content: "aldoni kaporojn"}]
-      }
-
-      recipe.instructions
-      |> Enum.map(& %{number: &1.number, content: &1.content})
-
-      {_number, instructions} = Orderables.append(recipe.instructions, new_instruction)
-
-      Recipes.update_recipe(recipe, %{instructions: instructions})
-
-      instructions = Recipes.get_recipe!(recipe.id) |> Recipes.translate("eo")
-      |> then(& &1.instructions)
-      |> Enum.map(& &1.content)
-
-      assert_lists_equal instructions, ["kuiri nudelojn", "aldoni tinuson", "aldoni kaporojn"]
     end
 
     test "add untranslated instruction to recipe actually adds it" do

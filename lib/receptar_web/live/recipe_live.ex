@@ -19,14 +19,31 @@ defmodule ReceptarWeb.RecipeLive do
     socket = socket
     |> assign(language: language)
     |> assign(recipe: recipe)
+    |> assign(edit_title: false)
     |> assign(edit_ingredients: [])
     |> assign(edit_instructions: [])
 
     {:ok, socket}
   end
 
+  def handle_event("edit-title", _attrs, socket) do
+    {:noreply, socket |> assign(edit_title: true)}
+  end
+
+  def handle_event("submit-title", %{"title" => title}, socket) do
+    recipe = socket.assigns.recipe
+    language = Helpers.determine_language(socket.assigns)
+
+    {:ok, recipe} = Recipes.update_recipe(recipe, %{title: title, language: language})
+
+    {:noreply,
+     socket
+     |> assign(recipe: recipe |> Recipes.translate(language))
+     |> assign(edit_title: false)
+    }
+  end
+
   def handle_info({:submit_ingredient, attrs}, socket) do
-    #IO.inspect(attrs.ingredient)
     ingredient = %{
       amount: attrs.ingredient.amount,
       unit: attrs.ingredient.unit,

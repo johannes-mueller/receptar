@@ -26,6 +26,31 @@ defmodule Receptar.TranslatablesTest do
       ] = translations
     end
 
+    @tag :skip
+    test "update translations add new translation" do
+      substance = substance_by_name("salo")
+
+      Translations.update_translations(substance, %{language: "sk", content: "soľ"})
+
+      assert [
+	%{language: "eo", content: "salo"},
+	%{language: "de", content: "Salz"},
+	%{language: "sk", content: "soľ"},
+      ] = substance_by_name("salo").translations
+    end
+
+    @tag :skip
+    test "update translations change translation" do
+      substance = substance_by_name("salo")
+
+      Translations.update_translations(substance, %{language: "eo", content: "saalo"})
+
+      assert [
+	%{language: "de", content: "Salz"},
+	%{language: "eo", content: "saalo"},
+      ] = substance_by_name("saalo").translations
+    end
+
     test "add a multiple translations to a substance actually adds them" do
       substance = substance_by_name("salo")
       new_translations = [

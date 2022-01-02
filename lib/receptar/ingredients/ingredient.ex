@@ -19,13 +19,17 @@ defmodule Receptar.Ingredients.Ingredient do
 
   @doc false
   def changeset(ingredient, attrs) do
-    attrs = Map.put_new(attrs, :language, nil)
+    attrs =
+      attrs
+      |> Map.put_new(:language, nil)
+
     ingredient
     |> cast(attrs, [:number, :amount, :unit_id, :substance_id, :recipe_id])
     |> put_assoc(:unit, cast_if_new_unit(attrs))
     |> put_assoc(:substance, cast_if_new_substance(attrs))
     |> validate_required([:amount])
   end
+
 
   defp cast_if_new_unit(%{unit_id: id}) do
     Receptar.Units.get_unit!(id)

@@ -1,4 +1,13 @@
-<h1><%= tr(@recipe.title) %></h1>
+<h1 phx-click="edit-title">
+  <%= if @edit_title do%>
+  <form phx-submit="submit-title">
+    <input name="title" value={@recipe.title}>
+    <button type="submit">Submit</button>
+  </form>
+  <% else %>
+  <%= tr(@recipe.title) %>
+  <% end %>
+</h1>
 <.live_component
   module={IngredientsLive},
   id="ingredients"

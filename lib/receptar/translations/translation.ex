@@ -19,4 +19,5 @@ defmodule Receptar.Translations.Translation do
     |> cast(attrs, [:content, :language, :substance_id, :instruction_id, :unit_id])
     |> validate_required([:content, :language])
   end
+
 end

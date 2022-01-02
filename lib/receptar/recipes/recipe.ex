@@ -7,7 +7,7 @@ defmodule Receptar.Recipes.Recipe do
   alias Receptar.Instructions.Instruction
 
   schema "recipes" do
-    has_many :translations, Receptar.Translations.Translation
+    has_many :translations, Receptar.Translations.Translation, on_replace: :delete
     has_many :ingredients, Receptar.Ingredients.Ingredient, on_replace: :delete
     has_many :instructions, Receptar.Instructions.Instruction, on_replace: :delete
 
@@ -24,6 +24,51 @@ defmodule Receptar.Recipes.Recipe do
     |> put_assoc(:instructions, cast_new_instructions(attrs))
     |> validate_required([])
   end
+
+  def update_changeset(recipe, attrs) do
+    attrs =
+      attrs
+      |> retranslate_ingredients
+      |> retranslate_instructions
+
+    recipe
+    |> cast(attrs, [])
+    |> update_title(attrs)
+    |> cast_assoc(:ingredients)
+    |> cast_assoc(:instructions, with: &Instruction.update_changeset/2)
+  end
+
+  defp update_title(%{data: recipe} = changeset, %{language: language, title: title}) do
+    new_translation = %{language: language, content: title}
+
+    %{changeset | changes: Map.put(changeset.changes, :translations, Receptar.Translations.update_translations(recipe, new_translation))}
+  end
+
+  defp update_title(changeset, _attrs) do
+    changeset
+  end
+
+  defp retranslate_ingredients(%{ingredients: ingredients} = attrs) do
+    ingredients =
+      ingredients
+      |> Enum.map(& from_struct_if_necessary(&1, attrs.language))
+
+    %{attrs | ingredients: ingredients}
+  end
+
+  defp retranslate_ingredients(attrs), do: attrs
+
+  defp retranslate_instructions(%{instructions: instructions} = attrs) do
+    instructions =
+      instructions
+      |> Enum.map(& from_struct_if_necessary(&1, attrs.language))
+
+    %{attrs | instructions: instructions}
+  end
+  defp retranslate_instructions(attrs), do: attrs
+
+  def from_struct_if_necessary(%_{} = struct, _language), do: Map.from_struct(struct)
+  def from_struct_if_necessary(%{} = map, language), do: Map.put(map, :language, language)
 
   defp cast_new_ingredients(%{ingredients: ingredients, language: language}) do
     Enum.map(ingredients, & cast_if_new_ingredient(&1, language))

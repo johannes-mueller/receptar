@@ -21,6 +21,63 @@ defmodule ReceptarWeb.RecipeLiveTest do
       create_socket()
     end
 
+    test "initially edit_title flag false", %{socket: socket} do
+	recipe_id = recipe_id("granda kino")
+
+	{:ok, socket} =
+	  RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+
+	assert socket.assigns.edit_title == false
+    end
+
+    test "edit-title event sets edit_title to true", %{socket: socket} do
+	recipe_id = recipe_id("granda kino")
+
+	{:ok, socket} =
+	  RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+
+	{:noreply, socket} =
+	  RecipeLive.handle_event("edit-title", %{}, socket)
+
+	assert socket.assigns.edit_title == true
+    end
+
+    for {language, title} <- [{"eo", "Grandega kino"}, {"de", "Epochales Theater"}] do
+      test "submit-title (#{language})", %{socket: socket} do
+	language = unquote(language)
+	title = unquote(title)
+
+	recipe_id = recipe_id("granda kino")
+
+	{:ok, socket} =
+	  RecipeLive.mount(%{"id" => recipe_id, "language" => language}, nil, socket)
+
+	{:noreply, socket} =
+	  RecipeLive.handle_event("submit-title", %{"title" => title}, socket)
+
+	assert socket.assigns.recipe.title == title
+
+	recipe = Recipes.get_recipe!(recipe_id)
+	|> Recipes.translate(language)
+
+	assert recipe.title == title
+      end
+    end
+
+    test "submit-title sets edit_title to false", %{socket: socket} do
+	recipe_id = recipe_id("granda kino")
+
+	{:ok, socket} =
+	  RecipeLive.mount(%{"id" => recipe_id, "language" => "eo"}, nil, socket)
+
+	socket = %{socket | assigns: %{socket.assigns | edit_title: true}}
+
+	{:noreply, socket} =
+	  RecipeLive.handle_event("submit-title", %{"title" => "foo"}, socket)
+
+	assert socket.assigns.edit_title == false
+    end
+
     for {name, language} <- [{"salo", "eo"}, {"Salz", "de"}] do
       test "submit ingredient known (#{language}) substance", %{socket: socket} do
 	name = unquote(name)
@@ -128,10 +185,36 @@ defmodule ReceptarWeb.RecipeLiveTest do
       insert_test_data()
     end
 
-    test "nothing", %{conn: conn} do
+    test "title does initially not have a form element", %{conn: conn} do
       id = recipe_id("granda kino")
       {:ok, view, _html} = live(conn, "/recipe/#{id}")
-      send view.pid, :foo
+
+      refute view
+      |> element("h1 form")
+      |> has_element?
+
+    end
+
+    test "title has a form element after edit-title event", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      html = view
+      |> element("h1")
+      |> render_click()
+
+      assert html =~ ~r/<form phx-submit="submit-title"/
+    end
+
+    test "title edit form defaults to old title", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      html = view
+      |> element("h1")
+      |> render_click()
+
+      assert html =~ ~r/<h1.*>.*<input.* value="Granda kino".*<\/h1>/
     end
   end
 end

@@ -132,21 +132,21 @@ defmodule ReceptarWeb.ReceptarControllerTest do
     for {url_function, target} <- [{&recipe_url/1, "edit"}] do
       test "#{target} recipe id 1 has title page 'Granda kino'", %{conn: conn} do
 	conn = get(conn, unquote(url_function).("granda kino"))
-	assert html_response(conn, 200) =~ "<h1>Granda kino</h1>"
-	refute html_response(conn, 200) =~ "<h1>Sardela pico</h1>"
-	refute html_response(conn, 200) =~ "<h1>Großes Kino</h1>"
+	assert html_response_stripped(conn, 200) =~ ~r/<h1.*>Granda kino<\/h1>/
+	refute html_response_stripped(conn, 200) =~ ~r/<h1.*>Sardela pico<\/h1>/
+	refute html_response_stripped(conn, 200) =~ ~r/<h1.*>Großes Kino<\/h1>/
       end
 
       test "#{target} recipe id 1 in German has title page 'Großes Kino'", %{conn: conn} do
 	conn = get(conn, unquote(url_function).("granda_kino") <> "?language=de")
-	assert html_response(conn, 200) =~ "<h1>Großes Kino</h1>"
-	refute html_response(conn, 200) =~ "<h1>Granda kino</h1>"
+	assert html_response_stripped(conn, 200) =~ ~r/<h1.*>Großes Kino<\/h1>/
+	refute html_response_stripped(conn, 200) =~ ~r/<h1.*>Granda kino<\/h1>/
       end
 
       test "#{target} recipe id 1 has title page 'Sardela pico'", %{conn: conn} do
 	conn = get(conn, unquote(url_function).("sardela pico"))
-	refute html_response(conn, 200) =~ "<h1>Granda kino</h1>"
-	assert html_response(conn, 200) =~ "<h1>Sardela pico</h1>"
+	refute html_response_stripped(conn, 200) =~ ~r/<h1.*>Granda kino<\/h1>/
+	assert html_response_stripped(conn, 200) =~ ~r/<h1.*>Sardela pico<\/h1>/
       end
 
       test "#{target} recipe 1 has an class-ingredients-list <ul> tag", %{conn: conn} do
