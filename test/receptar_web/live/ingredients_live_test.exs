@@ -122,7 +122,25 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	  assigns: %{edit_ingredients: [^expected_ingredient_number]}
 	} = socket
       end
+    end
 
+    for {number, number_string} <- [{1, "1"}, {2, "2"}] do
+      test "delete ingredient #{number}", %{socket: socket} do
+	number = unquote(number)
+	number_string = unquote(number_string)
+	recipe = recipe_by_title("granda kino")
+
+	params = %{ingredients: recipe.ingredients, edit_ingredients: []}
+	{:ok, socket} = IngredientsLive.update(params, socket)
+
+	{:noreply, _socket} =
+	  IngredientsLive.handle_event("delete-ingredient", %{"number" => number_string}, socket)
+
+	assert_received({
+	  :delete_ingredient,
+	  %{number: ^number}
+	})
+      end
     end
   end
 
@@ -159,6 +177,28 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       |> strip_html_code
 
       assert html =~ ~r/<form.*phx-submit="submit"/
+    end
+
+    for number <- [1, 2] do
+      test "ingredient #{number} has delete button", %{conn: conn, ingredient: ingredient} do
+	number = unquote(number)
+	session = %{
+	  "ingredients" => [%{ingredient | number: number}],
+	  "edit_ingredients" => []
+	}
+	{:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+	delete_element = view
+	|> element("a#delete-ingredient-#{number}")
+
+	render_click(delete_element)
+
+	html = delete_element
+	|> render()
+
+	assert html =~ ~r/phx-click="delete-ingredient"/
+	assert html =~ ~r/phx-value-number="#{number}"/
+      end
     end
   end
 end

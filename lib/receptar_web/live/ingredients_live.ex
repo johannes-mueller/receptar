@@ -38,15 +38,11 @@ defmodule ReceptarWeb.IngredientsLive do
 
   def handle_event("delete-ingredient", %{"number" => number}, socket) do
     number = String.to_integer(number)
-    edit_ingredients =
-      socket.assigns.edit_ingredients
-      |> Enum.filter(& &1 != number)
 
     send self(), {
       :delete_ingredient,
-      %{
-	number: number,
-	edit_ingredients: edit_ingredients}}
+      %{number: number}
+    }
 
     {:noreply, socket}
   end

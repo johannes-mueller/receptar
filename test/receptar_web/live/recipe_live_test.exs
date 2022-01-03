@@ -78,6 +78,43 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	assert socket.assigns.edit_title == false
     end
 
+    for {number, remaining} <- [{1, ["tinuso", "salo"]}, {2, ["nudeloj", "salo"]}] do
+      test "delete ingredient #{number}", %{socket: socket} do
+	number = unquote(number)
+	[remaining_1, remaining_2] = unquote(remaining)
+
+	recipe_id = recipe_id("granda kino")
+
+	{:ok, socket} =
+	  RecipeLive.mount(%{"id" => recipe_id, "language" => "eo"}, nil, socket)
+
+	{:noreply, socket} =
+	  RecipeLive.handle_info(
+	    {
+	      :delete_ingredient,
+	      %{number: number}
+	    },
+	    socket
+	  )
+
+	new_ingredients = socket.assigns.recipe.ingredients
+
+	assert [
+	  %{name: ^remaining_1, number: 1},
+	  %{name: ^remaining_2, number: 2}
+	] = new_ingredients
+
+	new_ingredients = Recipes.get_recipe!(recipe_id)
+	|> Recipes.translate("eo")
+	|> then(& &1.ingredients)
+
+	assert [
+	  %{name: ^remaining_1, number: 1},
+	  %{name: ^remaining_2, number: 2}
+	] = new_ingredients
+      end
+    end
+
     for {name, language} <- [{"salo", "eo"}, {"Salz", "de"}] do
       test "submit ingredient known (#{language}) substance", %{socket: socket} do
 	name = unquote(name)
