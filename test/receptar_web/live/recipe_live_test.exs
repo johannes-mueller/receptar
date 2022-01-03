@@ -42,6 +42,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	assert socket.assigns.edit_title == true
     end
 
+
     for {language, title} <- [{"eo", "Grandega kino"}, {"de", "Epochales Theater"}] do
       test "submit-title (#{language})", %{socket: socket} do
 	language = unquote(language)
@@ -74,6 +75,20 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
 	{:noreply, socket} =
 	  RecipeLive.handle_event("submit-title", %{"title" => "foo"}, socket)
+
+	assert socket.assigns.edit_title == false
+    end
+
+    test "cancel-edit-title event sets edit_title to false", %{socket: socket} do
+	recipe_id = recipe_id("granda kino")
+
+      {:ok, socket} =
+	  RecipeLive.mount(%{"id" => recipe_id, "language" => "eo"}, nil, socket)
+
+	socket = %{socket | assigns: %{socket.assigns | edit_title: true}}
+
+	{:noreply, socket} =
+	  RecipeLive.handle_event("cancel-edit-title", %{}, socket)
 
 	assert socket.assigns.edit_title == false
     end
@@ -241,6 +256,8 @@ defmodule ReceptarWeb.RecipeLiveTest do
       |> render_click()
 
       assert html =~ ~r/<form phx-submit="submit-title"/
+      assert html =~ ~r/<button.*phx-click="cancel-edit-title"/
+      assert html =~ ~r/<button.*type="button"/
     end
 
     test "title edit form defaults to old title", %{conn: conn} do

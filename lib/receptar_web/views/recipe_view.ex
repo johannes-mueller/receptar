@@ -4,7 +4,6 @@ defmodule ReceptarWeb.RecipeView do
   alias ReceptarWeb.RecipeLive
   alias ReceptarWeb.InstructionsLive
   alias ReceptarWeb.IngredientsLive
-  alias ReceptarWeb.IngredientLive
 
   def search_result_title(0), do: gettext("No recipes found.")
   def search_result_title(1), do: gettext("One recipe found.")

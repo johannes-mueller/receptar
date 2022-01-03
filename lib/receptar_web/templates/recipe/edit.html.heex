@@ -3,6 +3,7 @@
   <form phx-submit="submit-title">
     <input name="title" value={@recipe.title}>
     <button type="submit">Submit</button>
+    <button phx-click="cancel-edit-title" type="button">Cancel</button>
   </form>
   <% else %>
   <%= tr(@recipe.title) %>

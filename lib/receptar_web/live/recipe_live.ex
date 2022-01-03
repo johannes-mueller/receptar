@@ -43,6 +43,10 @@ defmodule ReceptarWeb.RecipeLive do
     }
   end
 
+  def handle_event("cancel-edit-title", _attrs, socket) do
+    {:noreply, socket |> assign(edit_title: false)}
+  end
+
   def handle_info({:submit_ingredient, attrs}, socket) do
     ingredient = %{
       amount: attrs.ingredient.amount,
