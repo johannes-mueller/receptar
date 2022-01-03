@@ -244,7 +244,7 @@ defmodule ReceptarWeb.InstructionsLiveTest do
       refute view |> has_element?("form")
     end
 
-    test "append instruction", %{conn: conn} do
+    test "append first instruction", %{conn: conn} do
       session = %{"instructions" => []}
       {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
@@ -254,6 +254,47 @@ defmodule ReceptarWeb.InstructionsLiveTest do
       |> strip_html_code
 
       assert html =~ ~r/<form phx-submit="submit-instruction-1"/
+      assert html =~ ~r/<button.*phx-value-number="1"/
+    end
+
+    test "append second instruction", %{conn: conn, instruction: instruction} do
+      session = %{"instructions" => [instruction]}
+      {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
+
+      html = view
+      |> element("#instruction-1")
+      |> render()
+
+      assert html =~ ~r/phx-value-number="1"/
+
+      html = view
+      |> element("a#append-instruction")
+      |> render_click()
+      |> strip_html_code
+
+      assert html =~ ~r/<form phx-submit="submit-instruction-2"/
+      assert html =~ ~r/<button.*phx-value-number="2"/
+      assert html =~ ~r/id="delete-instruction-2"/
+    end
+
+    test "append third instruction", %{conn: conn, instruction: instruction} do
+      session = %{"instructions" => [instruction, %{instruction | number: 2}]}
+      {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
+
+      html = view
+      |> element("#instruction-2")
+      |> render()
+
+      assert html =~ ~r/phx-value-number="2"/
+
+      html = view
+      |> element("a#append-instruction")
+      |> render_click()
+      |> strip_html_code
+
+      assert html =~ ~r/<form phx-submit="submit-instruction-3"/
+      assert html =~ ~r/<button.*phx-value-number="3"/
+      assert html =~ ~r/id="delete-instruction-3"/
     end
 
     test "edit instruction", %{conn: conn, instruction: instruction} do
