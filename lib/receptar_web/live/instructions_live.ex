@@ -19,6 +19,19 @@ defmodule ReceptarWeb.InstructionsLive do
     {:noreply, socket |> assign(edit_instructions: edit_list)}
   end
 
+  def handle_event("cancel-edit-instruction", %{"number" => number}, socket) do
+    number = case Integer.parse(number) do
+	       {number, ""} -> number
+	       _ -> 0
+	     end
+
+    edit_instructions =
+      socket.assigns.edit_instructions
+      |> Enum.filter(& &1 != number)
+
+    {:noreply, socket |> assign(edit_instructions: edit_instructions)}
+  end
+
   def handle_event("append-instruction", _attrs, socket) do
     instructions = socket.assigns.instructions
 
@@ -35,6 +48,7 @@ defmodule ReceptarWeb.InstructionsLive do
 
   def handle_event("delete-instruction", %{"number" => number}, socket) do
     number = String.to_integer(number)
+
     edit_instructions =
       socket.assigns.edit_instructions
       |> Enum.filter(& &1 != number)
