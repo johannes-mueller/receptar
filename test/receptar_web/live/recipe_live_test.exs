@@ -182,7 +182,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	{:noreply, socket} =
 	  RecipeLive.handle_info(
 	    {
-	      :submit_instruction,
+	      :update_instructions,
 	      %{
 		instructions: [%{content: content, number: 1}],
 		edit_instructions: []
@@ -203,34 +203,8 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	assert [%{content: ^content, number: 1}] = recipe.instructions
       end
     end
-
-    for {number, remaining} <- [{1, "aldoni tinuson"}, {2, "kuiri nudelojn"}] do
-      test "delete instruction #{number}", %{socket: socket} do
-	number = unquote(number)
-	remaining = unquote(remaining)
-	recipe_id = recipe_id("granda kino")
-
-	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
-
-	{:noreply, socket} =
-	  RecipeLive.handle_info(
-	    {
-	      :delete_instruction,
-	      %{
-		number: number,
-		edit_instructions: []
-	      }
-	    },
-	    socket
-	  )
-
-	instructions = socket.assigns.recipe.instructions
-	assert length(instructions) == 1
-	assert List.first(instructions).content == remaining
-      end
-    end
   end
+
 
   describe "Connection state" do
     setup do

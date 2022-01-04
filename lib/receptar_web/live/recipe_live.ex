@@ -80,7 +80,7 @@ defmodule ReceptarWeb.RecipeLive do
     {:noreply, socket |> assign(recipe: recipe)}
   end
 
-  def handle_info({:submit_instruction, attrs}, socket) do
+  def handle_info({:update_instructions, attrs}, socket) do
     %{instructions: instructions} = attrs
     language = socket.assigns.language
 
@@ -88,14 +88,5 @@ defmodule ReceptarWeb.RecipeLive do
     {:ok, recipe} = Recipes.update_recipe(socket.assigns.recipe, change_attrs)
 
     {:noreply, socket |> assign(recipe: recipe |> Recipes.translate(language))}
-  end
-
-  def handle_info({:delete_instruction, attrs}, socket) do
-    %{number: number, edit_instructions: edit_instructions} = attrs
-
-    instructions = Orderables.delete(socket.assigns.recipe.instructions, %{number: number})
-
-    recipe = %{socket.assigns.recipe | instructions: instructions}
-    {:noreply, socket |> assign(recipe: recipe)}
   end
 end

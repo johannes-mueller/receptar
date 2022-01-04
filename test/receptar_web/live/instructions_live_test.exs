@@ -136,19 +136,12 @@ defmodule ReceptarWeb.InstructionsLiveTest do
 	)
 
       assert_received({
-	:submit_instruction,
+	:update_instructions,
 	%{
-	  instructions: instructions,
+	  instructions: [%{content: "preparado", number: 1}, _],
 	  edit_instructions: [2]
 	}
       })
-
-      instruction =
-	instructions
-	|> Enum.sort(& &1.number < &2.number)
-	|> Enum.at(0)
-      assert instruction.content == "preparado"
-      assert instruction.number == 1
     end
 
     test "submit-instruction-2 event", %{socket: socket} do
@@ -167,19 +160,12 @@ defmodule ReceptarWeb.InstructionsLiveTest do
 	)
 
       assert_received({
-	:submit_instruction,
+	:update_instructions,
 	%{
-	  instructions: instructions,
+	  instructions: [_, %{content: "finfarado", number: 2}],
 	  edit_instructions: []
 	}
       })
-
-      instruction =
-	instructions
-	|> Enum.sort(& &1.number < &2.number)
-	|> Enum.at(1)
-      assert instruction.content == "finfarado"
-      assert instruction.number == 2
     end
 
     for {recipe_name} <- [{"granda kino"}, {"sukera bulko"}] do
@@ -232,13 +218,18 @@ defmodule ReceptarWeb.InstructionsLiveTest do
 	params = %{instructions: instructions, edit_instructions: edit_instructions}
 	{:ok, socket} = InstructionsLive.update(params, socket)
 
+	expected_instructions =
+	  instructions
+	  |> Enum.filter(& &1.number != number)
+	  |> Enum.map(& %{&1 | number: 1})
+
 	{:noreply, _socket} =
 	  InstructionsLive.handle_event("delete-instruction", %{"number" => number_string}, socket)
 
 	assert_received({
-	  :delete_instruction,
+	  :update_instructions,
 	  %{
-	    number: ^number,
+	    instructions: ^expected_instructions,
 	    edit_instructions: ^expected_edit_instructions
 	  }
 	    })

@@ -54,9 +54,9 @@ defmodule ReceptarWeb.InstructionsLive do
       |> Enum.filter(& &1 != number)
 
     send self(), {
-      :delete_instruction,
+      :update_instructions,
       %{
-	number: number,
+	instructions: Orderables.delete(socket.assigns.instructions, %{number: number}),
 	edit_instructions: edit_instructions}}
 
     {:noreply, socket}
@@ -74,7 +74,7 @@ defmodule ReceptarWeb.InstructionsLive do
       |> Enum.filter(& &1 != number)
 
     send self(), {
-      :submit_instruction,
+      :update_instructions,
       %{
 	instructions: instructions,
 	edit_instructions: edit_instructions
