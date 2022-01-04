@@ -119,9 +119,9 @@ defmodule Receptar.RecipeTest do
         |> Recipes.translate("eo")
 
       assert [
-	%{name: "nudeloj", substance: %{kind: :vegan}},
-	%{name: "tinuso", substance: %{kind: :meat}},
-	%{name: "salo", substance: %{kind: :vegan}},
+	%{substance: %{name: "nudeloj", kind: :vegan}},
+	%{substance: %{name: "tinuso", kind: :meat}},
+	%{substance: %{name: "salo", kind: :vegan}},
       ] = recipe.ingredients
     end
 
@@ -166,7 +166,6 @@ defmodule Receptar.RecipeTest do
       assert [%{title: "Großes Kino"}] = result
     end
 
-
     test "translated instruction names of recipe 1 to Esperanto" do
       result = Recipes.search(%{"title" => "Großes Kino"}, "de")
       |> Recipes.translate("eo")
@@ -176,6 +175,34 @@ defmodule Receptar.RecipeTest do
 	instructions: [
 	  %{content: "kuiri nudelojn"},
 	  %{content: "aldoni tinuson"},
+	]
+      } = result
+    end
+
+    test "translated ingredients of recipe 1 to Esperanto" do
+      result = Recipes.search(%{"title" => "Großes Kino"}, "de")
+      |> Recipes.translate("eo")
+      |> List.first
+
+      assert %Recipe{
+	ingredients: [
+	  %{substance: %{name: "nudeloj"}},
+	  %{substance: %{name: "tinuso"}},
+	  %{substance: %{name: "salo"}},
+	]
+      } = result
+    end
+
+    test "translated ingredient units of recipe 1 to Esperanto" do
+      result = Recipes.search(%{"title" => "Großes Kino"}, "de")
+      |> Recipes.translate("eo")
+      |> List.first
+
+      assert %Recipe{
+	ingredients: [
+	  %{unit: %{name: "kilogramo"}},
+	  %{unit: %{name: "gramo"}},
+	  %{unit: %{name: "gramo"}},
 	]
       } = result
     end
@@ -196,9 +223,9 @@ defmodule Receptar.RecipeTest do
       |> Recipes.translate("eo")
 
       assert [
-	%{name: "nudeloj", substance: %{kind: :vegan}},
-	%{name: "tinuso", substance: %{kind: :meat}},
-	%{name: "salo", substance: %{kind: :vegan}},
+	%{substance: %{name: "nudeloj", kind: :vegan}},
+	%{substance: %{name: "tinuso", kind: :meat}},
+	%{substance: %{name: "salo", kind: :vegan}},
       ] = recipe.ingredients
     end
 
@@ -209,9 +236,9 @@ defmodule Receptar.RecipeTest do
       |> Recipes.translate("eo")
 
       assert [
-	%{name: "pasto", substance: %{kind: :vegan}},
-	%{name: "sardeloj", substance: %{kind: :meat}},
-	%{name: "salo", substance: %{kind: :vegan}},
+	%{substance: %{name: "pasto", kind: :vegan}},
+	%{substance: %{name: "sardeloj", kind: :meat}},
+	%{substance: %{name: "salo", kind: :vegan}},
       ] = recipe.ingredients
     end
 
@@ -222,8 +249,8 @@ defmodule Receptar.RecipeTest do
       |> Recipes.translate("eo")
 
       assert [
-	%{name: "pasto", substance: %{kind: :vegan}},
-	%{name: "fromago", substance: %{kind: :vegetarian}},
+	%{substance: %{name: "pasto", kind: :vegan}},
+	%{substance: %{name: "fromago", kind: :vegetarian}},
       ] = recipe.ingredients
     end
 
@@ -362,7 +389,7 @@ defmodule Receptar.RecipeTest do
 
       ingredients = recipe
         |> then(& &1.ingredients)
-        |> Enum.map(& &1.name)
+        |> Enum.map(& &1.substance.name)
 
       assert ingredients == ["nudeloj", "tinuso", "salo", "lakto"]
 
@@ -398,7 +425,7 @@ defmodule Receptar.RecipeTest do
 
       ingredients = Recipes.get_recipe!(recipe.id) |> Recipes.translate("eo")
       |> then(& &1.ingredients)
-      |> Enum.map(& &1.name)
+      |> Enum.map(& &1.substance.name)
 
       assert ingredients == ["nudeloj", "tinuso", "salo", "kaporoj"]
     end
@@ -423,7 +450,7 @@ defmodule Receptar.RecipeTest do
 
       ingredients = Recipes.get_recipe!(recipe.id) |> Recipes.translate("de")
       |> then(& &1.ingredients)
-      |> Enum.map(& &1.name)
+      |> Enum.map(& &1.substance.name)
 
       assert ingredients == ["Pasta", "Thunfisch", "Salz", "Kapern"]
     end

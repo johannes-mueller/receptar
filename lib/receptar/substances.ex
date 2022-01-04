@@ -5,6 +5,7 @@ defmodule Receptar.Substances do
   alias Receptar.Substances.Substance
 
   alias Receptar.Translatables
+  alias Receptar.Translations
   alias Receptar.Translations.Translation
 
   def search(search_string, language) do
@@ -58,5 +59,10 @@ defmodule Receptar.Substances do
 	     _ -> :error
 	   end
     Map.put(substance, :kind, kind)
+  end
+
+  def translate(substance, language) do
+    translation = Translations.translation_for_language(substance.translations, language)
+    Map.put(substance, :name, translation)
   end
 end

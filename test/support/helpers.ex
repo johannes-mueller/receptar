@@ -31,7 +31,7 @@ defmodule Receptar.TestHelpers do
       number: 2,
       amount: Decimal.new("1.3"),
       unit: %{name: "gramo"},
-      name: "salo"
+      substance: %{name: "salo"}
     }
   end
 

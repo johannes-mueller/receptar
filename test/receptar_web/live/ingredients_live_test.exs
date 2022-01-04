@@ -109,7 +109,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	    number: ^expected_ingredient_number,
 	    amount: nil,
 	    unit: %{name: ""},
-	    name: ""
+	    substance: %{name: ""}
 	  } | tail] = Enum.reverse(ingredients)
 
 	assert_lists_equal Enum.map(tail, & &1.id), Enum.map(original_ingredients, & &1.id)
@@ -124,23 +124,66 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       end
     end
 
-    for {number, number_string} <- [{1, "1"}, {2, "2"}] do
-      test "delete ingredient #{number}", %{socket: socket} do
-	number = unquote(number)
-	number_string = unquote(number_string)
-	recipe = recipe_by_title("granda kino")
+    test "submit ingredient", %{socket: socket} do
+      ingredients = recipe_by_title("Tinusa bulko").ingredients
+      |> Ingredients.translate("eo")
 
-	params = %{ingredients: recipe.ingredients, edit_ingredients: []}
-	{:ok, socket} = IngredientsLive.update(params, socket)
+      params = %{ingredients: ingredients, edit_ingredients: [1]}
+      {:ok, socket} = IngredientsLive.update(params, socket)
 
-	{:noreply, _socket} =
-	  IngredientsLive.handle_event("delete-ingredient", %{"number" => number_string}, socket)
+      new_ingredient = %{
+	amount:  Decimal.new("1"),
+	unit: %{name: "kilogramo"},
+	substance: %{name: "ŝafa fromaĝo", kind: :vegetarian},
+	number: 1
+      }
 
-	assert_received({
-	  :delete_ingredient,
-	  %{number: ^number}
-	})
-      end
+      {:ok, socket} =
+	IngredientsLive.update(%{submit_ingredient: new_ingredient}, socket)
+
+      assert_received({
+	:update_ingredients,
+	%{
+	  ingredients: [
+	    %{substance: %{name: "ŝafa fromaĝo", kind: :vegetarian}, number: 1},
+	    %{substance: %{name: "tinuso"}, number: 2}
+	  ],
+	}
+      })
+
+      assert socket.assigns.edit_ingredients == []
+      assert [
+	    %{substance: %{name: "ŝafa fromaĝo", kind: :vegetarian}, number: 1},
+	    %{substance: %{name: "tinuso"}, number: 2}
+      ] = socket.assigns.ingredients
+    end
+
+    for {number, remaining} <- [
+	  {"1", ["tinuso", "salo"]},
+	  {"2", ["nudeloj", "salo"]}
+	] do
+	test "delete ingredient #{number}", %{socket: socket} do
+	  number = unquote(number)
+	  [remaining_1, remaining_2] = unquote(remaining)
+
+	  recipe = recipe_by_title("granda kino") |> Receptar.Recipes.translate("eo")
+
+	  params = %{ingredients: recipe.ingredients, edit_ingredients: []}
+	  {:ok, socket} = IngredientsLive.update(params, socket)
+
+	  {:noreply, _socket} =
+	    IngredientsLive.handle_event("delete-ingredient", %{"number" => number}, socket)
+
+	  assert_received({
+	    :update_ingredients,
+	    %{
+	      ingredients: [
+		%{substance: %{name: ^remaining_1}, number: 1},
+		%{substance: %{name: ^remaining_2}, number: 2}
+	      ]
+	    }
+	  })
+	end
     end
   end
 
@@ -148,7 +191,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
     setup do
       insert_test_data()
       %{ingredient: %{
-	   name: "foo",
+	   substance: %{name: "foo"},
 	   amount: Decimal.new("23.0"),
 	   unit: %{name: "gramo"},
 	   number: 1
@@ -165,7 +208,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       refute view |> has_element?("form")
     end
 
-    test "append instruction", %{conn: conn} do
+    test "append ingredient", %{conn: conn} do
       session = %{"ingredients" => []}
       {:ok, view, html} = live_isolated(conn, IngredientsTestLiveView, session: session)
 

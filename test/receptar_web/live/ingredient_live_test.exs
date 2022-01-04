@@ -179,13 +179,21 @@ defmodule ReceptarWeb.IngredientLiveTest do
       amount = Decimal.new("1.3")
 
       assert_received({
-	:submit_ingredient,
-	%{ingredient: %{
-	     amount: ^amount,
-	     unit: %{name: "gramo"},
-	     name: "salo",
-	     substance_kind: :vegan,
-	     number: 3
+	:phoenix, :send_update,
+	{
+	  ReceptarWeb.IngredientsLive,
+	  "ingredients",
+	  %{
+	    id: "ingredients",
+	    submit_ingredient: %{
+	      amount: ^amount,
+	      unit: %{name: "gramo"},
+	      substance: %{
+		name: "salo",
+		kind: :vegan
+	      },
+	      number: 3
+	    }
 	  }
 	}
       })
@@ -209,13 +217,21 @@ defmodule ReceptarWeb.IngredientLiveTest do
       amount = Decimal.new("1")
 
       assert_received({
-	:submit_ingredient,
-	%{ingredient: %{
+	:phoenix, :send_update,
+	{
+	  ReceptarWeb.IngredientsLive,
+	  "ingredients",
+	  %{
+	    id: "ingredients",
+	    submit_ingredient: %{
 	     amount: ^amount,
 	     unit: %{name: "kilogramo"},
-	     name: "ŝafida viando",
-	     substance_kind: :meat,
+	     substance: %{
+	       name: "ŝafida viando",
+	       kind: :meat
+	     },
 	     number: 2
+	    }
 	  }
 	}
       })
@@ -239,19 +255,25 @@ defmodule ReceptarWeb.IngredientLiveTest do
       amount = Decimal.new("1")
 
       assert_received({
-	:submit_ingredient,
-	%{ingredient: %{
-	     amount: ^amount,
-	     unit: %{name: "kilogramo"},
-	     name: "ŝafa fromaĝo",
-	     substance_kind: :vegetarian,
-	     number: 1
+	:phoenix, :send_update,
+	{
+	  ReceptarWeb.IngredientsLive,
+	  "ingredients",
+	  %{
+	    id: "ingredients",
+	    submit_ingredient: %{
+	      amount: ^amount,
+	      unit: %{name: "kilogramo"},
+	      substance: %{
+		name: "ŝafa fromaĝo",
+		kind: :vegetarian
+	      },
+	      number: 1
+	    }
 	  }
 	}
       })
     end
-
-
   end
 
   describe "Connection state" do
@@ -419,7 +441,12 @@ defmodule ReceptarWeb.IngredientLiveTest do
 
       test "by default all #{selector} is blank", %{conn: conn} do
 	session = %{
-	  "ingredient" => %{amount: nil, unit: %{name: ""}, name: "", number: 1},
+	  "ingredient" => %{
+	    amount: nil,
+	    unit: %{name: ""},
+	    substance: %{name: ""},
+	    number: 1
+	  },
 	  "language" => "eo"
 	}
 	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
@@ -452,7 +479,12 @@ defmodule ReceptarWeb.IngredientLiveTest do
     for selector <- ["form .vegan-rb", "form .vegetarian-rb", "form .meat-rb"] do
       test "by default #{selector} radio button is not checked", %{conn: conn} do
 	session = %{
-	  "ingredient" => %{amount: nil, unit: %{name: ""}, name: "", number: 1},
+	  "ingredient" => %{
+	    amount: nil,
+	    unit: %{name: ""},
+	    substance: %{name: ""},
+	    number: 1
+	  },
 	  "language" => "eo"
 	}
 	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)

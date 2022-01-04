@@ -4,6 +4,7 @@ defmodule ReceptarWeb.IngredientLive do
   alias Receptar.Units
 
   alias ReceptarWeb.IngredientView
+  alias ReceptarWeb.IngredientsLive
 
   def render(assigns) do
     IngredientView.render("ingredient-form.html", assigns)
@@ -24,7 +25,7 @@ defmodule ReceptarWeb.IngredientLive do
     socket
     |> assign_amount_field_value(ingredient)
     |> assign(unit_name_value: ingredient.unit.name)
-    |> assign(substance_name_value: ingredient.name)
+    |> assign(substance_name_value: ingredient.substance.name)
   end
 
   defp assign_field_values(socket, _attrs), do: socket
@@ -67,22 +68,17 @@ defmodule ReceptarWeb.IngredientLive do
 
     ingredient = %{
       amount: amount,
-      name: attrs["substance-name"],
-      substance_kind: substance_kind,
+      substance: %{
+	name: attrs["substance-name"],
+	kind: substance_kind
+      },
       unit: %{name: attrs["unit-name"]},
       number: number
     }
-    send self(), {:submit_ingredient, %{ingredient: ingredient}}
+
+    send_update(IngredientsLive, id: "ingredients", submit_ingredient: ingredient)
+
     {:noreply, socket}
-  end
-
-  def handle_event(event, params, socket) do
-    IO.inspect(event, label: "handle_event: event")
-    IO.inspect(params, label: "handle_event: params")
-    IO.inspect(socket, label: "handle_event: socket")
-    #suggestions = Receptar.Substances.completion_candiates(prefix, language)
-
-    {:error}
   end
 
   defp make_substance_suggestion(socket, %{"substance-name" => prefix}) do

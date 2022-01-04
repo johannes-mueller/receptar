@@ -8,6 +8,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
   alias Receptar.Recipes
   alias Receptar.Substances
+  alias Receptar.Units
 
   alias ReceptarWeb.RecipeLive
 
@@ -93,84 +94,59 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	assert socket.assigns.edit_title == false
     end
 
-    for {number, remaining} <- [{1, ["tinuso", "salo"]}, {2, ["nudeloj", "salo"]}] do
-      test "delete ingredient #{number}", %{socket: socket} do
-	number = unquote(number)
-	[remaining_1, remaining_2] = unquote(remaining)
+    for {substance_name, unit_name, language} <- [
+	  {"salo", "gramo", "eo"},
+	  {"Salz", "Gramm", "de"}
+	] do
+	test "submit ingredient known (#{language}) substance", %{socket: socket} do
+	  substance_name = unquote(substance_name)
+	  unit_name = unquote(unit_name)
+	  language = unquote(language)
 
-	recipe_id = recipe_id("granda kino")
+	  expected_susbstance_id = Substances.get_by_translation(substance_name, language).id
+	  expected_unit_id = Units.get_by_translation(unit_name, language).id
 
-	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id, "language" => "eo"}, nil, socket)
+	  recipe_id = recipe_id("granda kino")
 
-	{:noreply, socket} =
-	  RecipeLive.handle_info(
-	    {
-	      :delete_ingredient,
-	      %{number: number}
-	    },
-	    socket
-	  )
+	  {:ok, socket} =
+	    RecipeLive.mount(%{"id" => recipe_id, "language" => language}, nil, socket)
 
-	new_ingredients = socket.assigns.recipe.ingredients
+	  {:noreply, socket} =
+	    RecipeLive.handle_info(
+	      {
+		:update_ingredients,
+		%{
+		  ingredients: [
+		    %{
+		      amount: Decimal.new("1"),
+		      unit: %{name: unit_name},
+		      substance: %{name: substance_name, kind: :vegan},
+		      number: 1
+		    }
+		  ]
+		}
+	      },
+	      socket
+	    )
 
-	assert [
-	  %{name: ^remaining_1, number: 1},
-	  %{name: ^remaining_2, number: 2}
-	] = new_ingredients
+	  assert [%{
+		     substance: %{id: ^expected_susbstance_id},
+		     number: 1,
+		  }] = socket.assigns.recipe.ingredients
 
-	new_ingredients = Recipes.get_recipe!(recipe_id)
-	|> Recipes.translate("eo")
-	|> then(& &1.ingredients)
-
-	assert [
-	  %{name: ^remaining_1, number: 1},
-	  %{name: ^remaining_2, number: 2}
-	] = new_ingredients
-      end
-    end
-
-    for {name, language} <- [{"salo", "eo"}, {"Salz", "de"}] do
-      test "submit ingredient known (#{language}) substance", %{socket: socket} do
-	name = unquote(name)
-	language = unquote(language)
-
-	recipe_id = recipe_id("granda kino")
-
-	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id, "language" => language}, nil, socket)
-
-	{:noreply, socket} =
-	  RecipeLive.handle_info(
-	    {
-	      :submit_ingredient,
-	      %{
-		ingredient: %{
-		  amount: Decimal.new("1"),
-		  unit: %{name: "gramo"},
-		  name: name,
-		  substance_kind: :vegan,
-		  number: 4
-		},
-		edit_instructions: []
-	      }
-	    },
-	    socket
-	  )
-
-	new_ingredient =
-	  socket.assigns.recipe.ingredients
-          |> Enum.filter(& &1.number == 4)
-        |> List.first
-
-	known_substance = Substances.get_by_translation(name, language)
-
-	assert new_ingredient.substance_id == known_substance.id
-      end
+	  assert %{ingredients:  [
+		      %{
+			substance: %{id: ^expected_susbstance_id},
+			number: 1,
+			unit: %{id: ^expected_unit_id}
+		      }
+		    ]
+	  } = Recipes.get_recipe!(recipe_id) |> Recipes.translate("eo")
+	end
     end
 
     for {language, content} <- [{"eo", "ĉion samtempe"}, {"de", "alles auf einmal"}] do
-      test "submit instruction #{language}", %{socket: socket} do
+      test "update instructions #{language}", %{socket: socket} do
 	language = unquote(language)
 	content = unquote(content)
 

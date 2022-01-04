@@ -47,17 +47,7 @@ defmodule ReceptarWeb.RecipeLive do
     {:noreply, socket |> assign(edit_title: false)}
   end
 
-  def handle_info({:submit_ingredient, attrs}, socket) do
-    ingredient = %{
-      amount: attrs.ingredient.amount,
-      unit: attrs.ingredient.unit,
-      substance: %{
-	name: attrs.ingredient.name,
-	kind: attrs.ingredient.substance_kind
-      },
-      number: attrs.ingredient.number
-    }
-    ingredients = [ingredient | socket.assigns.recipe.ingredients]
+  def handle_info({:update_ingredients, %{ingredients: ingredients}}, socket) do
     language = socket.assigns.language
 
     change_attrs = %{ingredients: ingredients, language: language}
@@ -67,15 +57,6 @@ defmodule ReceptarWeb.RecipeLive do
     recipe =
       Recipes.get_recipe!(recipe.id)
       |> Recipes.translate("eo")
-
-    {:noreply, socket |> assign(recipe: recipe)}
-  end
-
-  def handle_info({:delete_ingredient, %{number: number}}, socket) do
-    ingredients = Orderables.delete(socket.assigns.recipe.ingredients, %{number: number})
-
-    {:ok, recipe} =
-      Recipes.update_recipe(socket.assigns.recipe, %{ingredients: ingredients})
 
     {:noreply, socket |> assign(recipe: recipe)}
   end

@@ -19,11 +19,8 @@ defmodule Receptar.Ingredients do
   def translate([], _language), do: []
 
   def translate(ingredient, language) do
-    translation = ingredient.substance.translations
-    |> Translations.translation_for_language(language)
-
     ingredient
-    |> Map.put(:name, translation)
+    |> Map.put(:substance, Receptar.Substances.translate(ingredient.substance, language))
     |> Map.put(:unit, Receptar.Units.translate(ingredient.unit, language))
   end
 end

@@ -11,7 +11,7 @@
           <% else %>
           <span class="amount-quantity"><%= render_amount(ingredient) %></span>
           <span class="amount-unit"><%= tr(ingredient.unit.name) %></span>
-          <span class="ingredient-substance"><%= tr(ingredient.name) %></span>
+          <span class="ingredient-substance"><%= tr(ingredient.substance.name) %></span>
           <% end %>
           <a href="#"
              id={idfy("delete-ingredient", ingredient.number)}
