@@ -136,6 +136,49 @@ defmodule Receptar.SubstancesTest do
       end
     end
 
+    for {i, substance, expected} <- [
+	  {1, %{name: ""}, false},
+	  {2, %{kind: :vegan}, true},
+	  {3, %{animal: false}, true}
+	] do
+	test "is_vegan/1 from #{i}" do
+	  assert Substance.is_vegan(unquote(Macro.escape(substance))) == unquote(expected)
+	end
+    end
+
+    for {i, substance, expected} <- [
+	  {1, %{name: ""}, false},
+	  {2, %{kind: :vegetarian}, true},
+	  {3, %{kind: :vegan}, true},
+	  {4, %{meat: false}, true}
+	] do
+	test "is_vegetarian/1 from #{i}" do
+	  assert Substance.is_vegetarian(unquote(Macro.escape(substance))) == unquote(expected)
+	end
+    end
+
+    for {i, substance, expected} <- [
+	  {1, %{name: ""}, false},
+	  {2, %{kind: :vegan}, false},
+	  {3, %{kind: :vegetarian}, true},
+	  {4, %{animal: true, meat: false}, true},
+	  {5, %{animal: false, meat: false}, false}
+	] do
+	test "is_vegetarian_non_vegan/1 from #{i}" do
+	  assert Substance.is_vegetarian_non_vegan(unquote(Macro.escape(substance))) == unquote(expected)
+	end
+    end
+
+    for {i, substance, expected} <- [
+	  {1, %{name: ""}, false},
+	  {2, %{kind: :meat}, true},
+	  {3, %{meat: true}, true}
+	] do
+	test "is_meat/1 from #{i}" do
+	  assert Substance.is_meat(unquote(Macro.escape(substance))) == unquote(expected)
+	end
+    end
+
     test "insert one substance with one translation" do
       Substances.create_substance(
 	%{

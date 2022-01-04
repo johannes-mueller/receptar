@@ -208,6 +208,42 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       refute view |> has_element?("form")
     end
 
+
+    for {number, selector} <- [
+	  {"1", "#ingredient-1"},
+	  {"2", "#ingredient-2"}
+	] do
+	test "edit ingredient #{number}", %{conn: conn, ingredient: ingredient} do
+	  number = unquote(number)
+	  selector = unquote(selector)
+
+	  session = %{"ingredients" => [
+		       %{ingredient | number: 1},
+		       %{ingredient | number: 2},
+		     ]}
+	  {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+	  html = view
+	  |> element(selector)
+	  |> render()
+
+	  assert html =~ ~r/phx-click="edit-ingredient"/
+	  assert html =~ ~r/phx-value-number="#{number}"/
+	end
+    end
+
+    test "test edit ingredient click", %{conn: conn, ingredient: ingredient} do
+	  session = %{"ingredients" => [
+		       %{ingredient | number: 1},
+		       %{ingredient | number: 2},
+		     ]}
+	  {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+	  html = view
+	  |> element("#ingredient-1")
+	  |> render_click()
+    end
+
     test "append ingredient", %{conn: conn} do
       session = %{"ingredients" => []}
       {:ok, view, html} = live_isolated(conn, IngredientsTestLiveView, session: session)

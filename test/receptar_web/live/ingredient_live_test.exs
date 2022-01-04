@@ -497,6 +497,41 @@ defmodule ReceptarWeb.IngredientLiveTest do
       end
     end
 
+    for kind <- [:vegan, :vegetarian, :meat] do
+      test "#{kind} substance has vegan radio button ticked", %{conn: conn} do
+	kind = unquote(kind)
+	session = %{
+	  "ingredient" => %{
+	    amount: nil,
+	    unit: %{name: ""},
+	    substance: %{name: "", kind: kind},
+	    number: 1
+	  },
+	  "language" => "eo"
+	}
+
+	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+	assert view |> element("input.#{kind}-rb") |> render() =~ "checked"
+      end
+    end
+
+    test "vegan substance has vegetarian radio button unticked", %{conn: conn} do
+      session = %{
+	"ingredient" => %{
+	  amount: nil,
+	  unit: %{name: ""},
+	  substance: %{name: "", kind: :vegan},
+	  number: 1
+	},
+	"language" => "eo"
+      }
+
+      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+      refute view |> element("input.vegetarian-rb") |> render() =~ "checked"
+    end
+
     @tag :skip
     test "examine params", %{conn: conn, session: session} do
       {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)

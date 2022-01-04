@@ -14,6 +14,23 @@ defmodule Receptar.Substances.Substance do
     timestamps()
   end
 
+  def is_vegan(%{kind: :vegan}), do: true
+  def is_vegan(%{animal: false}), do: true
+  def is_vegan(%{}), do: false
+
+  def is_vegetarian(%{kind: :vegetarian}), do: true
+  def is_vegetarian(%{kind: :vegan}), do: true
+  def is_vegetarian(%{meat: false}), do: true
+  def is_vegetarian(%{}), do: false
+
+  def is_vegetarian_non_vegan(substance) do
+    is_vegetarian(substance) and not is_vegan(substance)
+  end
+
+  def is_meat(%{kind: :meat}), do: true
+  def is_meat(%{meat: true}), do: true
+  def is_meat(%{}), do: false
+
   @doc false
   def changeset(substance, attrs) do
     substance

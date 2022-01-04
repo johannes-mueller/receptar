@@ -9,9 +9,14 @@
             ingredient={ingredient}
             language={@language}/>
           <% else %>
-          <span class="amount-quantity"><%= render_amount(ingredient) %></span>
-          <span class="amount-unit"><%= tr(ingredient.unit.name) %></span>
-          <span class="ingredient-substance"><%= tr(ingredient.substance.name) %></span>
+          <span id={idfy("ingredient", ingredient.number)}
+                phx-click="edit-ingredient"
+                phx-value-number={ingredient.number}
+                phx-target={@myself}>
+            <span class="amount-quantity"><%= render_amount(ingredient) %></span>
+            <span class="amount-unit"><%= tr(ingredient.unit.name) %></span>
+            <span class="ingredient-substance"><%= tr(ingredient.substance.name) %></span>
+          </span>
           <% end %>
           <a href="#"
              id={idfy("delete-ingredient", ingredient.number)}

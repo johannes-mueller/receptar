@@ -1,14 +1,11 @@
 defmodule ReceptarWeb.IngredientLive do
-  use Phoenix.LiveComponent
+  use ReceptarWeb, :live_component
 
   alias Receptar.Units
+  alias Receptar.Substances.Substance
 
   alias ReceptarWeb.IngredientView
   alias ReceptarWeb.IngredientsLive
-
-  def render(assigns) do
-    IngredientView.render("ingredient-form.html", assigns)
-  end
 
   def update(assigns, socket) do
     {:ok,

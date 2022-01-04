@@ -27,9 +27,12 @@
         <option value={suggestion}></option>
     <% end %>
   </datalist>
-  <input type="radio" class="vegan-rb" value="vegan" name="substance-kind">
-  <input type="radio" class="vegetarian-rb" value="vegetarian" name="substance-kind">
-  <input type="radio" class="meat-rb" value="meat" name="substance-kind">
+  <input type="radio" class="vegan-rb" value="vegan" name="substance-kind"
+         checked={Substance.is_vegan(@ingredient.substance)}>
+  <input type="radio" class="vegetarian-rb" value="vegetarian" name="substance-kind"
+         checked={Substance.is_vegetarian_non_vegan(@ingredient.substance)}>
+  <input type="radio" class="meat-rb" value="meat" name="substance-kind"
+         checked={Substance.is_meat(@ingredient.substance)}>
   <input type="hidden" class="ingredient-number-input" value={@id} name="number">
   <button type="submit">Submit</button>
 </form>
