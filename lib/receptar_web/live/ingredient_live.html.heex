@@ -28,11 +28,11 @@
     <% end %>
   </datalist>
   <input type="radio" class="vegan-rb" value="vegan" name="substance-kind"
-         checked={Substance.is_vegan(@ingredient.substance)}>
+         checked={@substance_kind_value == :vegan}>
   <input type="radio" class="vegetarian-rb" value="vegetarian" name="substance-kind"
-         checked={Substance.is_vegetarian_non_vegan(@ingredient.substance)}>
+         checked={@substance_kind_value == :vegetarian}>
   <input type="radio" class="meat-rb" value="meat" name="substance-kind"
-         checked={Substance.is_meat(@ingredient.substance)}>
+         checked={@substance_kind_value == :meat}>
   <input type="hidden" class="ingredient-number-input" value={@id} name="number">
   <button type="submit">Submit</button>
 </form>

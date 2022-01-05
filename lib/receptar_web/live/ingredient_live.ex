@@ -2,6 +2,7 @@ defmodule ReceptarWeb.IngredientLive do
   use ReceptarWeb, :live_component
 
   alias Receptar.Units
+  alias Receptar.Substances
   alias Receptar.Substances.Substance
 
   alias ReceptarWeb.IngredientView
@@ -23,6 +24,7 @@ defmodule ReceptarWeb.IngredientLive do
     |> assign_amount_field_value(ingredient)
     |> assign(unit_name_value: ingredient.unit.name)
     |> assign(substance_name_value: ingredient.substance.name)
+    |> assign(substance_kind_value: ingredient.substance[:kind])
   end
 
   defp assign_field_values(socket, _attrs), do: socket
@@ -33,23 +35,40 @@ defmodule ReceptarWeb.IngredientLive do
     |> assign(amount_value: if amount do Decimal.to_string(amount, :xsd) else "" end)
   end
 
-  def handle_event("make-suggestion", attrs, socket) do
-    socket = case attrs do
-	       %{"_target" => ["substance-name"]} ->
-		 socket
-		 |> make_substance_suggestion(attrs)
-		 |> assign(substance_name_value: attrs["substance-name"])
-	       %{"_target" => ["unit-name"]} ->
-		 socket
-		 |> make_unit_suggestion(attrs)
-		 |> assign(unit_name_value: attrs["unit-name"])
-	       %{"_target" => ["amount"]} ->
-		 socket
-		 |> assign(amount_value: attrs["amount"])
-	       _ -> socket
-	     end
-    {:noreply, socket}
+  def handle_event("make-suggestion", %{"_target" => ["substance-name"]} = attrs, socket) do
+    language = socket.assigns.language
+    {:noreply,
+     socket
+     |> make_substance_suggestion(attrs)
+     |> assign(substance_name_value: attrs["substance-name"])
+     |> assign(substance_kind_value: Substances.name_to_kind(attrs["substance-name"], language))
+    }
   end
+
+  def handle_event("make-suggestion", %{"_target" => ["unit-name"]} = attrs, socket) do
+    {:noreply,
+     socket
+     |> make_unit_suggestion(attrs)
+     |> assign(unit_name_value: attrs["unit-name"])}
+  end
+
+  def handle_event("make-suggestion", %{"_target" => ["amount"]} = attrs, socket) do
+    {:noreply,
+     socket
+     |> assign(amount_value: attrs["amount"])}
+  end
+
+  def handle_event("make-suggestion", %{"_target" => ["substance-kind"]} = attrs, socket) do
+    {:noreply,
+     socket
+     |> assign(substance_kind_value: case attrs["substance-kind"] do
+				       "vegan" -> :vegan
+				       "vegetarian" -> :vegetarian
+				       "meat" -> :meat
+				       _ -> nil
+				     end)}
+  end
+
 
   def handle_event("submit", attrs, socket) do
     amount = Decimal.new(attrs["amount"])

@@ -179,6 +179,17 @@ defmodule Receptar.SubstancesTest do
 	end
     end
 
+    for {kind, substance_name} <- [
+	  {:vegan, "salo"},
+	  {:vegetarian, "lakto"},
+	  {:meat, "tinuso"},
+	  {nil, "foo"}
+	] do
+	test "#{substance_name} name is #{kind}" do
+	  assert Substances.name_to_kind(unquote(substance_name), "eo") == unquote(kind)
+	end
+    end
+
     test "insert one substance with one translation" do
       Substances.create_substance(
 	%{

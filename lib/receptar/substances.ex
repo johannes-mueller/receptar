@@ -56,7 +56,7 @@ defmodule Receptar.Substances do
 	     %{meat: true} -> :meat
 	     %{animal: true, meat: false} -> :vegetarian
 	     %{animal: false, meat: false} -> :vegan
-	     _ -> :error
+	     _ -> :nil
 	   end
     Map.put(substance, :kind, kind)
   end
@@ -64,5 +64,12 @@ defmodule Receptar.Substances do
   def translate(substance, language) do
     translation = Translations.translation_for_language(substance.translations, language)
     Map.put(substance, :name, translation)
+  end
+
+  def name_to_kind(substance_name, language) do
+    substance =
+      get_by_translation(substance_name, language)
+
+    substance && substance |> fill_kind_field |> then(& &1.kind)
   end
 end

@@ -161,6 +161,19 @@ defmodule ReceptarWeb.IngredientLiveTest do
       end
     end
 
+    test "change in kind radio buttons remains in substance_kind_value", %{socket: socket} do
+	assigns = %{id: 1, language: "eo"}
+	{:ok, socket} = IngredientLive.update(assigns, socket)
+
+	attrs = %{"_target" => ["substance-kind"], "substance-kind" => "vegan"}
+
+
+	{:noreply, socket} =
+	  IngredientLive.handle_event("make-suggestion", attrs, socket)
+
+	assert socket.assigns.substance_kind_value == :vegan
+    end
+
     test "submit event salo", %{socket: socket} do
       assigns = %{id: 1, language: "eo"}
       {:ok, socket} = IngredientLive.update(assigns, socket)
@@ -512,9 +525,63 @@ defmodule ReceptarWeb.IngredientLiveTest do
 
 	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
 
-	assert view |> element("input.#{kind}-rb") |> render() =~ "checked"
+	assert view |> element("input.#{kind}-rb") |> render() =~ ~r/checked="checked"/
+      end
+
+      test "check #{kind} and then type into unit-name", %{conn: conn} do
+	kind = unquote(kind)
+	session = %{
+	  "ingredient" => %{
+	    amount: nil,
+	    unit: %{name: ""},
+	    substance: %{name: ""},
+	    number: 1
+	  },
+	  "language" => "eo"
+	}
+
+	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+	refute view |> element("input.#{kind}-rb") |> render() =~ ~r/checked="checked"/
+
+	view
+	|> element("form")
+	|> render_change(%{"_target" => "substance-kind", "substance-kind" => "#{kind}"})
+
+	view
+	|> element("form")
+	|> render_change(%{"_target" => "unit-name", "unit-name" => "foo"})
+
+	assert view |> element("input.#{kind}-rb") |> render() =~ ~r/checked="checked"/
       end
     end
+
+    for {kind, substance_name} <- [{:vegan, "salo"}, {:vegetarian, "lakto"}, {:meat, "tinuso"}] do
+      test "#{substance_name} typed -> #{kind} checked", %{conn: conn} do
+	kind = unquote(kind)
+	name = unquote(substance_name)
+	session = %{
+	  "ingredient" => %{
+	    amount: nil,
+	    unit: %{name: ""},
+	    substance: %{name: ""},
+	    number: 1
+	  },
+	  "language" => "eo"
+	}
+
+	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+	refute view |> element("input.#{kind}-rb") |> render() =~ ~r/checked="checked"/
+
+	view
+	|> element("form")
+	|> render_change(%{"_target" => "substance-name", "substance-name" => name})
+
+	assert view |> element("input.#{kind}-rb") |> render() =~ ~r/checked="checked"/
+      end
+    end
+
 
     test "vegan substance has vegetarian radio button unticked", %{conn: conn} do
       session = %{
