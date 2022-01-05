@@ -2,6 +2,8 @@ defmodule ReceptarWeb.IngredientsLive do
   use ReceptarWeb, :live_component
 
   alias Receptar.Orderables
+  alias Receptar.Substances.Substance
+
   alias ReceptarWeb.Helpers
 
   alias ReceptarWeb.IngredientLive
@@ -49,7 +51,7 @@ defmodule ReceptarWeb.IngredientsLive do
     {new_number, new_ingredients} =
       ingredients
       |> Orderables.append(
-        %{amount: nil, unit: %{name: ""}, substance: %{name: ""}}
+        %{amount: nil, unit: %{name: ""}, substance: %Substance{name: ""}}
       )
 
     {:noreply,

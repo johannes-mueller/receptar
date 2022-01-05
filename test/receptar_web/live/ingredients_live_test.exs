@@ -8,6 +8,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
   import Receptar.TestHelpers
 
   alias Receptar.Ingredients
+  alias Receptar.Substances.Substance
 
   alias ReceptarWeb.IngredientsLive
   alias ReceptarWeb.IngredientsTestLiveView
@@ -134,7 +135,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       new_ingredient = %{
 	amount:  Decimal.new("1"),
 	unit: %{name: "kilogramo"},
-	substance: %{name: "ŝafa fromaĝo", kind: :vegetarian},
+	substance: %Substance{name: "ŝafa fromaĝo", kind: :vegetarian},
 	number: 1
       }
 
@@ -145,16 +146,16 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	:update_ingredients,
 	%{
 	  ingredients: [
-	    %{substance: %{name: "ŝafa fromaĝo", kind: :vegetarian}, number: 1},
-	    %{substance: %{name: "tinuso"}, number: 2}
+	    %{substance: %Substance{name: "ŝafa fromaĝo", kind: :vegetarian}, number: 1},
+	    %{substance: %Substance{name: "tinuso"}, number: 2}
 	  ],
 	}
       })
 
       assert socket.assigns.edit_ingredients == []
       assert [
-	    %{substance: %{name: "ŝafa fromaĝo", kind: :vegetarian}, number: 1},
-	    %{substance: %{name: "tinuso"}, number: 2}
+	    %{substance: %Substance{name: "ŝafa fromaĝo", kind: :vegetarian}, number: 1},
+	    %{substance: %Substance{name: "tinuso"}, number: 2}
       ] = socket.assigns.ingredients
     end
 
@@ -178,8 +179,8 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	    :update_ingredients,
 	    %{
 	      ingredients: [
-		%{substance: %{name: ^remaining_1}, number: 1},
-		%{substance: %{name: ^remaining_2}, number: 2}
+		%{substance: %Substance{name: ^remaining_1}, number: 1},
+		%{substance: %Substance{name: ^remaining_2}, number: 2}
 	      ]
 	    }
 	  })
@@ -191,7 +192,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
     setup do
       insert_test_data()
       %{ingredient: %{
-	   substance: %{name: "foo"},
+	   substance: %Substance{name: "foo"},
 	   amount: Decimal.new("23.0"),
 	   unit: %{name: "gramo"},
 	   number: 1

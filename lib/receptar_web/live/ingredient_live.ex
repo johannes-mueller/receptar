@@ -24,7 +24,7 @@ defmodule ReceptarWeb.IngredientLive do
     |> assign_amount_field_value(ingredient)
     |> assign(unit_name_value: ingredient.unit.name)
     |> assign(substance_name_value: ingredient.substance.name)
-    |> assign(substance_kind_value: ingredient.substance[:kind])
+    |> assign(substance_kind_value: ingredient.substance.kind)
   end
 
   defp assign_field_values(socket, _attrs), do: socket
@@ -68,7 +68,6 @@ defmodule ReceptarWeb.IngredientLive do
 				       _ -> nil
 				     end)}
   end
-
 
   def handle_event("submit", attrs, socket) do
     amount = Decimal.new(attrs["amount"])

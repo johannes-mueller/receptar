@@ -9,7 +9,8 @@ defmodule Receptar.Substances.Substance do
     field :meat, :boolean, default: false
     field :animal, :boolean, default: false
 
-    field :kind, :any, virtual: true
+    field :kind, :any, default: nil, virtual: true
+    field :name, :string, virtual: true
 
     timestamps()
   end

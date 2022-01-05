@@ -6,6 +6,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
   import Phoenix.LiveView.Helpers
 
   import Receptar.TestHelpers
+  alias Receptar.Substances.Substance
   alias ReceptarWeb.IngredientLive
   alias ReceptarWeb.IngredientTestLiveView
 
@@ -457,7 +458,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	  "ingredient" => %{
 	    amount: nil,
 	    unit: %{name: ""},
-	    substance: %{name: ""},
+	    substance: %Substance{name: ""},
 	    number: 1
 	  },
 	  "language" => "eo"
@@ -495,7 +496,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	  "ingredient" => %{
 	    amount: nil,
 	    unit: %{name: ""},
-	    substance: %{name: ""},
+	    substance: %Substance{},
 	    number: 1
 	  },
 	  "language" => "eo"
@@ -517,7 +518,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	  "ingredient" => %{
 	    amount: nil,
 	    unit: %{name: ""},
-	    substance: %{name: "", kind: kind},
+	    substance: %Substance{name: "", kind: kind},
 	    number: 1
 	  },
 	  "language" => "eo"
@@ -534,7 +535,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	  "ingredient" => %{
 	    amount: nil,
 	    unit: %{name: ""},
-	    substance: %{name: ""},
+	    substance: %Substance{name: ""},
 	    number: 1
 	  },
 	  "language" => "eo"
@@ -564,7 +565,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	  "ingredient" => %{
 	    amount: nil,
 	    unit: %{name: ""},
-	    substance: %{name: ""},
+	    substance: %Substance{name: ""},
 	    number: 1
 	  },
 	  "language" => "eo"
@@ -588,7 +589,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	"ingredient" => %{
 	  amount: nil,
 	  unit: %{name: ""},
-	  substance: %{name: "", kind: :vegan},
+	  substance: %Substance{name: "", kind: :vegan},
 	  number: 1
 	},
 	"language" => "eo"

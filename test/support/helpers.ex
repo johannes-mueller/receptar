@@ -26,12 +26,16 @@ defmodule Receptar.TestHelpers do
   def recipe_url_edit(title), do: recipe_url(title) <> "/edit"
 
   def some_valid_ingredient() do
+    substance = %Receptar.Substances.Substance{
+      id: 2342,
+      name: "salo"
+    }
     %{
       id: 2342,
       number: 2,
       amount: Decimal.new("1.3"),
       unit: %{name: "gramo"},
-      substance: %{name: "salo"}
+      substance: substance
     }
   end
 
