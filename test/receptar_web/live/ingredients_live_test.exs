@@ -159,6 +159,21 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       ] = socket.assigns.ingredients
     end
 
+    for {number, remianing} <- [{1, [2]}, {2, [1]}] do
+      test "cancel ingredient #{number}", %{socket: socket} do
+	ingredients = recipe_by_title("Tinusa bulko").ingredients
+	|> Ingredients.translate("eo")
+
+	params = %{ingredients: ingredients, edit_ingredients: [1, 2]}
+	{:ok, socket} = IngredientsLive.update(params, socket)
+
+	{:ok, socket} =
+	  IngredientsLive.update(%{cancel: unquote(number)}, socket)
+
+	assert socket.assigns.edit_ingredients == unquote(remianing)
+      end
+    end
+
     for {number, remaining} <- [
 	  {"1", ["tinuso", "salo"]},
 	  {"2", ["nudeloj", "salo"]}

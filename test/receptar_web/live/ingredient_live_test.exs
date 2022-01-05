@@ -251,42 +251,66 @@ defmodule ReceptarWeb.IngredientLiveTest do
       })
     end
 
-    test "submit event ŝafa fromaĝo", %{socket: socket} do
-      assigns = %{id: 1, language: "eo"}
-      {:ok, socket} = IngredientLive.update(assigns, socket)
+    for number <- [1, 2] do
+      test "submit event ŝafa fromaĝo #{number}", %{socket: socket} do
+	number = unquote(number)
+	assigns = %{id: 1, language: "eo"}
+	{:ok, socket} = IngredientLive.update(assigns, socket)
 
-      attrs = %{
-	"amount" => "1",
-	"unit-name" => "kilogramo",
-	"substance-name" => "ŝafa fromaĝo",
-	"substance-kind" => "vegetarian",
-	"number" => "ingredient-1"
-      }
+	attrs = %{
+	  "amount" => "#{number}",
+	  "unit-name" => "kilogramo",
+	  "substance-name" => "ŝafa fromaĝo",
+	  "substance-kind" => "vegetarian",
+	  "number" => "ingredient-#{number}"
+	}
 
-      {:noreply, _socket} =
-	IngredientLive.handle_event("submit", attrs, socket)
+	{:noreply, _socket} =
+	  IngredientLive.handle_event("submit", attrs, socket)
 
-      amount = Decimal.new("1")
+	amount = Decimal.new("#{number}")
 
-      assert_received({
-	:phoenix, :send_update,
-	{
-	  ReceptarWeb.IngredientsLive,
-	  "ingredients",
-	  %{
-	    id: "ingredients",
-	    submit_ingredient: %{
-	      amount: ^amount,
-	      unit: %{name: "kilogramo"},
-	      substance: %{
-		name: "ŝafa fromaĝo",
-		kind: :vegetarian
-	      },
-	      number: 1
+	assert_received({
+	  :phoenix, :send_update,
+	  {
+	    ReceptarWeb.IngredientsLive,
+	    "ingredients",
+	    %{
+	      id: "ingredients",
+	      submit_ingredient: %{
+		amount: ^amount,
+		unit: %{name: "kilogramo"},
+		substance: %{
+		  name: "ŝafa fromaĝo",
+		  kind: :vegetarian
+		},
+		number: number
+	      }
 	    }
 	  }
-	}
-      })
+	    })
+      end
+
+      test "submit cancel edit #{number}", %{socket: socket} do
+	number = unquote(number)
+	assigns = %{id: 1, language: "eo"}
+	{:ok, socket} = IngredientLive.update(assigns, socket)
+
+	{:noreply, _socket} =
+	  IngredientLive.handle_event("cancel", %{"number" => "#{number}"}, socket)
+
+	assert_received({
+	  :phoenix, :send_update,
+	  {
+	    ReceptarWeb.IngredientsLive,
+	    "ingredients",
+	    %{
+	      id: "ingredients",
+	      cancel: ^number
+	    }
+	  }
+	})
+      end
     end
   end
 
@@ -377,20 +401,22 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	assert render(hidden_element) =~ ~r/type="hidden"/
 	assert render(hidden_element) =~ ~r/value="#{number}"/
       end
-    end
 
-    test "empty unit name input leads to all suggestions in Esperanto",
-      %{conn: conn, session: session} do
+      test "form #{number} has a cancel button", %{conn: conn, session: session} do
+	number = unquote(number)
+	session = %{session | "ingredient" => %{session["ingredient"] | number: number}}
 
-      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
 
-      assert view |> element("datalist#unit-suggestions-2") |> has_element?()
+	html = view
+	|> element("form button.cancel-button")
+	|> render()
 
-      html = view
-      |> element("form")
-      |> render()
+	assert html =~ ~r/type="button"/
+	assert html =~ ~r/phx-click="cancel"/
+	assert html =~ ~r/phx-value-number="#{number}"/
+      end
 
-      assert html =~ ~r/<option value="gramo">.*<option value="kilogramo">.*<option value="kulereto">/
     end
 
     test "unit name 'g' input leads to suggestion 'gramo' in Esperanto",
@@ -441,10 +467,18 @@ defmodule ReceptarWeb.IngredientLiveTest do
       {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
 
       html = view
-      |> element("form button")
+      |> element("form button.submit-button")
       |> render()
 
       assert html =~ ~r/type="submit"/
+    end
+
+    test "click cancel button", %{conn: conn, session: session} do
+      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+      html = view
+      |> element("form button.cancel-button")
+      |> render_click()
     end
 
     for selector <- [

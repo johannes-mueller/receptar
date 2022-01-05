@@ -31,6 +31,14 @@ defmodule ReceptarWeb.IngredientsLive do
     }
   end
 
+  def update(%{cancel: number}, socket) do
+    edit_ingredients =
+      socket.assigns.edit_ingredients
+      |> Enum.filter(& &1 != number)
+
+    {:ok, socket |> assign(edit_ingredients: edit_ingredients)}
+  end
+
   def update(params, socket) do
     socket = socket
     |> assign(language: Helpers.determine_language(params))

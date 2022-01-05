@@ -96,6 +96,12 @@ defmodule ReceptarWeb.IngredientLive do
     {:noreply, socket}
   end
 
+  def handle_event("cancel", %{"number" => number}, socket) do
+    number = String.to_integer(number)
+    send_update(IngredientsLive, id: "ingredients", cancel: number)
+    {:noreply, socket}
+  end
+
   defp make_substance_suggestion(socket, %{"substance-name" => prefix}) do
     %{assigns: %{language: language}} = socket
     suggestions = Receptar.Substances.completion_candidates(prefix, language)
