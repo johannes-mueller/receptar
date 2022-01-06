@@ -26,7 +26,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 
       attrs = %{"_target" => ["substance-name"], "substance-name" => ""}
       {:noreply, socket} =
-	IngredientLive.handle_event("make-suggestion", attrs, socket)
+	IngredientLive.handle_event("change-event", attrs, socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{substance_suggestions: []}
@@ -40,7 +40,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
       attrs = %{"_target" => ["substance-name"], "substance-name" => "sa"}
 
       {:noreply, socket} =
-	IngredientLive.handle_event("make-suggestion", attrs, socket)
+	IngredientLive.handle_event("change-event", attrs, socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{substance_suggestions: ["salo", "sardeloj"]}
@@ -54,7 +54,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
       attrs = %{"_target" => ["substance-name"], "substance-name" => "sa"}
 
       {:noreply, socket} =
-	IngredientLive.handle_event("make-suggestion", attrs, socket)
+	IngredientLive.handle_event("change-event", attrs, socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{substance_suggestions: ["Saft", "Salz", "Sardellen"]}
@@ -86,7 +86,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
       attrs = %{"_target" => ["unit-name"], "unit-name" => "g"}
 
       {:noreply, socket} =
-	IngredientLive.handle_event("make-suggestion", attrs, socket)
+	IngredientLive.handle_event("change-event", attrs, socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{unit_suggestions: ["gramo"]}
@@ -100,7 +100,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
       attrs = %{"_target" => ["unit-name"], "unit-name" => "g"}
 
       {:noreply, socket} =
-	IngredientLive.handle_event("make-suggestion", attrs, socket)
+	IngredientLive.handle_event("change-event", attrs, socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{unit_suggestions: ["Gramm"]}
@@ -114,7 +114,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
       attrs = %{"_target" => ["amount"]}
 
       {:noreply, _socket} =
-	IngredientLive.handle_event("make-suggestion", attrs, socket)
+	IngredientLive.handle_event("change-event", attrs, socket)
     end
 
     for amount <- [1.3, 2.5] do
@@ -126,7 +126,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	attrs = %{"_target" => ["amount"], "amount" => amount}
 
 	{:noreply, socket} =
-	  IngredientLive.handle_event("make-suggestion", attrs, socket)
+	  IngredientLive.handle_event("change-event", attrs, socket)
 
 	assert socket.assigns.amount_value == amount
       end
@@ -141,7 +141,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	attrs = %{"_target" => ["unit-name"], "unit-name" => unit}
 
 	{:noreply, socket} =
-	  IngredientLive.handle_event("make-suggestion", attrs, socket)
+	  IngredientLive.handle_event("change-event", attrs, socket)
 
 	assert socket.assigns.unit_name_value == unit
       end
@@ -156,7 +156,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	attrs = %{"_target" => ["substance-name"], "substance-name" => substance}
 
 	{:noreply, socket} =
-	  IngredientLive.handle_event("make-suggestion", attrs, socket)
+	  IngredientLive.handle_event("change-event", attrs, socket)
 
 	assert socket.assigns.substance_name_value == substance
       end
@@ -170,7 +170,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 
 
 	{:noreply, socket} =
-	  IngredientLive.handle_event("make-suggestion", attrs, socket)
+	  IngredientLive.handle_event("change-event", attrs, socket)
 
 	assert socket.assigns.substance_kind_value == :vegan
     end
@@ -337,7 +337,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
       form_element = element(view, "form")
 
       assert render(form_element) =~ ~r/phx-submit="submit"/
-      assert render(form_element) =~ ~r/phx-change="make-suggestion"/
+      assert render(form_element) =~ ~r/phx-change="change-event"/
     end
 
     test "ingredient form has an input field named #substance-input", %{conn: conn, session: session} do
