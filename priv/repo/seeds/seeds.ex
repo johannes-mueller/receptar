@@ -11,7 +11,6 @@ defmodule Receptar.Seeder.Helpers do
     recipes_data
     |> Enum.map(&make_translations/1)
     |> Enum.map(fn recipe_data -> make_ingredients(recipe_data, substances, units) end)
-#    |> Enum.map(&make_instructions/1)
   end
 
   defp make_ingredients(recipe_data, substances, units) do
@@ -25,11 +24,6 @@ defmodule Receptar.Seeder.Helpers do
       }
     end)
     %{recipe_data | ingredients: ingredients}
-  end
-
-  defp make_instructions(recipe_data) do
-    instructions = recipe_data.instructions
-    |> Enum.map(&make_translations/1)
   end
 
   def make_translations(%{} = data_map) do

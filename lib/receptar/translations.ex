@@ -41,14 +41,15 @@ defmodule Receptar.Translations do
 
   def update_translations(translatable, attrs) do
     language = attrs.language
-    translation = translatable.translations
+
+    translatable.translations
     |> Enum.reduce(%{attrs.language => add_translation_changeset(translatable, attrs)},
 		    fn
 		      %{language: ^language} = tl, acc ->
 			%{acc | attrs.language => update_translation_changeset(tl, attrs)}
 		      %{language: language} = tl, acc ->
 			Map.put(acc, language, zero_changeset(tl))
-    end)
+                    end)
     |> Map.values
   end
 

@@ -1,8 +1,6 @@
 defmodule Receptar.Ingredients do
   alias Receptar.Repo
   alias Receptar.Ingredients.Ingredient
-  alias Receptar.Recipes.Recipe
-  alias Receptar.Translations
 
   def get_ingredient!(id) do
     Repo.get!(Ingredient, id)

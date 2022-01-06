@@ -284,7 +284,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
 		  name: "ŝafa fromaĝo",
 		  kind: :vegetarian
 		},
-		number: number
+		number: ^number
 	      }
 	    }
 	  }
@@ -476,7 +476,7 @@ defmodule ReceptarWeb.IngredientLiveTest do
     test "click cancel button", %{conn: conn, session: session} do
       {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
 
-      html = view
+      view
       |> element("form button.cancel-button")
       |> render_click()
     end

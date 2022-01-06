@@ -43,7 +43,7 @@ defmodule Receptar.Instructions.Instruction do
     %{changeset | changes: Map.put(changeset.changes, :translations, new_translation)}
 
   end
-  defp update_translations(changeset, attrs) do
+  defp update_translations(changeset, _attrs) do
     changeset
   end
 

@@ -19,6 +19,13 @@
           </span>
           <% end %>
           <a href="#"
+             id={idfy("insert-ingredient", ingredient.number)}
+             phx-click="insert-ingredient"
+             phx-target={@myself}
+             phx-value-number={ingredient.number}>
+            Insert
+          </a>
+          <a href="#"
              id={idfy("delete-ingredient", ingredient.number)}
              phx-click="delete-ingredient"
              phx-target={@myself}

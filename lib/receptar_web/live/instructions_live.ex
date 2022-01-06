@@ -69,22 +69,8 @@ defmodule ReceptarWeb.InstructionsLive do
       socket.assigns.instructions
       |> Orderables.insert_before(%{content: ""}, %{number: number})
 
-    edit_instructions = [
-      number |
-      socket.assigns.edit_instructions
-      |> Enum.map(fn
-	i when i >= number -> i + 1
-	i -> i
-      end)
-    ]
-    new_instructions = [
-      number |
-      socket.assigns.new_instructions
-      |> Enum.map(fn
-	i when i >= number -> i + 1
-	i -> i
-      end)
-    ]
+    edit_instructions = Helpers.insert_number_at(socket.assigns.edit_instructions, number)
+    new_instructions = Helpers.insert_number_at(socket.assigns.new_instructions, number)
 
     {:noreply,
      socket

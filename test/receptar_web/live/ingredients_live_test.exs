@@ -161,6 +161,53 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       assert socket.assigns.ingredients == []
     end
 
+    test "insert ingredient 2", %{socket: socket} do
+      ingredients =
+	recipe_by_title("granda kino").ingredients
+        |> Ingredients.translate("eo")
+
+      params = %{ingredients: ingredients, edit_ingredients: []}
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      {:noreply, socket} =
+	IngredientsLive.handle_event("insert-ingredient", %{"number" => "2"}, socket)
+
+      assert [
+	%{substance: %{name: "nudeloj"}, number: 1},
+	%{substance: %{name: ""}, number: 2},
+	%{substance: %{name: "tinuso"}, number: 3},
+	%{substance: %{name: "salo"}, number: 4}
+      ] = socket.assigns.ingredients
+
+      assert socket.assigns.edit_ingredients == [2]
+      assert socket.assigns.new_ingredients == [2]
+    end
+
+    test "insert ingredient 1 and 2", %{socket: socket} do
+      ingredients =
+	recipe_by_title("granda kino").ingredients
+        |> Ingredients.translate("eo")
+
+      params = %{ingredients: ingredients, edit_ingredients: []}
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      {:noreply, socket} =
+	IngredientsLive.handle_event("insert-ingredient", %{"number" => "2"}, socket)
+
+      {:noreply, socket} =
+	IngredientsLive.handle_event("insert-ingredient", %{"number" => "1"}, socket)
+
+      assert [
+	%{substance: %{name: ""}, number: 1},
+	%{substance: %{name: "nudeloj"}, number: 2},
+	%{substance: %{name: ""}, number: 3},
+	%{substance: %{name: "tinuso"}, number: 4},
+	%{substance: %{name: "salo"}, number: 5}
+      ] = socket.assigns.ingredients
+
+      assert socket.assigns.edit_ingredients == [1, 3]
+      assert socket.assigns.new_ingredients == [1, 3]
+    end
 
     test "submit ingredient", %{socket: socket} do
       ingredients = recipe_by_title("Tinusa bulko").ingredients
@@ -292,7 +339,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 		     ]}
 	  {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
 
-	  html = view
+	  view
 	  |> element("#ingredient-1")
 	  |> render_click()
     end
@@ -329,6 +376,26 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	|> render()
 
 	assert html =~ ~r/phx-click="delete-ingredient"/
+	assert html =~ ~r/phx-value-number="#{number}"/
+      end
+
+      test "ingredient #{number} has insert button", %{conn: conn, ingredient: ingredient} do
+	number = unquote(number)
+	session = %{
+	  "ingredients" => [%{ingredient | number: number}],
+	  "edit_ingredients" => []
+	}
+	{:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+	insert_element = view
+	|> element("a#insert-ingredient-#{number}")
+
+	render_click(insert_element)
+
+	html = insert_element
+	|> render()
+
+	assert html =~ ~r/phx-click="insert-ingredient"/
 	assert html =~ ~r/phx-value-number="#{number}"/
       end
     end

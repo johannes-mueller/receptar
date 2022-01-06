@@ -3,7 +3,6 @@ defmodule Receptar.Recipes do
   import Ecto.Query
 
   alias Receptar.Recipes.Recipe
-  alias Receptar.Translatables
   alias Receptar.Instructions.Instruction
   alias Receptar.Instructions
   alias Receptar.Ingredients.Ingredient

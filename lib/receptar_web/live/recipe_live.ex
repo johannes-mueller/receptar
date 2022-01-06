@@ -1,7 +1,6 @@
 defmodule ReceptarWeb.RecipeLive do
   use ReceptarWeb, :live_view
 
-  alias Receptar.Orderables
   alias Receptar.Recipes
   alias ReceptarWeb.Helpers
 

@@ -84,6 +84,27 @@ defmodule ReceptarWeb.IngredientsLive do
     }
   end
 
+  def handle_event("insert-ingredient", %{"number" => number}, socket) do
+    number = String.to_integer(number)
+
+    {_new_number, ingredients} =
+      socket.assigns.ingredients
+      |> Orderables.insert_before(
+        %{amount: nil, unit: %{name: ""}, substance: %Substance{name: ""}},
+        %{number: number}
+      )
+
+    edit_ingredients = Helpers.insert_number_at(socket.assigns.edit_ingredients, number)
+    new_ingredients = Helpers.insert_number_at(socket.assigns.new_ingredients, number)
+
+    {:noreply,
+     socket
+     |> assign(ingredients: ingredients)
+     |> assign(edit_ingredients: edit_ingredients)
+     |> assign(new_ingredients: new_ingredients)
+    }
+  end
+
   def handle_event("delete-ingredient", %{"number" => number}, socket) do
     number = String.to_integer(number)
 

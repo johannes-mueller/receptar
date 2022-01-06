@@ -3,9 +3,7 @@ defmodule ReceptarWeb.IngredientLive do
 
   alias Receptar.Units
   alias Receptar.Substances
-  alias Receptar.Substances.Substance
 
-  alias ReceptarWeb.IngredientView
   alias ReceptarWeb.IngredientsLive
 
   def update(assigns, socket) do
