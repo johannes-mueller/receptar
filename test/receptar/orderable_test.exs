@@ -49,13 +49,14 @@ defmodule Receptar.OrderableTest do
     end
 
     test "insert orderable", %{orderables: orderables} do
+      target = Enum.find(orderables, & &1.number == 2)
       assert {
 	2, [
 	  %{number: 1, foo: 'a'},
 	  %{number: 2, foo: 'x'},
 	  %{number: 3, foo: 'c'},
 	  %{number: 4, foo: 'b'},
-	]} = Orderables.insert_before(orderables, %{foo: 'x'}, Enum.at(orderables, 2))
+	]} = Orderables.insert_before(orderables, %{foo: 'x'}, target)
     end
 
     test "delete orderable at end", %{orderables: orderables} do

@@ -32,11 +32,24 @@ defmodule ReceptarWeb.IngredientsLive do
   end
 
   def update(%{cancel: number}, socket) do
+    ingredients =
+      socket.assigns.ingredients
+      |> Enum.filter(& not (&1.number == number and number in socket.assigns.new_ingredients))
+
     edit_ingredients =
       socket.assigns.edit_ingredients
       |> Enum.filter(& &1 != number)
 
-    {:ok, socket |> assign(edit_ingredients: edit_ingredients)}
+    new_ingredients =
+      socket.assigns.new_ingredients
+      |> Enum.filter(& &1 != number)
+
+    {:ok,
+     socket
+     |> assign(edit_ingredients: edit_ingredients)
+     |> assign(new_ingredients: new_ingredients)
+     |> assign(ingredients: ingredients)
+    }
   end
 
   def update(params, socket) do
@@ -44,6 +57,7 @@ defmodule ReceptarWeb.IngredientsLive do
     |> assign(language: Helpers.determine_language(params))
     |> assign(ingredients: params.ingredients)
     |> assign(edit_ingredients: params.edit_ingredients)
+    |> assign(new_ingredients: [])
 
     {:ok, socket}
   end
@@ -65,7 +79,8 @@ defmodule ReceptarWeb.IngredientsLive do
     {:noreply,
      socket
      |> assign(ingredients: new_ingredients)
-     |> assign(edit_ingredients: [new_number])
+     |> assign(edit_ingredients: [new_number | socket.assigns.edit_ingredients])
+     |> assign(new_ingredients: [new_number | socket.assigns.new_ingredients])
     }
   end
 

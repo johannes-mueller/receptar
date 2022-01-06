@@ -125,6 +125,43 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       end
     end
 
+    test "cancel after append", %{socket: socket} do
+      params = %{ingredients: [], edit_ingredients: []}
+
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      {:noreply, socket} =
+	IngredientsLive.handle_event("append-ingredient", %{}, socket)
+
+      {:ok, socket} =
+	  IngredientsLive.update(%{cancel: 1}, socket)
+
+      assert socket.assigns.ingredients == []
+    end
+
+    test "cancel after two appends", %{socket: socket} do
+      params = %{ingredients: [], edit_ingredients: []}
+
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      {:noreply, socket} =
+	IngredientsLive.handle_event("append-ingredient", %{}, socket)
+
+      {:noreply, socket} =
+	IngredientsLive.handle_event("append-ingredient", %{}, socket)
+
+      {:ok, socket} =
+	  IngredientsLive.update(%{cancel: 2}, socket)
+
+      assert [%{number: 1}] = socket.assigns.ingredients
+
+      {:ok, socket} =
+	  IngredientsLive.update(%{cancel: 1}, socket)
+
+      assert socket.assigns.ingredients == []
+    end
+
+
     test "submit ingredient", %{socket: socket} do
       ingredients = recipe_by_title("Tinusa bulko").ingredients
       |> Ingredients.translate("eo")

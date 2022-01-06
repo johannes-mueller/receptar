@@ -21,6 +21,13 @@
           </span>
           <% end %>
           <a href="#"
+             id={idfy("insert-instruction", instruction.number)}
+             phx-click="insert-instruction"
+             phx-target={@myself}
+             phx-value-number={instruction.number}>
+            Insert
+          </a>
+          <a href="#"
              id={idfy("delete-instruction", instruction.number)}
              phx-click="delete-instruction"
              phx-target={@myself}
