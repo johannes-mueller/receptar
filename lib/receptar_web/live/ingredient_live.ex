@@ -23,6 +23,7 @@ defmodule ReceptarWeb.IngredientLive do
     |> assign(unit_name_value: ingredient.unit.name)
     |> assign(substance_name_value: ingredient.substance.name)
     |> assign(substance_kind_value: ingredient.substance.kind)
+    |> assign_submit_disabled
   end
 
   defp assign_field_values(socket, _attrs), do: socket
@@ -32,6 +33,24 @@ defmodule ReceptarWeb.IngredientLive do
     socket
     |> assign(amount_value: if amount do Decimal.to_string(amount, :xsd) else "" end)
   end
+
+  defp assign_submit_disabled(socket) do
+    socket
+    |> assign(submit_disabled: submit_disabled(socket.assigns))
+  end
+
+  defp submit_disabled(%{
+	amount_value: amount,
+	unit_name_value: unit_name,
+	substance_name_value: substance_name,
+	substance_kind_value: substance_kind
+       }) when
+  amount != "" and
+  unit_name != "" and
+  substance_name !="" and
+  not is_nil(substance_kind), do: false
+
+  defp submit_disabled(_assigns), do: true
 
   def handle_event("submit", attrs, socket) do
     amount = Decimal.new(attrs["amount"])
@@ -67,41 +86,40 @@ defmodule ReceptarWeb.IngredientLive do
   end
 
   def handle_event("change-event", attrs, socket) do
-    handle_input_change_event(attrs, socket)
+    socket = handle_input_change_event(attrs, socket)
+    {:noreply,
+     socket
+     |> assign(submit_disabled: submit_disabled(socket.assigns))
+    }
   end
 
   defp handle_input_change_event(%{"_target" => ["substance-name"]} = attrs, socket) do
     language = socket.assigns.language
-    {:noreply,
-     socket
-     |> make_substance_suggestion(attrs)
-     |> assign(substance_name_value: attrs["substance-name"])
-     |> assign(substance_kind_value: Substances.name_to_kind(attrs["substance-name"], language))
-    }
+    socket
+    |> make_substance_suggestion(attrs)
+    |> assign(substance_name_value: attrs["substance-name"])
+    |> assign(substance_kind_value: Substances.name_to_kind(attrs["substance-name"], language))
   end
 
   defp handle_input_change_event(%{"_target" => ["unit-name"]} = attrs, socket) do
-    {:noreply,
-     socket
-     |> make_unit_suggestion(attrs)
-     |> assign(unit_name_value: attrs["unit-name"])}
+    socket
+    |> make_unit_suggestion(attrs)
+    |> assign(unit_name_value: attrs["unit-name"])
   end
 
   defp handle_input_change_event(%{"_target" => ["amount"]} = attrs, socket) do
-    {:noreply,
-     socket
-     |> assign(amount_value: attrs["amount"])}
+    socket
+    |> assign(amount_value: attrs["amount"])
   end
 
   defp handle_input_change_event(%{"_target" => ["substance-kind"]} = attrs, socket) do
-    {:noreply,
-     socket
-     |> assign(substance_kind_value: case attrs["substance-kind"] do
-				       "vegan" -> :vegan
-				       "vegetarian" -> :vegetarian
-				       "meat" -> :meat
-				       _ -> nil
-				     end)}
+    socket
+    |> assign(substance_kind_value: case attrs["substance-kind"] do
+				      "vegan" -> :vegan
+				      "vegetarian" -> :vegetarian
+				      "meat" -> :meat
+				      _ -> nil
+				    end)
   end
 
   defp make_substance_suggestion(socket, %{"substance-name" => prefix}) do

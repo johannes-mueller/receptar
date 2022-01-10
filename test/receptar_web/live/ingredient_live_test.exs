@@ -168,7 +168,6 @@ defmodule ReceptarWeb.IngredientLiveTest do
 
 	attrs = %{"_target" => ["substance-kind"], "substance-kind" => "vegan"}
 
-
 	{:noreply, socket} =
 	  IngredientLive.handle_event("change-event", attrs, socket)
 
@@ -312,6 +311,41 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	})
       end
     end
+
+    for {num, perm} <- permutation_of([
+	  %{"_target" => ["substance-kind"], "substance-kind" => "vegan"},
+	  %{"_target" => ["substance-name"], "substance-name" => "foo"},
+	  %{"_target" => ["amount"], "amount" => "1.3"},
+	  %{"_target" => ["unit-name"], "unit-name" => "litro"}
+	]) |> Enum.with_index(fn el, num -> {num, el} end) do
+	test "enabling submit button #{num}", %{socket: socket} do
+	  ingredient = %{
+	    amount: nil,
+	    unit: %{name: ""},
+	    substance: %Substance{name: "", kind: nil},
+	    number: 1
+	  }
+
+	  assigns = %{id: 1, ingredient: ingredient, language: "eo"}
+	  {:ok, socket} = IngredientLive.update(assigns, socket)
+
+	  socket = unquote(Macro.escape(perm))
+	  |> Enum.map_reduce(false, fn
+	    %{"substance-kind" => _} = change, false -> {change, true}
+	    %{"substance-name" => _}, true -> {%{"_target" => ["substance-name"], "substance-name" => "salo"}, true}
+	    change, acc -> {change, acc}
+	  end)
+	  |> then(fn {changes, _} -> changes end)
+	  |> Enum.reduce(socket, fn change, socket ->
+	    assert socket.assigns.submit_disabled
+	    {:noreply, socket} = IngredientLive.handle_event("change-event", change, socket)
+ 	    socket
+	  end)
+
+	  refute socket.assigns.submit_disabled
+	end
+    end
+
   end
 
   describe "Connection state" do
@@ -617,7 +651,6 @@ defmodule ReceptarWeb.IngredientLiveTest do
       end
     end
 
-
     test "vegan substance has vegetarian radio button unticked", %{conn: conn} do
       session = %{
 	"ingredient" => %{
@@ -634,6 +667,46 @@ defmodule ReceptarWeb.IngredientLiveTest do
       refute view |> element("input.vegetarian-rb") |> render() =~ "checked"
     end
 
+    test "test submit button disabled for new ingredient", %{conn: conn} do
+      session = %{
+	"ingredient" => %{
+	  amount: nil,
+	  unit: %{name: ""},
+	  substance: %Substance{name: "", kind: :vegan},
+	  number: 1
+	},
+	"language" => "eo"
+      }
+
+      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+      html = view
+      |> element("button.submit-button")
+      |> render()
+
+      assert html =~ ~r/disabled/
+    end
+
+    test "test submit button enabled for full ingredient", %{conn: conn} do
+      session = %{
+	"ingredient" => %{
+	  amount: Decimal.new("1.0"),
+	  unit: %{name: "litro"},
+	  substance: %Substance{name: "vino", kind: :vegan},
+	  number: 1
+	},
+	"language" => "eo"
+      }
+
+      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+      html = view
+      |> element("button.submit-button")
+      |> render()
+
+      refute html =~ ~r/disabled/
+    end
+
     @tag :skip
     test "examine params", %{conn: conn, session: session} do
       {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
@@ -643,7 +716,6 @@ defmodule ReceptarWeb.IngredientLiveTest do
       |> render_submit(%{foo: "bar"})
     end
   end
-
 end
 
 defmodule ReceptarWeb.IngredientTestLiveView do

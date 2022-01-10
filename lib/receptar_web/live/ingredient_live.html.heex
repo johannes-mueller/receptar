@@ -34,7 +34,11 @@
   <input type="radio" class="meat-rb" value="meat" name="substance-kind"
          checked={@substance_kind_value == :meat}>
   <input type="hidden" class="ingredient-number-input" value={@id} name="number">
+  <%= if @submit_disabled do %>
+  <button class="submit-button" type="submit" disabled>Submit</button>
+  <% else %>
   <button class="submit-button" type="submit">Submit</button>
+  <% end %>
   <button
     class="cancel-button"
     type="button"

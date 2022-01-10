@@ -39,4 +39,11 @@ defmodule Receptar.TestHelpers do
     }
   end
 
+  def permutation_of([]), do: [[]]
+
+  def permutation_of(list) do
+    for head <- list, tail <- permutation_of(list -- [head]), do: [head | tail]
+  end
+
+
 end
