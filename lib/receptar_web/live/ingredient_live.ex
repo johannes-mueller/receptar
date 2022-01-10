@@ -55,11 +55,7 @@ defmodule ReceptarWeb.IngredientLive do
   def handle_event("submit", attrs, socket) do
     amount = Decimal.new(attrs["amount"])
 
-    substance_kind = case attrs["substance-kind"] do
-		       "meat" -> :meat
-		       "vegan" -> :vegan
-		       "vegetarian" -> :vegetarian
-		     end
+    substance_kind = extract_substance_kind(attrs)
 
     "ingredient-" <> number_string = attrs["number"]
     number = String.to_integer(number_string)
@@ -114,12 +110,7 @@ defmodule ReceptarWeb.IngredientLive do
 
   defp handle_input_change_event(%{"_target" => ["substance-kind"]} = attrs, socket) do
     socket
-    |> assign(substance_kind_value: case attrs["substance-kind"] do
-				      "vegan" -> :vegan
-				      "vegetarian" -> :vegetarian
-				      "meat" -> :meat
-				      _ -> nil
-				    end)
+    |> assign(substance_kind_value: extract_substance_kind(attrs))
   end
 
   defp make_substance_suggestion(socket, %{"substance-name" => prefix}) do
@@ -134,5 +125,14 @@ defmodule ReceptarWeb.IngredientLive do
     suggestions = Receptar.Units.completion_candidates(prefix, language)
 
     assign(socket, :unit_suggestions, suggestions)
+  end
+
+  defp extract_substance_kind(attrs) do
+    case attrs["substance-kind"] do
+      "meat" -> :meat
+      "vegan" -> :vegan
+      "vegetarian" -> :vegetarian
+      _ -> nil
+    end
   end
 end
