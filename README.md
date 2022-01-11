@@ -1,3 +1,5 @@
+[![Elixir CI](https://github.com/johannes-mueller/receptar/actions/workflows/elixir.yml/badge.svg)](https://github.com/johannes-mueller/receptar/actions/workflows/elixir.yml)
+
 # Receptar
 
 A multilingual database for recipes.
