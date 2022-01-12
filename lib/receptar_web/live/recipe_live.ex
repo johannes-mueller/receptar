@@ -4,12 +4,10 @@ defmodule ReceptarWeb.RecipeLive do
   alias Receptar.Recipes
   alias ReceptarWeb.Helpers
 
-  alias ReceptarWeb.RecipeView
   import ReceptarWeb.RecipeController
 
-  def render(assigns) do
-    RecipeView.render("edit.html", assigns)
-  end
+  alias ReceptarWeb.InstructionsLive
+  alias ReceptarWeb.IngredientsLive
 
   def mount(params, _session, socket) do
     language = Helpers.determine_language(params)
