@@ -59,7 +59,7 @@ defmodule ReceptarWeb.ConnCase do
   test context.
   """
   def register_and_log_in_user(%{conn: conn}) do
-    user = Receptar.AccountsFixtures.user_fixture()
+    user = Receptar.AccountsFixtures.admin_fixture()
     %{conn: log_in_user(conn, user), user: user}
   end
 

@@ -12,7 +12,7 @@ defmodule Receptar.AccountsTest do
     end
 
     test "returns the user if the email exists" do
-      %{id: id} = user = user_fixture()
+      %{id: id} = user = admin_fixture()
       assert %User{id: ^id} = Accounts.get_user_by_email(user.email)
     end
   end
@@ -23,12 +23,12 @@ defmodule Receptar.AccountsTest do
     end
 
     test "does not return the user if the password is not valid" do
-      user = user_fixture()
+      user = admin_fixture()
       refute Accounts.get_user_by_email_and_password(user.email, "invalid")
     end
 
     test "returns the user if the email and password are valid" do
-      %{id: id} = user = user_fixture()
+      %{id: id} = user = admin_fixture()
 
       assert %User{id: ^id} =
                Accounts.get_user_by_email_and_password(user.email, valid_user_password())
@@ -43,7 +43,7 @@ defmodule Receptar.AccountsTest do
     end
 
     test "returns the user with the given id" do
-      %{id: id} = user = user_fixture()
+      %{id: id} = user = admin_fixture()
       assert %User{id: ^id} = Accounts.get_user!(user.id)
     end
   end
@@ -75,7 +75,7 @@ defmodule Receptar.AccountsTest do
     end
 
     test "validates email uniqueness" do
-      %{email: email} = user_fixture()
+      %{email: email} = admin_fixture()
       {:error, changeset} = Accounts.register_user(%{email: email})
       assert "has already been taken" in errors_on(changeset).email
 
@@ -85,6 +85,7 @@ defmodule Receptar.AccountsTest do
     end
 
     test "registers users with a hashed password" do
+      admin_fixture()
       email = unique_user_email()
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
       assert user.email == email
@@ -101,6 +102,7 @@ defmodule Receptar.AccountsTest do
     end
 
     test "allows fields to be set" do
+      admin_fixture()
       email = unique_user_email()
       password = valid_user_password()
 
@@ -126,7 +128,7 @@ defmodule Receptar.AccountsTest do
 
   describe "apply_user_email/3" do
     setup do
-      %{user: user_fixture()}
+      %{user: admin_fixture()}
     end
 
     test "requires email to change", %{user: user} do
@@ -151,7 +153,7 @@ defmodule Receptar.AccountsTest do
     end
 
     test "validates email uniqueness", %{user: user} do
-      %{email: email} = user_fixture()
+      %{email: email} = admin_fixture()
 
       {:error, changeset} =
         Accounts.apply_user_email(user, valid_user_password(), %{email: email})
@@ -176,7 +178,7 @@ defmodule Receptar.AccountsTest do
 
   describe "deliver_update_email_instructions/3" do
     setup do
-      %{user: user_fixture()}
+      %{user: admin_fixture()}
     end
 
     test "sends token through notification", %{user: user} do
@@ -195,7 +197,7 @@ defmodule Receptar.AccountsTest do
 
   describe "update_user_email/2" do
     setup do
-      user = user_fixture()
+      user = admin_fixture()
       email = unique_user_email()
 
       token =
@@ -256,7 +258,7 @@ defmodule Receptar.AccountsTest do
 
   describe "update_user_password/3" do
     setup do
-      %{user: user_fixture()}
+      %{user: admin_fixture()}
     end
 
     test "validates password", %{user: user} do
@@ -312,7 +314,7 @@ defmodule Receptar.AccountsTest do
 
   describe "generate_user_session_token/1" do
     setup do
-      %{user: user_fixture()}
+      %{user: admin_fixture()}
     end
 
     test "generates a token", %{user: user} do
@@ -324,7 +326,7 @@ defmodule Receptar.AccountsTest do
       assert_raise Ecto.ConstraintError, fn ->
         Repo.insert!(%UserToken{
           token: user_token.token,
-          user_id: user_fixture().id,
+          user_id: admin_fixture().id,
           context: "session"
         })
       end
@@ -333,7 +335,7 @@ defmodule Receptar.AccountsTest do
 
   describe "get_user_by_session_token/1" do
     setup do
-      user = user_fixture()
+      user = admin_fixture()
       token = Accounts.generate_user_session_token(user)
       %{user: user, token: token}
     end
@@ -355,7 +357,7 @@ defmodule Receptar.AccountsTest do
 
   describe "delete_session_token/1" do
     test "deletes the token" do
-      user = user_fixture()
+      user = admin_fixture()
       token = Accounts.generate_user_session_token(user)
       assert Accounts.delete_session_token(token) == :ok
       refute Accounts.get_user_by_session_token(token)
@@ -364,7 +366,7 @@ defmodule Receptar.AccountsTest do
 
   describe "deliver_user_confirmation_instructions/2" do
     setup do
-      %{user: user_fixture()}
+      %{user: admin_fixture()}
     end
 
     test "sends token through notification", %{user: user} do
@@ -383,7 +385,7 @@ defmodule Receptar.AccountsTest do
 
   describe "confirm_user/1" do
     setup do
-      user = user_fixture()
+      user = admin_fixture()
 
       token =
         extract_user_token(fn url ->
@@ -417,7 +419,7 @@ defmodule Receptar.AccountsTest do
 
   describe "deliver_user_reset_password_instructions/2" do
     setup do
-      %{user: user_fixture()}
+      %{user: admin_fixture()}
     end
 
     test "sends token through notification", %{user: user} do
@@ -436,7 +438,7 @@ defmodule Receptar.AccountsTest do
 
   describe "get_user_by_reset_password_token/1" do
     setup do
-      user = user_fixture()
+      user = admin_fixture()
 
       token =
         extract_user_token(fn url ->
@@ -465,7 +467,7 @@ defmodule Receptar.AccountsTest do
 
   describe "reset_user_password/2" do
     setup do
-      %{user: user_fixture()}
+      %{user: admin_fixture()}
     end
 
     test "validates password", %{user: user} do
@@ -517,9 +519,23 @@ defmodule Receptar.AccountsTest do
 
     test "register non admin user" do
       email = unique_user_email()
+      attrs = Map.put(valid_user_attributes(email: email), :is_admin, true)
+      {:ok, _user} = Accounts.register_user(attrs)
+
+      email = unique_user_email()
       attrs = valid_user_attributes(email: email)
       {:ok, user} = Accounts.register_user(attrs)
       assert user.is_admin == false
+    end
+
+    test "enforce that the first user is admin" do
+      email = unique_user_email()
+      attrs = valid_user_attributes(email: email)
+      {:error, changeset} = Accounts.register_user(attrs)
+
+      assert %{
+	is_admin: ["User must be admin as no other admin user is registered."]
+      } = errors_on(changeset)
     end
 
     test "admin user is missing" do
@@ -539,7 +555,8 @@ defmodule Receptar.AccountsTest do
 
     test "at least user is registered" do
       email = unique_user_email()
-      {:ok, _user} = Accounts.register_user(valid_user_attributes(email: email))
+      attrs = Map.put(valid_user_attributes(email: email), :is_admin, true)
+      {:ok, _user} = Accounts.register_user(attrs)
       refute Accounts.no_user_is_registered()
     end
   end

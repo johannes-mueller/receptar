@@ -6,7 +6,7 @@ defmodule ReceptarWeb.UserResetPasswordControllerTest do
   import Receptar.AccountsFixtures
 
   setup do
-    %{user: user_fixture()}
+    %{user: admin_fixture()}
   end
 
   describe "GET /users/reset_password" do

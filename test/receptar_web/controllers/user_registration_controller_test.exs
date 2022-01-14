@@ -13,7 +13,7 @@ defmodule ReceptarWeb.UserRegistrationControllerTest do
     end
 
     test "redirects if already logged in", %{conn: conn} do
-      conn = conn |> log_in_user(user_fixture()) |> get(Routes.user_registration_path(conn, :new))
+      conn = conn |> log_in_user(admin_fixture()) |> get(Routes.user_registration_path(conn, :new))
       assert redirected_to(conn) == "/"
     end
   end
@@ -21,6 +21,7 @@ defmodule ReceptarWeb.UserRegistrationControllerTest do
   describe "POST /users/register" do
     @tag :capture_log
     test "creates account and logs the user in", %{conn: conn} do
+      admin_fixture()
       email = unique_user_email()
 
       conn =

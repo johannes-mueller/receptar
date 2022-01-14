@@ -34,6 +34,7 @@ defmodule Receptar.Accounts.User do
     |> cast(attrs, [:email, :password, :is_admin])
     |> validate_email()
     |> validate_password(opts)
+    |> enforce_at_least_one_admin_user()
   end
 
   defp validate_email(changeset) do
@@ -65,6 +66,23 @@ defmodule Receptar.Accounts.User do
       |> validate_length(:password, max: 72, count: :bytes)
       |> put_change(:hashed_password, Bcrypt.hash_pwd_salt(password))
       |> delete_change(:password)
+    else
+      changeset
+    end
+  end
+
+  defp enforce_at_least_one_admin_user(changeset) do
+    %{changes: changes, errors: errors} = changeset
+    is_admin = Map.get(changes, :is_admin)
+
+    if !is_admin && not Receptar.Accounts.admin_user_is_registered() do
+      %{
+	changeset |
+	errors: errors ++ [
+	  is_admin: {"User must be admin as no other admin user is registered.", []}
+	],
+	valid?: false
+      }
     else
       changeset
     end

@@ -18,7 +18,7 @@ defmodule ReceptarWeb.UserAuthTest do
 
   describe "log_in_user/3" do
     setup %{conn: conn} do
-      %{user: user_fixture(), conn: conn}
+      %{user: admin_fixture(), conn: conn}
     end
 
     test "stores the user token in the session", %{conn: conn, user: user} do
@@ -51,7 +51,7 @@ defmodule ReceptarWeb.UserAuthTest do
 
   describe "logout_user/1" do
     setup %{conn: conn} do
-      %{user: user_fixture(), conn: conn}
+      %{user: admin_fixture(), conn: conn}
     end
 
     test "erases session and cookies", %{conn: conn, user: user} do
@@ -92,7 +92,7 @@ defmodule ReceptarWeb.UserAuthTest do
 
   describe "fetch_current_user/2" do
     setup %{conn: conn} do
-      %{user: user_fixture(), conn: conn}
+      %{user: admin_fixture(), conn: conn}
     end
 
     test "authenticates user from session", %{conn: conn, user: user} do
@@ -127,7 +127,7 @@ defmodule ReceptarWeb.UserAuthTest do
 
   describe "redirect_if_user_is_authenticated/2" do
     setup %{conn: conn} do
-      %{user: user_fixture(), conn: conn}
+      %{user: admin_fixture(), conn: conn}
     end
 
     test "redirects if user is authenticated", %{conn: conn, user: user} do
@@ -145,7 +145,7 @@ defmodule ReceptarWeb.UserAuthTest do
 
   describe "require_authenticated_user/2" do
     setup %{conn: conn} do
-      %{user: user_fixture(), conn: conn}
+      %{user: admin_fixture(), conn: conn}
     end
 
     test "redirects if user is not authenticated", %{conn: conn} do
