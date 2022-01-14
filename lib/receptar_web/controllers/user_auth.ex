@@ -121,6 +121,17 @@ defmodule ReceptarWeb.UserAuth do
     end
   end
 
+  def redirect_if_no_user_registered(conn, _opts) do
+    if Accounts.no_user_is_registered() do
+      conn
+      |> put_flash(:info, "Please register an admin user.")
+      |> redirect(to: Routes.user_registration_path(conn, :new))
+      |> halt()
+    else
+      conn
+    end
+  end
+
   @doc """
   Used for routes that require the user to be authenticated.
 

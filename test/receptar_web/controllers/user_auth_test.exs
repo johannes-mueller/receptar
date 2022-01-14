@@ -13,10 +13,14 @@ defmodule ReceptarWeb.UserAuthTest do
       |> Map.replace!(:secret_key_base, ReceptarWeb.Endpoint.config(:secret_key_base))
       |> init_test_session(%{})
 
-    %{user: user_fixture(), conn: conn}
+    %{conn: conn}
   end
 
   describe "log_in_user/3" do
+    setup %{conn: conn} do
+      %{user: user_fixture(), conn: conn}
+    end
+
     test "stores the user token in the session", %{conn: conn, user: user} do
       conn = UserAuth.log_in_user(conn, user)
       assert token = get_session(conn, :user_token)
@@ -46,6 +50,10 @@ defmodule ReceptarWeb.UserAuthTest do
   end
 
   describe "logout_user/1" do
+    setup %{conn: conn} do
+      %{user: user_fixture(), conn: conn}
+    end
+
     test "erases session and cookies", %{conn: conn, user: user} do
       user_token = Accounts.generate_user_session_token(user)
 
@@ -83,6 +91,10 @@ defmodule ReceptarWeb.UserAuthTest do
   end
 
   describe "fetch_current_user/2" do
+    setup %{conn: conn} do
+      %{user: user_fixture(), conn: conn}
+    end
+
     test "authenticates user from session", %{conn: conn, user: user} do
       user_token = Accounts.generate_user_session_token(user)
       conn = conn |> put_session(:user_token, user_token) |> UserAuth.fetch_current_user([])
@@ -114,6 +126,10 @@ defmodule ReceptarWeb.UserAuthTest do
   end
 
   describe "redirect_if_user_is_authenticated/2" do
+    setup %{conn: conn} do
+      %{user: user_fixture(), conn: conn}
+    end
+
     test "redirects if user is authenticated", %{conn: conn, user: user} do
       conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_is_authenticated([])
       assert conn.halted
@@ -128,6 +144,10 @@ defmodule ReceptarWeb.UserAuthTest do
   end
 
   describe "require_authenticated_user/2" do
+    setup %{conn: conn} do
+      %{user: user_fixture(), conn: conn}
+    end
+
     test "redirects if user is not authenticated", %{conn: conn} do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])
       assert conn.halted
@@ -167,4 +187,24 @@ defmodule ReceptarWeb.UserAuthTest do
       refute conn.status
     end
   end
+
+  describe "missing admin user" do
+    test "admin user missing redirect to register_admin page", %{conn: conn} do
+      conn = conn |> fetch_flash() |> UserAuth.redirect_if_no_user_registered([])
+      assert redirected_to(conn) == Routes.user_registration_path(conn, :new)
+      assert conn.halted
+      assert get_flash(conn, :info) == "Please register an admin user."
+    end
+  end
+
+  describe "at least one user registered" do
+    test "no redirect if at least one user is registered", %{conn: conn} do
+      admin_fixture()
+
+      conn = conn |> fetch_flash() |> UserAuth.redirect_if_no_user_registered([])
+      refute conn.halted
+      refute conn.status
+    end
+  end
+
 end
