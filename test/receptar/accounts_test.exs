@@ -505,4 +505,22 @@ defmodule Receptar.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "admin user" do
+
+    test "register admin user" do
+      email = unique_user_email()
+      attrs = Map.put(valid_user_attributes(email: email), :is_admin, true)
+      {:ok, user} = Accounts.register_user(attrs)
+      assert user.is_admin == true
+    end
+
+    test "register non admin user" do
+      email = unique_user_email()
+      attrs = valid_user_attributes(email: email)
+      {:ok, user} = Accounts.register_user(attrs)
+      assert user.is_admin == false
+    end
+
+  end
 end

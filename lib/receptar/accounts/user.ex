@@ -4,6 +4,7 @@ defmodule Receptar.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :is_admin, :boolean, default: false
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
@@ -30,7 +31,7 @@ defmodule Receptar.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :is_admin])
     |> validate_email()
     |> validate_password(opts)
   end
