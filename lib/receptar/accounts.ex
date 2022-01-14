@@ -60,6 +60,11 @@ defmodule Receptar.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+
+  def no_user_is_registered() do
+    Repo.one(from u in User, select: count()) == 0
+  end
+
   ## User registration
 
   @doc """

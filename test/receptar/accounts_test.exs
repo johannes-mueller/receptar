@@ -522,5 +522,15 @@ defmodule Receptar.AccountsTest do
       assert user.is_admin == false
     end
 
+
+    test "no user is registered" do
+      assert Accounts.no_user_is_registered()
+    end
+
+    test "at least user is registered" do
+      email = unique_user_email()
+      {:ok, _user} = Accounts.register_user(valid_user_attributes(email: email))
+      refute Accounts.no_user_is_registered()
+    end
   end
 end
