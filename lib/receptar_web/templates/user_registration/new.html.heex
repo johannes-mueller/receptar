@@ -15,6 +15,10 @@
   <%= password_input f, :password, required: true %>
   <%= error_tag f, :password %>
 
+  <%= label f, "User has admin rights" %>
+  <%= checkbox f, :is_admin %>
+  <%= error_tag f, :is_admin %>
+
   <div>
     <%= submit "Register" %>
   </div>

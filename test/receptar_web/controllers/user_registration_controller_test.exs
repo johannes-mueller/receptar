@@ -10,10 +10,15 @@ defmodule ReceptarWeb.UserRegistrationControllerTest do
       assert response =~ "<h1>Register</h1>"
       assert response =~ "Log in</a>"
       assert response =~ "Register</a>"
+      assert response =~ "User has admin rights"
     end
 
     test "redirects if already logged in", %{conn: conn} do
-      conn = conn |> log_in_user(admin_fixture()) |> get(Routes.user_registration_path(conn, :new))
+      conn =
+	conn
+	|> log_in_user(admin_fixture())
+	|> get(Routes.user_registration_path(conn, :new))
+
       assert redirected_to(conn) == "/"
     end
   end
@@ -50,6 +55,19 @@ defmodule ReceptarWeb.UserRegistrationControllerTest do
       assert response =~ "<h1>Register</h1>"
       assert response =~ "must have the @ sign and no spaces"
       assert response =~ "should be at least 12 character"
+    end
+
+    test "render error no admin user", %{conn: conn} do
+      email = unique_user_email()
+
+      conn =
+        post(conn, Routes.user_registration_path(conn, :create), %{
+          "user" => valid_user_attributes(email: email)
+        })
+
+      response = html_response(conn, 200)
+      assert response =~ "<h1>Register</h1>"
+      assert response =~ "User must be admin as no other admin user is registered"
     end
   end
 end

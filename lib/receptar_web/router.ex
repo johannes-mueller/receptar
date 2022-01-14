@@ -18,9 +18,13 @@ defmodule ReceptarWeb.Router do
   end
 
   scope "/", ReceptarWeb do
-    pipe_through :browser
+    pipe_through [:browser, :redirect_if_no_user_registered]
 
     get "/", PageController, :index
+  end
+
+  scope "/", ReceptarWeb do
+    pipe_through :browser
 
     get "/search", RecipeController, :search
     live "/recipe/:id/", RecipeLive
