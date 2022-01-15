@@ -24,10 +24,14 @@ defmodule ReceptarWeb.Router do
   end
 
   scope "/", ReceptarWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
     get "/search", RecipeController, :search
     live "/recipe/:id/", RecipeLive
+  end
+
+  scope "/", ReceptarWeb do
+    pipe_through :browser
   end
 
   # Other scopes may use custom stacks.
@@ -69,14 +73,19 @@ defmodule ReceptarWeb.Router do
   scope "/", ReceptarWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-    get "/users/register", UserRegistrationController, :new
-    post "/users/register", UserRegistrationController, :create
     get "/users/log_in", UserSessionController, :new
     post "/users/log_in", UserSessionController, :create
     get "/users/reset_password", UserResetPasswordController, :new
     post "/users/reset_password", UserResetPasswordController, :create
     get "/users/reset_password/:token", UserResetPasswordController, :edit
     put "/users/reset_password/:token", UserResetPasswordController, :update
+  end
+
+  scope "/", ReceptarWeb do
+    pipe_through [:browser, :require_authenticated_admin_user]
+
+    get "/users/register", UserRegistrationController, :new
+    post "/users/register", UserRegistrationController, :create
   end
 
   scope "/", ReceptarWeb do

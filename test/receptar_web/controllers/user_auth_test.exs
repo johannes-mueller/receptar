@@ -222,6 +222,8 @@ defmodule ReceptarWeb.UserAuthTest do
     end
 
     test "redirects if no user is authenticated", %{conn: conn} do
+      user_fixture()
+
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_admin_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
@@ -229,6 +231,8 @@ defmodule ReceptarWeb.UserAuthTest do
     end
 
     test "stores the path to redirect to on GET", %{conn: conn} do
+      user_fixture()
+
       halted_conn =
         %{conn | path_info: ["foo"], query_string: ""}
         |> fetch_flash()
@@ -257,6 +261,12 @@ defmodule ReceptarWeb.UserAuthTest do
     test "does not redirect if admin user is authenticated", %{conn: conn} do
       user = admin_fixture()
       conn = conn |> assign(:current_user, user) |> UserAuth.require_authenticated_admin_user([])
+      refute conn.halted
+      refute conn.status
+    end
+
+    test "does not redirect if no user is registered", %{conn: conn} do
+      conn = conn |> fetch_flash() |> UserAuth.require_authenticated_admin_user([])
       refute conn.halted
       refute conn.status
     end

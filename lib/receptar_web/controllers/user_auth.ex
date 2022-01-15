@@ -160,11 +160,15 @@ defmodule ReceptarWeb.UserAuth do
 	|> redirect(to: signed_in_path(conn))
 	|> halt()
       nil ->
-	conn
-	|> put_flash(:error, "You must log in to access this page.")
-	|> maybe_store_return_to()
-      	|> redirect(to: Routes.user_session_path(conn, :new))
-	|> halt()
+	if Accounts.no_user_is_registered() do
+	  conn
+	else
+	  conn
+	  |> put_flash(:error, "You must log in to access this page.")
+	  |> maybe_store_return_to()
+      	  |> redirect(to: Routes.user_session_path(conn, :new))
+	  |> halt()
+	end
     end
   end
 

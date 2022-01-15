@@ -1,13 +1,13 @@
-defmodule ReceptarWeb.ReceptarControllerTest do
+defmodule ReceptarWeb.RecipeControllerTest do
   use ReceptarWeb.ConnCase
 
   import Receptar.Seeder
   import Receptar.TestHelpers
 
   describe "sample database available" do
-#    @describetag :skip
-    setup do
+    setup %{conn: conn} do
       insert_test_data()
+      register_and_log_in_user(%{conn: conn})
     end
 
     test "search for unknown title finds nothing", %{conn: conn} do
@@ -193,5 +193,11 @@ defmodule ReceptarWeb.ReceptarControllerTest do
 	assert html_response_stripped(conn, 200) =~ ~r/class="translation-missing"/
       end
     end
+  end
+
+  test "search form redirect if no user authenticated", %{conn: conn} do
+    conn = get(conn, "/search")
+
+    assert redirected_to(conn) == "/users/log_in"
   end
 end

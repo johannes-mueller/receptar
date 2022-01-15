@@ -183,8 +183,9 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
 
   describe "Connection state" do
-    setup do
+    setup %{conn: conn} do
       insert_test_data()
+      register_and_log_in_user(%{conn: conn})
     end
 
     test "title does initially not have a form element", %{conn: conn} do
@@ -194,7 +195,6 @@ defmodule ReceptarWeb.RecipeLiveTest do
       refute view
       |> element("h1 form")
       |> has_element?
-
     end
 
     test "title has a form element after edit-title event", %{conn: conn} do
@@ -219,6 +219,12 @@ defmodule ReceptarWeb.RecipeLiveTest do
       |> render_click()
 
       assert html =~ ~r/<h1.*>.*<input.* value="Granda kino".*<\/h1>/
+    end
+  end
+
+  describe "No authenticated user" do
+    test "redirect", %{conn: conn} do
+      assert {:error, {:redirect, %{to: "/users/log_in"}}} = live(conn, "/recipe/23")
     end
   end
 end
