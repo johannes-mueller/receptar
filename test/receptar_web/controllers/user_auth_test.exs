@@ -145,7 +145,7 @@ defmodule ReceptarWeb.UserAuthTest do
 
   describe "require_authenticated_user/2" do
     setup %{conn: conn} do
-      %{user: admin_fixture(), conn: conn}
+      %{user: user_fixture(), conn: conn}
     end
 
     test "redirects if user is not authenticated", %{conn: conn} do
@@ -205,6 +205,62 @@ defmodule ReceptarWeb.UserAuthTest do
       refute conn.halted
       refute conn.status
     end
+  end
+
+  describe "require authenticated admin user" do
+
+    test "redirects if non admin user is authenticated", %{conn: conn} do
+      conn =
+	conn
+        |> fetch_flash()
+        |> assign(:current_user, user_fixture())
+        |> UserAuth.require_authenticated_admin_user([])
+
+      assert conn.halted
+      assert redirected_to(conn) == "/"
+      assert get_flash(conn, :error) == "You must have admin rights to access this page."
+    end
+
+    test "redirects if no user is authenticated", %{conn: conn} do
+      conn = conn |> fetch_flash() |> UserAuth.require_authenticated_admin_user([])
+      assert conn.halted
+      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert get_flash(conn, :error) == "You must log in to access this page."
+    end
+
+    test "stores the path to redirect to on GET", %{conn: conn} do
+      halted_conn =
+        %{conn | path_info: ["foo"], query_string: ""}
+        |> fetch_flash()
+        |> UserAuth.require_authenticated_admin_user([])
+
+      assert halted_conn.halted
+      assert get_session(halted_conn, :user_return_to) == "/foo"
+
+      halted_conn =
+        %{conn | path_info: ["foo"], query_string: "bar=baz"}
+        |> fetch_flash()
+        |> UserAuth.require_authenticated_admin_user([])
+
+      assert halted_conn.halted
+      assert get_session(halted_conn, :user_return_to) == "/foo?bar=baz"
+
+      halted_conn =
+        %{conn | path_info: ["foo"], query_string: "bar", method: "POST"}
+        |> fetch_flash()
+        |> UserAuth.require_authenticated_admin_user([])
+
+      assert halted_conn.halted
+      refute get_session(halted_conn, :user_return_to)
+    end
+
+    test "does not redirect if admin user is authenticated", %{conn: conn} do
+      user = admin_fixture()
+      conn = conn |> assign(:current_user, user) |> UserAuth.require_authenticated_admin_user([])
+      refute conn.halted
+      refute conn.status
+    end
+
   end
 
 end

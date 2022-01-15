@@ -150,6 +150,24 @@ defmodule ReceptarWeb.UserAuth do
     end
   end
 
+  def require_authenticated_admin_user(conn, _opts) do
+    current_user = conn.assigns[:current_user]
+    case current_user do
+      %{is_admin: true} -> conn
+      %{is_admin: false} ->
+	conn
+	|> put_flash(:error, "You must have admin rights to access this page.")
+	|> redirect(to: signed_in_path(conn))
+	|> halt()
+      nil ->
+	conn
+	|> put_flash(:error, "You must log in to access this page.")
+	|> maybe_store_return_to()
+      	|> redirect(to: Routes.user_session_path(conn, :new))
+	|> halt()
+    end
+  end
+
   defp maybe_store_return_to(%{method: "GET"} = conn) do
     put_session(conn, :user_return_to, current_path(conn))
   end

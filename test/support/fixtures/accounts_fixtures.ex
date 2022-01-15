@@ -15,6 +15,7 @@ defmodule Receptar.AccountsFixtures do
   end
 
   def user_fixture(attrs \\ %{}) do
+    admin_fixture()
     {:ok, user} =
       attrs
       |> valid_user_attributes()

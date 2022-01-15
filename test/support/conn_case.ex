@@ -63,6 +63,12 @@ defmodule ReceptarWeb.ConnCase do
     %{conn: log_in_user(conn, user), user: user}
   end
 
+  def register_and_log_in_non_admin_user(%{conn: conn}) do
+    Receptar.AccountsFixtures.admin_fixture()
+    user = Receptar.AccountsFixtures.user_fixture()
+    %{conn: log_in_user(conn, user), user: user}
+  end
+
   @doc """
   Logs the given `user` into the `conn`.
 
