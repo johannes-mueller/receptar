@@ -25,6 +25,7 @@ defmodule ReceptarWeb.RecipeLive do
   defp prepare_form(socket) do
     socket
     |> assign(edit_title: socket.assigns.recipe.translations == [])
+    |> assign(submit_title_disabled: true)
   end
 
   def handle_event("edit-title", _attrs, socket) do
@@ -46,6 +47,10 @@ defmodule ReceptarWeb.RecipeLive do
 
   def handle_event("cancel-edit-title", _attrs, socket) do
     {:noreply, socket |> assign(edit_title: false)}
+  end
+
+  def handle_event("title-change", %{"title" => title}, socket) do
+    {:noreply, socket |> assign(submit_title_disabled: title == "")}
   end
 
   def handle_info({:update_ingredients, %{ingredients: ingredients}}, socket) do

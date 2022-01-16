@@ -186,6 +186,18 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	assert [%{content: ^content, number: 1}] = recipe.instructions
       end
     end
+
+    test "submit_title_disabled true after title clear", %{socket: socket} do
+      recipe_id = recipe_id("granda kino")
+
+      {:ok, socket} =
+	RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+
+      {:noreply, socket} =
+	RecipeLive.handle_event("title-change", %{"title" => ""}, socket)
+
+      assert socket.assigns.submit_title_disabled == true
+    end
   end
 
 
@@ -234,6 +246,26 @@ defmodule ReceptarWeb.RecipeLiveTest do
       assert view
       |> element("h1 form")
       |> render() =~ ~r|value=""|
+    end
+
+    test "create recipe title form submit button is disabled", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/recipe/new")
+
+      html = view
+      |> element("h1 form")
+      |> render()
+
+      assert html =~ ~r/<button[^>]* type="submit"[^>]*disabled.*>/
+    end
+
+    test "create recipe title form submit button is enabled after input", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/recipe/new")
+
+      html = view
+      |> element("h1 form")
+      |> render_change(title: "foo")
+
+      refute html =~ ~r/<button[^>]* type="submit"[^>]*disabled.*>/
     end
   end
 
