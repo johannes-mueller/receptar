@@ -105,6 +105,9 @@ defmodule ReceptarWeb do
       end
       def tr(translated_string), do: translated_string
 
+      def tr_form(:translation_missing), do: ""
+      def tr_form(translated_string), do: translated_string
+
       def idfy(string, id), do: string <> "-#{id}"
 
       def render_amount(%{amount: amount}) do

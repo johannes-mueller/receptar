@@ -1,7 +1,7 @@
 <h1 phx-click="edit-title">
   <%= if @edit_title do%>
   <form phx-submit="submit-title">
-    <input name="title" value={@recipe.title}>
+    <input name="title" value={tr_form(@recipe.title)}>
     <button type="submit">Submit</button>
     <button phx-click="cancel-edit-title" type="button">Cancel</button>
   </form>

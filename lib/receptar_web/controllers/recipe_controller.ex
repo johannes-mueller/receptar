@@ -22,12 +22,11 @@ defmodule ReceptarWeb.RecipeController do
 
   def query_recipe(params) do
     language = Helpers.determine_language(params)
-    params = params
-    |> Enum.map(&sanitize_parameters/1)
-    |> Enum.into(%{})
 
-    %{"id" => id} = params
-    Recipes.get_recipe!(id)
+    case params do
+      %{"id" => id} -> Recipes.get_recipe!(id)
+      _ -> Recipes.new_recipe()
+    end
     |> Recipes.translate(language)
   end
 

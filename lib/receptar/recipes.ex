@@ -128,8 +128,12 @@ defmodule Receptar.Recipes do
   def create_recipe(attrs) do
     %Recipe{}
     |> Recipe.changeset(attrs)
-    #|> IO.inspect(label: "create_recipe")
     |> Repo.insert
+  end
+
+  def new_recipe() do
+    {:ok, %{id: id}} = create_recipe(%{})
+    get_recipe!(id)
   end
 
   def update_recipe(%Recipe{} = recipe, attrs) do

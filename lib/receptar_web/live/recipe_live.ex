@@ -11,16 +11,20 @@ defmodule ReceptarWeb.RecipeLive do
 
   def mount(params, _session, socket) do
     language = Helpers.determine_language(params)
-    recipe = query_recipe(params)
 
     socket = socket
     |> assign(language: language)
-    |> assign(recipe: recipe)
-    |> assign(edit_title: false)
+    |> assign(recipe: query_recipe(params))
+    |> prepare_form()
     |> assign(edit_ingredients: [])
     |> assign(edit_instructions: [])
 
     {:ok, socket}
+  end
+
+  defp prepare_form(socket) do
+    socket
+    |> assign(edit_title: socket.assigns.recipe.translations == [])
   end
 
   def handle_event("edit-title", _attrs, socket) do

@@ -250,6 +250,15 @@ defmodule Receptar.RecipeTest do
       } = Recipes.get_recipe!(id)
     end
 
+    test "new recipe" do
+      assert %{
+	id: _id,
+	translations: [],
+	ingredients: [],
+	instructions: []
+      } = Recipes.new_recipe()
+    end
+
     test "translate an empty recipe" do
       {:ok, recipe} = Recipes.create_recipe(%{})
 

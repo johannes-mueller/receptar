@@ -22,13 +22,20 @@ defmodule ReceptarWeb.RecipeLiveTest do
       create_socket()
     end
 
-    test "initially edit_title flag false", %{socket: socket} do
+    test "initially edit_title flag false known recipe", %{socket: socket} do
 	recipe_id = recipe_id("granda kino")
 
 	{:ok, socket} =
 	  RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
 
 	assert socket.assigns.edit_title == false
+    end
+
+    test "initially edit_title flag true unknown recipe", %{socket: socket} do
+	{:ok, socket} =
+	  RecipeLive.mount(%{}, nil, socket)
+
+	assert socket.assigns.edit_title == true
     end
 
     test "edit-title event sets edit_title to true", %{socket: socket} do
@@ -219,6 +226,14 @@ defmodule ReceptarWeb.RecipeLiveTest do
       |> render_click()
 
       assert html =~ ~r/<h1.*>.*<input.* value="Granda kino".*<\/h1>/
+    end
+
+    test "create new recipe title form empty", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/recipe/new")
+
+      assert view
+      |> element("h1 form")
+      |> render() =~ ~r|value=""|
     end
   end
 

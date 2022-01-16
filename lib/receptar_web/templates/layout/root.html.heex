@@ -20,6 +20,7 @@
             <% end %>
           </ul>
           <%= render "_user_menu.html", assigns %>
+          <%= link "New recipe", to: "/recipe/new" %>
           <%= form_for @conn, Routes.recipe_path(@conn, :search), [method: :get], fn f -> %>
           <%= select f, :language, Receptar.Translations.known_languages %>
           <%= search_input f, :title %>
@@ -27,6 +28,7 @@
           <% end %>
         </nav>
         Space for the logo
+        <a href="/">Home</a>
       </section>
     </header>
     <%= @inner_content %>
