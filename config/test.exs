@@ -31,3 +31,7 @@ config :logger, level: System.get_env("MIX_TEST_LOGLEVEL", "warn") |> String.to_
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :ex_cldr,
+  default_locale: "eo",
+  locales: ["eo", "de", "sk"]

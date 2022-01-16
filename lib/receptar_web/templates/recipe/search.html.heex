@@ -10,6 +10,8 @@
 <%= label f, :all %>
 <%= radio_button f, :class, "all" %>
 
+<%= select f, :language, Receptar.Translations.known_languages %>
+
 <%= submit "Search" %>
 <% end %>
 

@@ -21,6 +21,7 @@
           </ul>
           <%= render "_user_menu.html", assigns %>
           <%= form_for @conn, Routes.recipe_path(@conn, :search), [method: :get], fn f -> %>
+          <%= select f, :language, Receptar.Translations.known_languages %>
           <%= search_input f, :title %>
           <%= submit "Go" %>
           <% end %>

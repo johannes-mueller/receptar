@@ -72,3 +72,7 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :ex_cldr,
+  default_locale: "eo",
+  locales: ["eo", "de", "sk", "en"]
