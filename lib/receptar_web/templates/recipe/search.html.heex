@@ -1,14 +1,27 @@
-<section class="phx-hero">
-    <h1><%= search_result_title(length(@recipes)) %></h1>
-    <ul class="search-result">
-	<%= for recipe <- @recipes do %>
-	    <li class="recipe-list-entry">
-		<%=
-		link recipe.title,
-		to: "/recipe/#{recipe.id}",
-		class: "recipe-link"
-		%>
-	    </li>
-	<% end %>
-    </ul>
-</section>
+<%= form_for @conn, Routes.recipe_path(@conn, :search), [method: :get], fn f -> %>
+<%= search_input f, :title %>
+
+<%= label f, :vegan %>
+<%= radio_button f, :class, "vegan" %>
+
+<%= label f, :vegetarian %>
+<%= radio_button f, :class, "vegetarian" %>
+
+<%= label f, :all %>
+<%= radio_button f, :class, "all" %>
+
+<%= submit "Search" %>
+<% end %>
+
+<h1><%= search_result_title(length(@recipes)) %></h1>
+<ul class="search-result">
+  <%= for recipe <- @recipes do %>
+      <li class="recipe-list-entry">
+	<%=
+	  link recipe.title,
+	  to: "/recipe/#{recipe.id}",
+	  class: "recipe-link"
+	  %>
+      </li>
+      <% end %>
+</ul>

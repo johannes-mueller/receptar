@@ -20,6 +20,10 @@
             <% end %>
           </ul>
           <%= render "_user_menu.html", assigns %>
+          <%= form_for @conn, Routes.recipe_path(@conn, :search), [method: :get], fn f -> %>
+          <%= search_input f, :title %>
+          <%= submit "Go" %>
+          <% end %>
         </nav>
         Space for the logo
       </section>
