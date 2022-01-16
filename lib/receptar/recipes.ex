@@ -49,16 +49,16 @@ defmodule Receptar.Recipes do
     |> where([_r,  ingredients: i], i.count == ^substance_list_length)
   end
 
-  defp compose_query(%{"vegetarian" => yn}, query) do
+  defp compose_query(%{"class" => "vegetarian"}, query) do
     query
-    |> join(:left, [r], i in subquery(query_vegetarian()), on: r.id == i.recipe_id)
-    |> where([_r, i], i.vegetarian == ^yn)
+    |> join(:left, [r], i in subquery(query_vegetarian()), as: :i, on: r.id == i.recipe_id)
+    |> where([_r, i: i], i.vegetarian == true)
   end
 
-  defp compose_query(%{"vegan" => yn}, query) do
+  defp compose_query(%{"class" => "vegan"}, query) do
     query
-    |> join(:left, [r], i in subquery(query_vegan()), on: r.id == i.recipe_id)
-    |> where([_r, i], i.vegan == ^yn)
+    |> join(:left, [r], i in subquery(query_vegan()), as: :i, on: r.id == i.recipe_id)
+    |> where([_r, i: i], i.vegan == true)
   end
 
   defp compose_query(_unknown_parmeter, query), do: query

@@ -77,33 +77,25 @@ defmodule ReceptarWeb.RecipeControllerTest do
     end
 
     test "search for 'bulko' in Esperanto and vegetarian", %{conn: conn} do
-      conn = get(conn, "/search?language=eo&title=bulko&vegetarian=true")
+      conn = get(conn, "/search?language=eo&title=bulko&class=vegetarian")
       assert html_response(conn, 200) =~ "Fromaĝa bulko"
       assert html_response(conn, 200) =~ "Sukera bulko"
       refute html_response(conn, 200) =~ "Tinusa bulko"
-      refute html_response(conn, 200) =~ "Granda kino"
-    end
-
-    test "search for 'bulko' in Esperanto and non vegetarian", %{conn: conn} do
-      conn = get(conn, "/search?language=eo&title=bulko&vegetarian=false")
-      refute html_response(conn, 200) =~ "Fromaĝa bulko"
-      refute html_response(conn, 200) =~ "Sukera bulko"
-      assert html_response(conn, 200) =~ "Tinusa bulko"
       refute html_response(conn, 200) =~ "Granda kino"
     end
 
     test "search for 'bulko' in Esperanto and vegan", %{conn: conn} do
-      conn = get(conn, "/search?language=eo&title=bulko&vegan=true")
+      conn = get(conn, "/search?language=eo&title=bulko&class=vegan")
       refute html_response(conn, 200) =~ "Fromaĝa bulko"
       assert html_response(conn, 200) =~ "Sukera bulko"
       refute html_response(conn, 200) =~ "Tinusa bulko"
       refute html_response(conn, 200) =~ "Granda kino"
     end
 
-    test "search for 'bulko' in Esperanto and non vegan", %{conn: conn} do
-      conn = get(conn, "/search?language=eo&title=bulko&vegan=false")
+    test "search for 'bulko' in Esperanto and unrestricted", %{conn: conn} do
+      conn = get(conn, "/search?language=eo&title=bulko&class=all")
       assert html_response(conn, 200) =~ "Fromaĝa bulko"
-      refute html_response(conn, 200) =~ "Sukera bulko"
+      assert html_response(conn, 200) =~ "Sukera bulko"
       assert html_response(conn, 200) =~ "Tinusa bulko"
       refute html_response(conn, 200) =~ "Granda kino"
     end

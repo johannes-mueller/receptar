@@ -85,31 +85,17 @@ defmodule Receptar.RecipeTest do
     end
 
     test "search 'bulko' and vegetarian finds 'Fromaĝa bulko' and 'Sukera bulko'" do
-      result = Recipes.search(%{"title" => "bulko", "vegetarian" => true}, "eo")
+      result = Recipes.search(%{"title" => "bulko", "class" => "vegetarian"}, "eo")
       |> Recipes.translate("eo")
       |> Enum.map(& &1.title)
 
       assert_lists_equal result, ["Sukera bulko", "Fromaĝa bulko"]
     end
 
-    test "search 'bulko' and not vegetarian finds 'Fromaĝa bulko' and 'Sukera bulko'" do
-      assert [
-	%Recipe { translations: [%{content: "Tinusa bulko"}, _]},
-      ] = Recipes.search(%{"title" => "bulko", "vegetarian" => false}, "eo")
-    end
-
     test "search 'bulko' and vegan finds 'Sukera bulko'" do
       assert [
 	%Recipe { translations: [%{content: "Sukera bulko"}, _]},
-      ] = Recipes.search(%{"title" => "bulko", "vegan" => true}, "eo")
-    end
-
-    test "search 'bulko' and not vegan finds 'Fromaĝa bulko' and 'Tinusa bulko'" do
-      result = Recipes.search(%{"title" => "bulko", "vegan" => false}, "eo")
-      |> Recipes.translate("eo")
-      |> Enum.map(& &1.title)
-
-      assert_lists_equal result, ["Fromaĝa bulko", "Tinusa bulko"]
+      ] = Recipes.search(%{"title" => "bulko", "class" => "vegan"}, "eo")
     end
 
     test "search recipe returns substance kind fields set" do
