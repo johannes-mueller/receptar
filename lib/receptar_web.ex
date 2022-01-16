@@ -114,6 +114,19 @@ defmodule ReceptarWeb do
 	amount
 	|> Decimal.to_string(:xsd)
       end
+
+      def maybe_add_to_list(number, list) do
+	case Integer.parse(number) do
+	  :error -> list
+	  {i, _remainder} ->
+	    if i not in list do
+	      [i | list]
+	    else
+	      list
+	    end
+	end
+      end
+
     end
   end
 
