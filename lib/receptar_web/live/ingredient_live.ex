@@ -13,7 +13,7 @@ defmodule ReceptarWeb.IngredientLive do
      |> assign(substance_suggestions: [])
      |> assign(unit_suggestions: Units.completion_candidates("", assigns.language))
      |> assign_field_values(assigns)
-     #|> IO.inspect(label: "update_ingerdient_live")
+     |> assign(translate_substance: false)
     }
   end
 
@@ -87,6 +87,10 @@ defmodule ReceptarWeb.IngredientLive do
      socket
      |> assign(submit_disabled: submit_disabled(socket.assigns))
     }
+  end
+
+  def handle_event("translate-substance", _attrs, socket) do
+    {:noreply, socket |> assign(translate_substance: true)}
   end
 
   defp handle_input_change_event(%{"_target" => ["substance-name"]} = attrs, socket) do

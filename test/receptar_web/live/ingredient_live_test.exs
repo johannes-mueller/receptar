@@ -346,10 +346,25 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	end
     end
 
+    test "default translate_substance default false", %{socket: socket} do
+      assigns = %{id: 1, language: "eo"}
+      {:ok, socket} = IngredientLive.update(assigns, socket)
+
+      refute socket.assigns.translate_substance
+    end
+
+    test "default translate_substance set true", %{socket: socket} do
+      assigns = %{id: 1, language: "eo"}
+      {:ok, socket} = IngredientLive.update(assigns, socket)
+
+      {:noreply, socket}
+        = IngredientLive.handle_event("translate-substance", %{}, socket)
+
+      assert socket.assigns.translate_substance
+    end
   end
 
   describe "Connection state" do
-
     setup do
       insert_test_data()
       {:ok, %{session: %{
@@ -705,6 +720,40 @@ defmodule ReceptarWeb.IngredientLiveTest do
       |> render()
 
       refute html =~ ~r/disabled/
+    end
+
+    test "translate div present when translate_sustance true", %{conn: conn} do
+      session = %{
+	"ingredient" => %{
+	  amount: Decimal.new("1.0"),
+	  unit: %{name: "litro"},
+	  substance: %Substance{name: "vino", kind: :vegan},
+	  number: 1
+	},
+	"language" => "eo",
+      }
+
+      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+      view |> element("a#translate-substance-btn") |> render_click()
+
+      assert view |> element("div.translate-substance-frame") |> has_element?()
+    end
+
+    test "translate div not present when translate_sustance false", %{conn: conn} do
+      session = %{
+	"ingredient" => %{
+	  amount: Decimal.new("1.0"),
+	  unit: %{name: "litro"},
+	  substance: %Substance{name: "vino", kind: :vegan},
+	  number: 1
+	},
+	"language" => "eo",
+      }
+
+      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
+
+      refute view |> element("div.translate-substance-frame") |> has_element?()
     end
 
     @tag :skip

@@ -1,50 +1,64 @@
 <form phx-submit="submit" phx-target={@myself} phx-change="change-event">
-  <input id={idfy("amount-input", @id)}
-         name="amount"
-         phx-debounce="700"
-         autocomplete="off"
-         type="number"
-         value={@amount_value}>
-  <input id={idfy("substance-input", @id)}
-         name="substance-name"
-         phx-debounce="700"
-         autocomplete="off"
-         list={idfy("substance-suggestions", @id)}
-         value={@substance_name_value}>
-  <datalist id={idfy("substance-suggestions", @id)}>
-    <%= for suggestion <- @substance_suggestions do %>
-        <option value={suggestion}></option>
+    <label for={idfy("amount-input", @id)}>Amount</label>
+    <input id={idfy("amount-input", @id)}
+           name="amount"
+           phx-debounce="700"
+           autocomplete="off"
+           type="number"
+           value={@amount_value}>
+    <label for={idfy("unit-input", @id)}>Unit</label>
+    <input id={idfy("unit-input", @id)}
+           name="unit-name"
+           phx-debounce="700"
+           autocomplete="off"
+           list={idfy("unit-suggestions", @id)}
+           value={@unit_name_value}>
+    <datalist id={idfy("unit-suggestions", @id)}>
+	<%= for suggestion <- @unit_suggestions do %>
+            <option value={suggestion}></option>
+	<% end %>
+    </datalist>
+    <label for={idfy("substance-input", @id)}>Substance</label>
+    <input id={idfy("substance-input", @id)}
+           name="substance-name"
+           phx-debounce="700"
+           autocomplete="off"
+           list={idfy("substance-suggestions", @id)}
+           value={@substance_name_value}>
+    <datalist id={idfy("substance-suggestions", @id)}>
+	<%= for suggestion <- @substance_suggestions do %>
+            <option value={suggestion}></option>
+	<% end %>
+    </datalist>
+    <a href="#"
+       id="translate-substance-btn"
+       phx-click="translate-substance"
+       phx-target={@myself}>
+	Translate
+    </a>
+    <input type="radio" class="vegan-rb" value="vegan" name="substance-kind"
+           checked={@substance_kind_value == :vegan}>
+    <input type="radio" class="vegetarian-rb" value="vegetarian" name="substance-kind"
+           checked={@substance_kind_value == :vegetarian}>
+    <input type="radio" class="meat-rb" value="meat" name="substance-kind"
+           checked={@substance_kind_value == :meat}>
+    <input type="hidden" class="ingredient-number-input" value={@id} name="number">
+    <%= if @submit_disabled do %>
+	<button class="submit-button" type="submit" disabled>Submit</button>
+    <% else %>
+	<button class="submit-button" type="submit">Submit</button>
     <% end %>
-  </datalist>
-  <input id={idfy("unit-input", @id)}
-         name="unit-name"
-         phx-debounce="700"
-         autocomplete="off"
-         list={idfy("unit-suggestions", @id)}
-         value={@unit_name_value}>
-  <datalist id={idfy("unit-suggestions", @id)}>
-    <%= for suggestion <- @unit_suggestions do %>
-        <option value={suggestion}></option>
+    <button
+	class="cancel-button"
+	type="button"
+	phx-click="cancel"
+	phx-value-number={@ingredient.number}
+	phx-target={@myself}>
+	Cancel
+    </button>
+    <%= if @translate_substance do %>
+	<div class="translate-substance-frame">
+	    There will be foxes
+	</div>
     <% end %>
-  </datalist>
-  <input type="radio" class="vegan-rb" value="vegan" name="substance-kind"
-         checked={@substance_kind_value == :vegan}>
-  <input type="radio" class="vegetarian-rb" value="vegetarian" name="substance-kind"
-         checked={@substance_kind_value == :vegetarian}>
-  <input type="radio" class="meat-rb" value="meat" name="substance-kind"
-         checked={@substance_kind_value == :meat}>
-  <input type="hidden" class="ingredient-number-input" value={@id} name="number">
-  <%= if @submit_disabled do %>
-  <button class="submit-button" type="submit" disabled>Submit</button>
-  <% else %>
-  <button class="submit-button" type="submit">Submit</button>
-  <% end %>
-  <button
-    class="cancel-button"
-    type="button"
-    phx-click="cancel"
-    phx-value-number={@ingredient.number}
-    phx-target={@myself}>
-    Cancel
-  </button>
 </form>

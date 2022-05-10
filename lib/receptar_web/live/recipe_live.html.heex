@@ -1,25 +1,28 @@
 <h1 phx-click="edit-title">
-  <%= if @edit_title do%>
-  <form phx-submit="submit-title" phx-change="title-change">
-    <input name="title" value={tr_form(@recipe.title)}>
-    <%= if @submit_title_disabled do %>
-      <button class="submit-button" type="submit" disabled>Submit</button>
+    <%= if @edit_title do %>
+	<form phx-submit="submit-title" phx-change="title-change">
+	    <input name="title" value={tr_form(@recipe.title)}>
+	    <%= if @submit_title_disabled do %>
+		<button class="submit-button" type="submit" disabled>Submit</button>
+	    <% else %>
+		<button class="submit-button" type="submit">Submit</button>
+	    <% end %>
+	    <button phx-click="cancel-edit-title" type="button">Cancel</button>
+	</form>
     <% else %>
-      <button class="submit-button" type="submit">Submit</button>
+	<%= tr(@recipe.title) %>
     <% end %>
-    <button phx-click="cancel-edit-title" type="button">Cancel</button>
-  </form>
-  <% else %>
-  <%= tr(@recipe.title) %>
-  <% end %>
 </h1>
+
 <.live_component
-  module={IngredientsLive},
-  id="ingredients"
-  ingredients={@recipe.ingredients}
-  edit_ingredients={@edit_ingredients}/>
+    module={IngredientsLive},
+    id="ingredients"
+    ingredients={@recipe.ingredients}
+    edit_ingredients={@edit_ingredients}
+/>
 <.live_component
   module={InstructionsLive},
   id="instructions"
   instructions={@recipe.instructions}
-  edit_instructions={@edit_instructions}/>
+  edit_instructions={@edit_instructions}
+/>
