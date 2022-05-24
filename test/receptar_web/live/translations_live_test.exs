@@ -2,13 +2,13 @@ defmodule ReceptarWeb.TranslationLiveTest do
   use ReceptarWeb.ConnCase
   use ExUnit.Case
   import Receptar.Seeder
-#  import Phoenix.LiveViewTest
+  import Phoenix.LiveViewTest
   import Phoenix.LiveView.Helpers
 
 #  import Receptar.TestHelpers
 
   alias ReceptarWeb.TranslationLive
-#  alias ReceptarWeb.TranslationTestLiveView
+  alias ReceptarWeb.TranslationTestLiveView
 
 
   describe "Socket state" do
@@ -284,6 +284,27 @@ defmodule ReceptarWeb.TranslationLiveTest do
     end
 
   end
+
+  describe "Connection stat" do
+    setup %{conn: conn} do
+      insert_test_data()
+      register_and_log_in_user(%{conn: conn})
+
+      translatable = Receptar.Substances.search("salo", "eo") |> List.first
+      {:ok, %{session: %{"translatable" => translatable, "language" => "eo"}}}
+    end
+
+    test "TranslationLive view has a form", %{conn: conn, session: session} do
+
+      {:ok, view, _html} = live_isolated(conn, TranslationTestLiveView, session: session)
+
+      form_element = element(view, "form")
+
+      assert render(form_element) =~ ~r/phx-submit="submit"/
+      assert render(form_element) =~ ~r/phx-change="change-translation-content"/
+    end
+
+  end
 end
 
 defmodule ReceptarWeb.TranslationTestLiveView do
@@ -294,20 +315,20 @@ defmodule ReceptarWeb.TranslationTestLiveView do
   def render(assigns) do
     ~H"<.live_component
     module={TranslationLive}
-    id={@translation.number}
-    translation={@translation}
+    id={@translatable.id}
+    translatable={@translatable}
     language={@language}
     />"
   end
 
   def mount(_params, session, socket) do
     %{
-      "translation" => translation,
+      "translatable" => translatable,
       "language" => language
     } = session
     socket =
       socket
-      |> assign(translation: translation)
+      |> assign(translatable: translatable)
       |> assign(language: language)
 
     {:ok, socket}
