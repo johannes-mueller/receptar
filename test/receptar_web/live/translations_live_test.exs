@@ -7,8 +7,6 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
 #  import Receptar.TestHelpers
 
-  alias Receptar.Translations.Translation
-
   alias ReceptarWeb.TranslationLive
 #  alias ReceptarWeb.TranslationTestLiveView
 
@@ -16,27 +14,20 @@ defmodule ReceptarWeb.TranslationLiveTest do
   describe "Socket state" do
     setup do
       insert_test_data()
+      translatable = Receptar.Substances.search("salo", "eo") |> List.first
+
       %{
 	socket: %Phoenix.LiveView.Socket{},
-	known_translations: [
-	    %Translation{
-	      language: "eo",
-	      content: "salo"
-	    },
-	    %Translation{
-	      language: "de",
-	      content: "Salz"
-	    }
-	  ]
+	translatable: translatable
       }
     end
 
     for language <- ["sk", "en"] do
-      test "default translation #{language}", %{socket: socket, known_translations: translations} do
+      test "default translation #{language}", %{socket: socket, translatable: translatable} do
 	language = unquote(language)
 	assigns = %{
 	  language: language,
-	  translations: translations
+	  translatable: translatable
 	}
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
@@ -47,10 +38,10 @@ defmodule ReceptarWeb.TranslationLiveTest do
       end
     end
 
-    test "translation in default language known", %{socket: socket, known_translations: translations} do
+    test "translation in default language known", %{socket: socket, translatable: translatable} do
       assigns = %{
 	language: "eo",
-	  translations: translations
+	  translatable: translatable
       }
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
@@ -62,12 +53,12 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
     for language <- ["sk", "fr"] do
       test "change-dst-language event (#{language}) sets/changes dst language", fixtures do
-	%{socket: socket, known_translations: translations} = fixtures
+	%{socket: socket, translatable: translatable} = fixtures
 
 	language = unquote(language)
 	assigns = %{
 	  language: "eo",
-	  translations: translations
+	  translatable: translatable
 	}
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
@@ -86,11 +77,11 @@ defmodule ReceptarWeb.TranslationLiveTest do
     end
 
     test "change-dst-language event to known language sets content", fixtures do
-      %{socket: socket, known_translations: translations} = fixtures
+      %{socket: socket, translatable: translatable} = fixtures
 
       assigns = %{
 	language: "eo",
-	translations: translations
+	translatable: translatable
       }
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
@@ -106,13 +97,13 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
     for {language, content} <- [{"sk", "soľ"}, {"fr", "sel"}] do
       test "change-translation-content for #{language} changes translation", fixtures do
-	%{socket: socket, known_translations: translations} = fixtures
+	%{socket: socket, translatable: translatable} = fixtures
 
 	language = unquote(language)
 	content = unquote(content)
 	assigns = %{
 	  language: language,
-	  translations: translations
+	  translatable: translatable
 	}
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
@@ -130,15 +121,17 @@ defmodule ReceptarWeb.TranslationLiveTest do
 	  {"eo", "saloo", "salo"}, {"de", "Salzz", "Salz"}, {"sk", "soľ", ""}
 	] do
       test "save-translation-content for #{language} saves translation", fixtures do
-	%{socket: socket, known_translations: translations} = fixtures
+	%{socket: socket, translatable: translatable} = fixtures
 
 	language = unquote(language)
 	content = unquote(content)
 	orig_content = unquote(orig_content)
 	assigns = %{
 	  language: language,
-	  translations: translations
+	  translatable: translatable
 	}
+
+	substance_id = translatable.id
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
 
@@ -148,34 +141,49 @@ defmodule ReceptarWeb.TranslationLiveTest do
 	{:noreply, socket} =
 	  TranslationLive.handle_event("save-translation-content", %{}, socket)
 
-	%{assigns: %{translations: translations}} = socket
+	translatable = Receptar.Substances.get_substance!(substance_id)
 
-	translations
+	translatable.translations
 	|> Enum.any?(fn
 	  %{language: ^language, content: ^content} -> true
 	  _ -> false
 	end)
 	|> assert
 
-	translations
+	translatable.translations
 	|> Enum.any?(fn
 	  %{language: ^language, content: ^orig_content} -> true
 	  _ -> false
 	end)
 	|> refute
 
+	socket.assigns.translatable.translations
+	|> Enum.any?(fn
+	  %{language: ^language, content: ^content} -> true
+	  _ -> false
+	end)
+	|> assert
+
+	socket.assigns.translatable.translations
+	|> Enum.any?(fn
+	  %{language: ^language, content: ^orig_content} -> true
+	  _ -> false
+	end)
+	|> refute
+
+
       end
     end
 
     for {language, content} <- [{"eo", "salo"}, {"de", "Salz"}] do
       test "reset-translation-content for #{language} reset translation", fixtures do
-	%{socket: socket, known_translations: translations} = fixtures
+	%{socket: socket, translatable: translatable} = fixtures
 
 	language = unquote(language)
 	content = unquote(content)
 	assigns = %{
 	  language: language,
-	  translations: translations
+	  translatable: translatable
 	}
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
@@ -193,11 +201,11 @@ defmodule ReceptarWeb.TranslationLiveTest do
     end
 
     test "initial state not changed", fixtures do
-      %{socket: socket, known_translations: translations} = fixtures
+      %{socket: socket, translatable: translatable} = fixtures
 
       assigns = %{
 	language: "eo",
-	translations: translations
+	translatable: translatable
       }
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
@@ -208,11 +216,11 @@ defmodule ReceptarWeb.TranslationLiveTest do
     end
 
     test "after content change state changed", fixtures do
-      %{socket: socket, known_translations: translations} = fixtures
+      %{socket: socket, translatable: translatable} = fixtures
 
       assigns = %{
 	language: "eo",
-	translations: translations
+	translatable: translatable
       }
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
@@ -226,11 +234,11 @@ defmodule ReceptarWeb.TranslationLiveTest do
     end
 
     test "after content reset state not changed", fixtures do
-      %{socket: socket, known_translations: translations} = fixtures
+      %{socket: socket, translatable: translatable} = fixtures
 
       assigns = %{
 	language: "eo",
-	translations: translations
+	translatable: translatable
       }
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
@@ -249,11 +257,11 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
     for module <- [ReceptarWeb.IngredientLive, ReceptarWeb.RecipeLive] do
       test "translation done send update done to #{module}", fixtures do
-	%{socket: socket, known_translations: translations} = fixtures
+	%{socket: socket, translatable: translatable} = fixtures
 	module = unquote(module)
 	assigns = %{
 	  language: "eo",
-	  translations: translations,
+	  translatable: translatable,
 	  parent_module: module
 	}
 

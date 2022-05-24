@@ -35,19 +35,20 @@ defmodule ReceptarWeb.TranslationLive do
   end
 
   def handle_event("save-translation-content", _attrs, socket) do
-    %{assigns: %{translations: translations, dst_translation: dst_translation}} = socket
+    %{assigns: %{translatable: translatable, dst_translation: dst_translation}} = socket
     %{language: dst_language} = dst_translation
 
-    translations =
-      translations
-      |> Enum.reject(fn
-        %{language: ^dst_language} -> true
-        _ -> false
-      end)
+    translation = Enum.find(translatable.translations, fn tr -> tr.language == dst_language end)
+
+    if translation do
+      Receptar.Translations.update_translation(translation, Map.from_struct(dst_translation))
+    else
+      Receptar.Translations.add_translation(translatable, dst_translation)
+    end
 
     {:noreply,
      socket
-     |> assign(translations: [dst_translation | translations])
+     |> update_translations
     }
   end
 
@@ -59,14 +60,29 @@ defmodule ReceptarWeb.TranslationLive do
   end
 
   defp assign_initial_translation(socket) do
-    %{assigns: %{translations: translations, language: language}} = socket
+    %{assigns: %{translatable: translatable, language: language}} = socket
 
     initial =
-      translations
+      translatable.translations
       |> Enum.find(%{language: language, content: ""}, &(&1.language == language))
 
     socket
     |> assign(dst_translation: initial)
     |> assign(content_changed: false)
+  end
+
+  defp update_translations(socket) do
+    %{assigns: %{translatable: translatable, dst_translation: dst_translation}} = socket
+    %{language: dst_language} = dst_translation
+
+    translations =
+      translatable.translations
+      |> Enum.reject(fn
+        %{language: ^dst_language} -> true
+        _ -> false
+      end)
+
+     socket
+     |> assign(translatable: %{translatable | translations: [dst_translation | translations]})
   end
 end
