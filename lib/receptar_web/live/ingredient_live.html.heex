@@ -57,8 +57,14 @@
 	Cancel
     </button>
     <%= if @translate_substance do %>
-	<div class="translate-substance-frame">
-	    There will be foxes
+	<div class="translate-substance">
+	    Goooo
+	    <.live_component
+	      module={TranslationLive}
+	      id={@ingredient.substance.id}
+	      translatable={@ingredient.substance}
+	      language={@language}
+	    />
 	</div>
     <% end %>
 </form>

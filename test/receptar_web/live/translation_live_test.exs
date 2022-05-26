@@ -63,9 +63,9 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
 
-	attrs = %{"language" => language}
+	attrs = %{"_target" => ["dst-language"], "dst-language" => language}
 	{:noreply, socket} =
-	  TranslationLive.handle_event("change-dst-language", attrs, socket)
+	  TranslationLive.handle_event("change-event", attrs, socket)
 
 	assert %Phoenix.LiveView.Socket{
 	  assigns: %{
@@ -86,9 +86,9 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
 
-      attrs = %{"language" => "de"}
+      attrs = %{"_target" => ["dst-language"], "dst-language" => "de"}
       {:noreply, socket} =
-	TranslationLive.handle_event("change-dst-language", attrs, socket)
+	TranslationLive.handle_event("change-event", attrs, socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{dst_translation: %{language: "de", content: "Salz"}}
@@ -108,8 +108,9 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
 
+	attrs = %{"_target" => ["translation-content"], "translation-content" => content}
 	{:noreply, socket} =
-	  TranslationLive.handle_event("change-translation-content", %{content: content}, socket)
+	  TranslationLive.handle_event("change-event", attrs, socket)
 
 	assert %Phoenix.LiveView.Socket{
 	  assigns: %{dst_translation: %{language: ^language, content: ^content}}
@@ -135,8 +136,9 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
 
+	attrs = %{"_target" => ["translation-content"], "translation-content" => content}
 	{:noreply, socket} =
-	  TranslationLive.handle_event("change-translation-content", %{content: content}, socket)
+	  TranslationLive.handle_event("change-event", attrs, socket)
 
 	{:noreply, socket} =
 	  TranslationLive.handle_event("save-translation-content", %{}, socket)
@@ -188,8 +190,9 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
 	{:ok, socket} = TranslationLive.update(assigns, socket)
 
+	attrs = %{"_target" => ["translation-content"], "translation-content" => "uuuh"}
 	{:noreply, socket} =
-	  TranslationLive.handle_event("change-translation-content", %{content: "uuuh"}, socket)
+	  TranslationLive.handle_event("change-event", attrs, socket)
 
 	{:noreply, socket} =
 	  TranslationLive.handle_event("reset-translation-content", %{}, socket)
@@ -225,8 +228,10 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
 
+
+      attrs = %{"_target" => ["translation-content"], "translation-content" => "uuuh"}
       {:noreply, socket} =
-	TranslationLive.handle_event("change-translation-content", %{content: "uuuh"}, socket)
+	TranslationLive.handle_event("change-event", attrs, socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{content_changed: true}
@@ -243,8 +248,9 @@ defmodule ReceptarWeb.TranslationLiveTest do
 
       {:ok, socket} = TranslationLive.update(assigns, socket)
 
+      attrs = %{"_target" => ["translation-content"], "translation-content" => "uuuh"}
       {:noreply, socket} =
-	TranslationLive.handle_event("change-translation-content", %{content: "uuuh"}, socket)
+	TranslationLive.handle_event("change-event", attrs, socket)
 
       {:noreply, socket} =
 	TranslationLive.handle_event("reset-translation-content", %{}, socket)
@@ -295,15 +301,68 @@ defmodule ReceptarWeb.TranslationLiveTest do
     end
 
     test "TranslationLive view has a form", %{conn: conn, session: session} do
-
       {:ok, view, _html} = live_isolated(conn, TranslationTestLiveView, session: session)
 
       form_element = element(view, "form")
 
-      assert render(form_element) =~ ~r/phx-submit="submit"/
-      assert render(form_element) =~ ~r/phx-change="change-translation-content"/
+      assert render(form_element) =~ ~r/phx-submit="done"/
+      assert render(form_element) =~ ~r/phx-change="change-event/
     end
 
+    test "form has a submit button", %{conn: conn, session: session} do
+      {:ok, view, _html} = live_isolated(conn, TranslationTestLiveView, session: session)
+
+      html = view
+      |> element("form button.submit-button")
+      |> render()
+
+      assert html =~ ~r/type="submit"/
+    end
+
+    test "form has a translation-content textarea", %{conn: conn, session: session} do
+      {:ok, view, _html} = live_isolated(conn, TranslationTestLiveView, session: session)
+
+      html = view
+      |> element("form textarea#translation-content")
+      |> render()
+
+      assert html =~ ~r/phx-debounce="700"/
+    end
+
+    for {language, content} <- [{"eo", "salo"}, {"de", "Salz"}] do
+      test "translation-content textarea showing #{language} translation", %{conn: conn, session: session} do
+	language = unquote(language)
+	content = unquote(content)
+	session = %{session | "language" => language}
+	{:ok, view, _html} = live_isolated(conn, TranslationTestLiveView, session: session)
+
+	html = view
+	|> element("form textarea#translation-content")
+	|> render()
+
+	assert html =~ ~r/#{content}/
+      end
+    end
+
+    test "spans for other translations are present", %{conn: conn, session: session} do
+      {:ok, view, _html} = live_isolated(conn, TranslationTestLiveView, session: session)
+
+      view |> has_element?("span.known-translation-content", "salo") |> assert
+      view |> has_element?("span.known-translation-content", "Salz") |> assert
+
+    end
+
+    test "form has selection for dst-language", %{conn: conn, session: session} do
+      {:ok, view, _html} = live_isolated(conn, TranslationTestLiveView, session: session)
+
+      html = view
+      |> element("form select.dst-language-select")
+      |> render()
+
+      assert html =~ ~r/name="dst-language"/
+      assert html =~ ~r|<option value="eo" selected="selected">eo</option>|
+      assert html =~ ~r|<option value="de">de</option>|
+    end
   end
 end
 

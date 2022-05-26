@@ -486,10 +486,10 @@ defmodule ReceptarWeb.IngredientLiveTest do
 
       input_element = element(view, "form input#amount-input-2")
 
-      assert render(input_element) =~~r/name="amount"/
-      assert render(input_element) =~~r/phx-debounce="700"/
-      assert render(input_element) =~~r/autocomplete="off"/
-      assert render(input_element) =~~r/type="number"/
+      assert render(input_element) =~ ~r/name="amount"/
+      assert render(input_element) =~ ~r/phx-debounce="700"/
+      assert render(input_element) =~ ~r/autocomplete="off"/
+      assert render(input_element) =~ ~r/type="number"/
     end
 
     test "form has radio buttons for substance kind", %{conn: conn, session: session} do

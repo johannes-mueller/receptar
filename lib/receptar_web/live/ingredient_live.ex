@@ -5,6 +5,7 @@ defmodule ReceptarWeb.IngredientLive do
   alias Receptar.Substances
 
   alias ReceptarWeb.IngredientsLive
+  alias ReceptarWeb.TranslationLive
 
   def update(assigns, socket) do
     {:ok,

@@ -1,3 +1,5 @@
+alias Receptar.Translations
+
 defmodule ReceptarWeb.TranslationLive do
   use ReceptarWeb, :live_component
 
@@ -9,7 +11,7 @@ defmodule ReceptarWeb.TranslationLive do
     }
   end
 
-  def handle_event("change-dst-language", %{"language" => language}, socket) do
+  def handle_event("change-event", %{"_target" => ["dst-language"], "dst-language" => language}, socket) do
     {:noreply,
      socket
      |> assign(language: language)
@@ -17,7 +19,7 @@ defmodule ReceptarWeb.TranslationLive do
     }
   end
 
-  def handle_event("change-translation-content", %{content: content}, socket) do
+  def handle_event("change-event", %{"_target" => ["translation-content"], "translation-content" => content}, socket) do
     %{assigns: %{dst_translation: translation}} = socket
 
     {:noreply,
