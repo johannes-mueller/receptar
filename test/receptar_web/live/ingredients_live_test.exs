@@ -243,6 +243,30 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       ] = socket.assigns.ingredients
     end
 
+    test "submit substance add translation", %{socket: socket} do
+      ingredients =
+	recipe_by_title("granda kino").ingredients
+        |> Ingredients.translate("eo")
+
+      [%{substance: substance} | _] = ingredients
+
+      substance_updated = %{
+	substance |
+	translations: [
+	  %{language: "sk", content: "cestovina"} | substance.translations]
+      }
+
+      {:ok, _socket} =
+	IngredientsLive.update(%{update_translations: substance_updated}, socket)
+
+      assert_received({
+	:update_translations,
+	%{
+	  translatable: ^substance_updated
+	}
+      })
+    end
+
     for {number, remianing} <- [{1, [2]}, {2, [1]}] do
       test "cancel ingredient #{number}", %{socket: socket} do
 	ingredients = recipe_by_title("Tinusa bulko").ingredients
@@ -282,8 +306,66 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 		%{substance: %Substance{name: ^remaining_2}, number: 2}
 	      ]
 	    }
-	  })
+	      })
 	end
+    end
+
+    test "by default no substance and amount to be translated", %{socket: socket} do
+      ingredients =
+      	recipe_by_title("granda kino").ingredients
+	|> Ingredients.translate("eo")
+
+      params = %{ingredients: ingredients, edit_ingredients: []}
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      assert %Phoenix.LiveView.Socket{
+	assigns: %{translate_item: nil}
+      } = socket
+    end
+
+    for {number, number_string, item} <- [{1, "1", :substance}, {2, "2", :amount}] do
+      test "translate_item set after translate-item #{number} event", %{socket: socket} do
+	number = unquote(number)
+	number_string = unquote(number_string)
+	item = unquote(item)
+	ingredients =
+      	  recipe_by_title("granda kino").ingredients
+	|> Ingredients.translate("eo")
+
+	params = %{ingredients: ingredients, edit_ingredients: []}
+	{:ok, socket} = IngredientsLive.update(params, socket)
+
+	attrs = %{"number" => number_string}
+	event = "translate-" <> Atom.to_string(item)
+
+	{:noreply, socket} =
+	  IngredientsLive.handle_event(event, attrs, socket)
+
+	assert %Phoenix.LiveView.Socket{
+	  assigns: %{translate_item: {^number, ^item}}
+	} = socket
+      end
+    end
+
+    test "translate_item reset after translation-done", %{socket: socket} do
+      ingredients =
+      	recipe_by_title("granda kino").ingredients
+      |> Ingredients.translate("eo")
+
+      params = %{ingredients: ingredients, edit_ingredients: []}
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      {:noreply, socket} =
+	IngredientsLive.handle_event("translate-substance", %{"number" => "1"}, socket)
+
+      [first_ingredient | _] = ingredients
+
+      {:ok, socket} =
+	IngredientsLive.update(%{update_translations: first_ingredient}, socket)
+
+      assert %Phoenix.LiveView.Socket{
+	assigns: %{translate_item: nil}
+      } = socket
     end
   end
 
@@ -291,7 +373,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
     setup do
       insert_test_data()
       %{ingredient: %{
-	   substance: %Substance{name: "foo"},
+	   substance: %Substance{id: 2342, translations: [%{language: "eo", content: "salo"}, %{language: "de", content: "Salz"}]},
 	   amount: Decimal.new("23.0"),
 	   unit: %{name: "gramo"},
 	   number: 1
@@ -308,6 +390,15 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       refute view |> has_element?("form")
     end
 
+    test "initial view does have button#translate- elements",
+      %{conn: conn, ingredient: ingredient} do
+
+      session = %{"ingredients" => [ingredient]}
+      {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+      assert view |> has_element?("button#translate-substance-1")
+      assert view |> has_element?("button#translate-amount-1")
+    end
 
     for {number, selector} <- [
 	  {"1", "#ingredient-1"},
@@ -332,7 +423,14 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	end
     end
 
-    test "test edit ingredient click", %{conn: conn, ingredient: ingredient} do
+    for {number, selector} <- [
+	  {"1", "#ingredient-1"},
+	  {"2", "#ingredient-2"}
+	] do
+	test "test edit ingredient #{number} click", %{conn: conn, ingredient: ingredient} do
+	  number = unquote(number)
+	  selector = unquote(selector)
+
 	  session = %{"ingredients" => [
 		       %{ingredient | number: 1},
 		       %{ingredient | number: 2},
@@ -340,8 +438,35 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	  {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
 
 	  view
-	  |> element("#ingredient-1")
+	  |> element(selector)
 	  |> render_click()
+
+	  assert view |> has_element?("form#edit-ingredient-" <> number)
+	end
+    end
+
+    for {number, selector} <- [
+	  {"1", "button#translate-substance-1"},
+	  {"2", "button#translate-substance-2"}
+	] do
+	test "test translate substance #{number} click", %{conn: conn, ingredient: ingredient} do
+	  number = unquote(number)
+	  selector = unquote(selector)
+
+	  session = %{"ingredients" => [
+		       %{ingredient | number: 1},
+		       %{ingredient | number: 2},
+		     ]}
+	  {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+	  refute view |> has_element?("div.translate-edit-frame")
+
+	  view
+	  |> element(selector)
+	  |> render_click()
+
+	  assert view |> has_element?("span#translation-content-eo-translations-substance-" <> number)
+	end
     end
 
     test "append ingredient", %{conn: conn} do
@@ -398,6 +523,20 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	assert html =~ ~r/phx-click="insert-ingredient"/
 	assert html =~ ~r/phx-value-number="#{number}"/
       end
+
+    end
+
+    test "translation-done resets translation", %{conn: conn, ingredient: ingredient} do
+      session = %{"ingredients" => [ingredient]}
+      {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+      refute view |> has_element?("button.translation-done")
+
+      view |> element("button#translate-substance-1") |> render_click()
+
+      view |> element("button.translation-done") |> render_click()
+
+      refute view |> has_element?("button.translation-done")
     end
   end
 end
@@ -409,7 +548,6 @@ defmodule ReceptarWeb.IngredientsTestLiveView do
   alias ReceptarWeb.IngredientsLive
 
   def render(assigns) do
-    #IO.inspect(assigns, label: "render")
     ~H"<.live_component
     module={IngredientsLive}
     id=\"ingredients\"
@@ -429,7 +567,6 @@ defmodule ReceptarWeb.IngredientsTestLiveView do
      socket
      |> assign(ingredients: ingredients)
      |> assign(edit_ingredients: edit_ingredients)
-     #|> IO.inspect(label: "mount")
     }
   end
 end

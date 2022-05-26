@@ -508,7 +508,6 @@ defmodule ReceptarWeb.InstructionsTestLiveView do
   alias ReceptarWeb.InstructionsLive
 
   def render(assigns) do
-    #IO.inspect(assigns, label: "render")
     ~H"<.live_component
     module={InstructionsLive}
     id=\"instructions\"

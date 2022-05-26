@@ -10,7 +10,6 @@ defmodule ReceptarWeb.InstructionsLive do
     |> assign(instructions: params.instructions)
     |> assign(edit_instructions: params.edit_instructions)
     |> assign(new_instructions: [])
-    #|> IO.inspect(label: "update")
 
     {:ok, socket}
   end

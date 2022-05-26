@@ -1,44 +1,66 @@
 <div id="ingredients">
-  <ul class="ingredients-list">
-    <%= for ingredient <- @ingredients do %>
-        <li class="ingredient-list-entry">
-          <%= if ingredient.number in @edit_ingredients do %>
-          <.live_component
-            module={IngredientLive}
-            id={idfy("ingredient", ingredient.number)}
-            ingredient={ingredient}
-            language={@language}/>
-          <% else %>
-          <span id={idfy("ingredient", ingredient.number)}
-                phx-click="edit-ingredient"
-                phx-value-number={ingredient.number}
-                phx-target={@myself}>
-            <span class="amount-quantity"><%= render_amount(ingredient) %></span>
-            <span class="amount-unit"><%= tr(ingredient.unit.name) %></span>
-            <span class="ingredient-substance"><%= tr(ingredient.substance.name) %></span>
-          </span>
-          <% end %>
-          <a href="#"
-             id={idfy("insert-ingredient", ingredient.number)}
-             phx-click="insert-ingredient"
-             phx-target={@myself}
-             phx-value-number={ingredient.number}>
-            Insert
-          </a>
-          <a href="#"
-             id={idfy("delete-ingredient", ingredient.number)}
-             phx-click="delete-ingredient"
-             phx-target={@myself}
-             phx-value-number={ingredient.number}>
-            Delete
-          </a>
-        </li>
-        <% end %>
-  </ul>
-  <a href="#"
-     id="append-ingredient"
-     phx-click="append-ingredient"
-     phx-target={@myself}>
-    Append ingredient
-  </a>
+    <ul class="ingredients-list">
+	<%= for ingredient <- @ingredients do %>
+	    <li class="ingredient-list-entry">
+		<%= if ingredient.number in @edit_ingredients do %>
+		    <.live_component
+		    module={IngredientLive}
+		    id={idfy("ingredient", ingredient.number)}
+		    ingredient={ingredient}
+		    language={@language}
+		    />
+                <% else %>
+		    <span id={idfy("ingredient", ingredient.number)}
+			  phx-click="edit-ingredient"
+			  phx-value-number={ingredient.number}
+			  phx-target={@myself}>
+			<span class="amount-quantity"><%= render_amount(ingredient) %></span>
+			<span class="amount-unit"><%= tr(ingredient.unit.name) %></span>
+			<button id={idfy("translate-amount", ingredient.number)} type="button"
+				   phx-click="translate-amount" phx-value-number={ingredient.number} phx-target={@myself}>
+			    TR
+			</button>
+			<span class="ingredient-substance"><%= tr(ingredient.substance.name) %></span>
+			<button id={idfy("translate-substance", ingredient.number)} type="button"
+				   phx-click="translate-substance" phx-value-number={ingredient.number} phx-target={@myself}>
+			    TR
+			</button>
+		    </span>
+		<% end %>
+		<a href="#"
+		   id={idfy("insert-ingredient", ingredient.number)}
+		   phx-click="insert-ingredient"
+		   phx-target={@myself}
+		   phx-value-number={ingredient.number}>
+		    Insert
+		</a>
+		<a href="#"
+		   id={idfy("delete-ingredient", ingredient.number)}
+		   phx-click="delete-ingredient"
+		   phx-target={@myself}
+		   phx-value-number={ingredient.number}>
+		    Delete
+		</a>
+            </li>
+	    <%= if @translate_item == {ingredient.number, :amount} do %>
+		AMOUNT
+	    <% end %>
+	    <%= if @translate_item == {ingredient.number, :substance} do %>
+		<.live_component
+		  module={TranslationsLive}
+		  id={idfy("translations-substance", ingredient.number)}
+		  translatable={ingredient.substance}
+		  parent_module={ReceptarWeb.IngredientsLive}
+		  parent_id="ingredients"
+		/>
+	    <% end %>
+
+	<% end %>
+    </ul>
+    <a href="#"
+       id="append-ingredient"
+       phx-click="append-ingredient"
+       phx-target={@myself}>
+	Append ingredient
+    </a>
 </div>

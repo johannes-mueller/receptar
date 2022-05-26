@@ -1,0 +1,40 @@
+<div class="translate-edit-frame">
+    <%= for tr <- @translatable.translations do %>
+	<%= if tr.language in @active_languages do %>
+	    <form id={idfy("change-translation-form-"<>tr.language, @id )}
+		  phx-submit="submit-changed-translation"
+		  phx-target={@myself}>
+		<button id={idfy("cancel-translation-"<>tr.language, @id)}
+			type="button"
+			phx-click="cancel-translation"
+			phx-value-language={tr.language}
+			phx-target={@myself}>
+		    Cancel
+		</button>
+		<button id={idfy("submit-changed-translation-"<>tr.language, @id)} type="submit">
+		    Submit
+		</button>
+		<input name="content">
+		<input name="language" type="hidden" value={tr.language}>
+	    </form>
+	<% else  %>
+	    <span id={idfy("translation-content-"<>tr.language, @id )}
+		  phx-click="activate-language"
+		  phx-value-language={tr.language}
+		  phx-target={@myself}>
+		<%= tr.content %>
+	    </span>
+	<% end %>
+    <% end %>
+    <form id={idfy("add-translation-form", @id)} phx-submit="submit-new-translation" phx-target={@myself}>
+	<label for={idfy("new-translation-language", @id)}>Language:</label>
+	<input id={idfy("new-translation-language", @id)} name="language">
+	<label for={idfy("new-translation-content", @id)}>New translation:</label>
+	<input id={idfy("new-translation-content", @id)} name="content">
+	<button type="submit">Submit</button>
+    </form>
+
+    <button type="button" phx-click="done" phx-target={@myself} class="translation-done">
+	Done
+    </button>
+</div>

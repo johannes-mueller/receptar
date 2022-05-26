@@ -39,6 +39,10 @@ defmodule Receptar.Translations do
     |> then(& %{&1 | action: :update})
   end
 
+  def update_translations(translatable, [_|_] = translations) do
+    Enum.map(translations, fn tr -> do_update_translation(translatable, tr) end)
+  end
+
   def update_translations(translatable, attrs) do
     language = attrs.language
 
@@ -51,6 +55,17 @@ defmodule Receptar.Translations do
 			Map.put(acc, language, zero_changeset(tl))
                     end)
     |> Map.values
+  end
+
+  defp do_update_translation(_translatable, %Translation{language: language, content: content} = translation) do
+    Repo.get!(Translation, translation.id)
+    |> Translation.changeset(%{language: language, content: content})
+    |> then(& %{&1 | action: :update})
+    |> Repo.update
+  end
+
+  defp do_update_translation(translatable, translation) do
+    add_translation(translatable, translation)
   end
 
   defp zero_changeset(tl) do

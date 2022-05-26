@@ -198,8 +198,91 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
       assert socket.assigns.submit_title_disabled == true
     end
-  end
 
+    test "add translation substance", %{socket: socket} do
+      recipe_id = recipe_id("granda kino")
+
+      {:ok, socket} =
+	RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+
+      %{
+	recipe: %{
+	  ingredients: [%{substance: substance} | _]
+	}
+      } = socket.assigns
+
+      substance_updated = %{
+	substance |
+	translations: [
+	  %{language: "sk", content: "cestovina"} | substance.translations]
+      }
+
+      {:noreply, socket} =
+	RecipeLive.handle_info({:update_translations, %{translatable: substance_updated}}, socket)
+
+      new_substance = Substances.get_by_translation("cestovina", "sk")
+      assert new_substance.id == substance.id
+
+      %{
+	recipe: %{
+	  ingredients: [%{substance: substance} | _]
+	}
+      } = socket.assigns
+
+      assert substance.translations
+      |> Enum.any?(fn
+	%{language: "sk", content: "cestovina"} -> true
+	_ -> false
+      end)
+    end
+
+    test "change translation substance", %{socket: socket} do
+      recipe_id = recipe_id("granda kino")
+
+      {:ok, socket} =
+	RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+
+      %{
+	recipe: %{
+	  ingredients: [%{substance: substance} | _]
+	}
+      } = socket.assigns
+
+      substance_updated = %{
+	substance |
+	translations: substance.translations |> Enum.map(fn
+	    %{language: "eo"} = tr -> %{tr | content: "nuuudeloj"}
+	    tr -> tr
+	  end)
+      }
+
+      {:noreply, socket} =
+	RecipeLive.handle_info({:update_translations, %{translatable: substance_updated}}, socket)
+
+      new_substance = Substances.get_by_translation("nuuudeloj", "eo")
+      assert new_substance.id == substance.id
+
+      refute Substances.get_by_translation("nudeloj", "eo")
+
+      %{
+	recipe: %{
+	  ingredients: [%{substance: substance} | _]
+	}
+      } = socket.assigns
+
+      assert substance.translations
+      |> Enum.any?(fn
+	%{language: "eo", content: "nuuudeloj"} -> true
+	_ -> false
+      end)
+
+      refute substance.translations
+      |> Enum.any?(fn
+	%{language: "eo", content: "nudeloj"} -> true
+	_ -> false
+      end)
+    end
+  end
 
   describe "Connection state" do
     setup %{conn: conn} do

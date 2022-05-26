@@ -2,6 +2,8 @@ defmodule ReceptarWeb.RecipeLive do
   use ReceptarWeb, :live_view
 
   alias Receptar.Recipes
+  alias Receptar.Translations
+
   alias ReceptarWeb.Helpers
 
   import ReceptarWeb.RecipeController
@@ -75,5 +77,17 @@ defmodule ReceptarWeb.RecipeLive do
     {:ok, recipe} = Recipes.update_recipe(socket.assigns.recipe, change_attrs)
 
     {:noreply, socket |> assign(recipe: recipe |> Recipes.translate(language))}
+  end
+
+  def handle_info({:update_translations, %{translatable: translatable}}, socket) do
+    Translations.update_translations(translatable, translatable.translations)
+
+    recipe_id = socket.assigns.recipe.id
+    updated_recipe = Recipes.get_recipe!(recipe_id)
+
+    {:noreply,
+     socket
+     |> assign(recipe: updated_recipe |> Recipes.translate(socket.assigns.language))
+    }
   end
 end

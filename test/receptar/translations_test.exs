@@ -26,6 +26,39 @@ defmodule Receptar.TranslatablesTest do
       ] = translations
     end
 
+
+    test "update_translations add new_translation" do
+      substance = substance_by_name("salo")
+      translations = [%{language: "sk", content: "soľ"} | substance.translations]
+
+      Translations.update_translations(substance, translations)
+
+      assert [
+	%{language: "eo", content: "salo"},
+	%{language: "de", content: "Salz"},
+	%{language: "sk", content: "soľ"},
+      ] = substance_by_name("salo").translations
+
+    end
+
+    test "update_translations change translation" do
+      substance = substance_by_name("salo")
+      translations = substance.translations
+      |> Enum.map(fn
+	%{language: "eo"} -> %{language: "eo", content: "saaalo"}
+	tr -> tr
+      end)
+
+      Translations.update_translations(substance, translations)
+
+      Substances.get_substance!(substance.id).translations
+      |> Enum.all?(fn
+	%{language: "de", content: "Salz"} -> true
+	%{language: "eo", content: "saaalo"} -> true
+	_ -> false
+      end)
+    end
+
     @tag :skip
     test "update translations add new translation" do
       substance = substance_by_name("salo")

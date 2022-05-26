@@ -1,4 +1,4 @@
-<form phx-submit="submit" phx-target={@myself} phx-change="change-event">
+<form phx-submit="submit" phx-target={@myself} phx-change="change-event" id={idfy("edit", @id)}>
     <label for={idfy("amount-input", @id)}>Amount</label>
     <input id={idfy("amount-input", @id)}
            name="amount"
@@ -15,7 +15,7 @@
            value={@unit_name_value}>
     <datalist id={idfy("unit-suggestions", @id)}>
 	<%= for suggestion <- @unit_suggestions do %>
-            <option value={suggestion}></option>
+	    <option value={suggestion}></option>
 	<% end %>
     </datalist>
     <label for={idfy("substance-input", @id)}>Substance</label>
@@ -27,15 +27,9 @@
            value={@substance_name_value}>
     <datalist id={idfy("substance-suggestions", @id)}>
 	<%= for suggestion <- @substance_suggestions do %>
-            <option value={suggestion}></option>
+	    <option value={suggestion}></option>
 	<% end %>
     </datalist>
-    <a href="#"
-       id="translate-substance-btn"
-       phx-click="translate-substance"
-       phx-target={@myself}>
-	Translate
-    </a>
     <input type="radio" class="vegan-rb" value="vegan" name="substance-kind"
            checked={@substance_kind_value == :vegan}>
     <input type="radio" class="vegetarian-rb" value="vegetarian" name="substance-kind"
@@ -56,15 +50,4 @@
 	phx-target={@myself}>
 	Cancel
     </button>
-    <%= if @translate_substance do %>
-	<div class="translate-substance">
-	    Goooo
-	    <.live_component
-	      module={TranslationLive}
-	      id={@ingredient.substance.id}
-	      translatable={@ingredient.substance}
-	      language={@language}
-	    />
-	</div>
-    <% end %>
 </form>

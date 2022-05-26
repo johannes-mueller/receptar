@@ -20,6 +20,7 @@ defmodule Receptar.Substances do
       where: t.language == ^language and t.content == ^name,
       select: s)
     |> List.first
+    |> Repo.preload([:translations])
   end
 
   def completion_candidates("", _language), do: []

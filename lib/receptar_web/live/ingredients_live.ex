@@ -7,6 +7,17 @@ defmodule ReceptarWeb.IngredientsLive do
   alias ReceptarWeb.Helpers
 
   alias ReceptarWeb.IngredientLive
+  alias ReceptarWeb.TranslationsLive
+
+  def update(%{update_translations: translatable}, socket) do
+    send self(), {
+      :update_translations,
+      %{
+	translatable: translatable
+      }
+    }
+    {:ok, socket |> assign(translate_item: nil)}
+  end
 
   def update(%{submit_ingredient: ingredient}, socket) do
     ingredients = socket.assigns.ingredients
@@ -58,6 +69,7 @@ defmodule ReceptarWeb.IngredientsLive do
     |> assign(ingredients: params.ingredients)
     |> assign(edit_ingredients: params.edit_ingredients)
     |> assign(new_ingredients: [])
+    |> assign(translate_item: nil)
 
     {:ok, socket}
   end
@@ -116,5 +128,19 @@ defmodule ReceptarWeb.IngredientsLive do
     }
 
     {:noreply, socket}
+  end
+
+  def handle_event("translate-" <> item, %{"number" => number}, socket) do
+    {:noreply,
+     socket
+     |> assign(translate_item: {String.to_integer(number), String.to_atom(item)})
+    }
+  end
+
+  def handle_info(:translation_done, _attrs, socket) do
+    {:noreply,
+     socket
+     |> assign(translate_item: nil)
+    }
   end
 end
