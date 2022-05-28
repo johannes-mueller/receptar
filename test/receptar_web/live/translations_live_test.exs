@@ -29,6 +29,14 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       assert socket.assigns.active_languages == []
     end
 
+    test "translations sorted by language", %{socket: socket, translatable: translatable} do
+      assigns = %{translatable: translatable}
+      {:ok, socket} = TranslationsLive.update(assigns, socket)
+
+      assert [%{language: "de"}, %{language: "eo"}] = socket.assigns.translatable.translations
+    end
+
+
     test "activate-language event activates language", %{socket: socket, translatable: translatable} do
       assigns = %{translatable: translatable}
       {:ok, socket} = TranslationsLive.update(assigns, socket)
@@ -99,6 +107,16 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       end
     end
 
+    test "submit changed translation order persists", %{socket: socket, translatable: translatable} do
+      assigns = %{translatable: translatable}
+      {:ok, socket} = TranslationsLive.update(assigns, socket)
+
+      {:noreply, socket} =
+	TranslationsLive.handle_event("submit-changed-translation", %{"language" => "eo", "content" => "saalo"}, socket)
+
+      assert [%{language: "de"}, %{language: "eo"}] = socket.assigns.translatable.translations
+    end
+
     for {language, content} <- [{"sk", "soľ"}, {"fr", "sel"}] do
       test "submit-new-translation #{language} adds translation", %{socket: socket, translatable: translatable} do
 	language = unquote(language)
@@ -138,6 +156,15 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       end
     end
 
+    test "submit new translation order persists", %{socket: socket, translatable: translatable} do
+      assigns = %{translatable: translatable}
+      {:ok, socket} = TranslationsLive.update(assigns, socket)
+
+      {:noreply, socket} =
+	TranslationsLive.handle_event("submit-new-translation", %{"language" => "sk", "content" => "soľ"}, socket)
+
+      assert [%{language: "de"}, %{language: "eo"}, %{language: "sk"}] = socket.assigns.translatable.translations
+    end
 
     for language <- ["eo", "de"] do
       test "cancel translation content deactivates #{language}", %{socket: socket, translatable: translatable} do
@@ -173,13 +200,15 @@ defmodule ReceptarWeb.TranslationsLiveTest do
         {:noreply, _socket} =
           TranslationsLive.handle_event("done", %{}, socket)
 
+	expected_translations = Enum.sort(translatable.translations, & &1.language <= &2.language)
+
         assert_received(
           {
             :phoenix, :send_update,
             {
               ^module,
               ^module_id,
-              %{id: ^module_id, update_translations: ^translatable}
+              %{id: ^module_id, update_translations: %{translations: ^expected_translations}}
             }
           }
         )

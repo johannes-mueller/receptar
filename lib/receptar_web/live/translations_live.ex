@@ -5,6 +5,7 @@ defmodule ReceptarWeb.TranslationsLive do
     {:ok,
      socket
      |> assign(assigns)
+     |> sort_translations_by_languages
      |> assign(active_languages: [])
     }
   end
@@ -21,6 +22,7 @@ defmodule ReceptarWeb.TranslationsLive do
      socket
      |> deactivate_language(language)
      |> update_translations(language, content)
+     |> sort_translations_by_languages
     }
   end
 
@@ -31,6 +33,7 @@ defmodule ReceptarWeb.TranslationsLive do
     {:noreply,
      socket
      |> assign(translatable: %{translatable | translations: translations})
+     |> sort_translations_by_languages
     }
   end
 
@@ -50,6 +53,16 @@ defmodule ReceptarWeb.TranslationsLive do
     send_update(parent_module, id: parent_id, update_translations: translatable)
 
     {:noreply, socket}
+  end
+
+  defp sort_translations_by_languages(socket) do
+    translatable = socket.assigns.translatable
+    sorted_translations =
+      translatable.translations
+      |> Enum.sort(& &1.language <= &2.language)
+
+    socket
+    |> assign(translatable: %{translatable | translations: sorted_translations})
   end
 
   defp deactivate_language(socket, language) do
