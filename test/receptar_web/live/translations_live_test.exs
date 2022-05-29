@@ -264,9 +264,10 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       assert view |> has_element?("span#translation-content-fr-#{translatable_id}", "sel")
     end
 
-    for language <- ["eo", "de"] do
+    for {language, content} <- [{"eo", "salo"}, {"de", "Salz"}] do
       test "has form for language #{language} after clicking eo span", %{conn: conn, session: session} do
 	language = unquote(language)
+	content = unquote(content)
 	{:ok, view, _html} = live_isolated(conn, TranslationsTestLiveView, session: session)
 	translatable_id = session["translatable"].id
 
@@ -277,6 +278,9 @@ defmodule ReceptarWeb.TranslationsLiveTest do
 	html = view |> element("form#change-translation-form-#{language}-#{translatable_id}") |> render()
 
 	assert html =~ ~r/phx-submit="submit-changed-translation"/
+
+	assert view |> element("input.translation-content") |> render() =~ ~r/value="#{content}"/
+	assert view |> element("input.translation-language") |> render() =~ ~r/value="#{language}"/
       end
     end
 

@@ -14,8 +14,8 @@
 		<button id={idfy("submit-changed-translation-"<>tr.language, @id)} type="submit">
 		    Submit
 		</button>
-		<input name="content">
-		<input name="language" type="hidden" value={tr.language}>
+		<input class="translation-content" name="content" value={tr.content}>
+		<input class="translation-language" name="language" type="hidden" value={tr.language}>
 	    </form>
 	<% else  %>
 	    <span id={idfy("translation-content-"<>tr.language, @id )}
