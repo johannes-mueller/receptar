@@ -27,12 +27,6 @@ defmodule Receptar.Translations do
     |> Enum.each(&(add_translation(translatable, &1)))
   end
 
-  def update_translation(translation, attrs) do
-    translation
-    |> Translation.changeset(attrs)
-    |> Repo.update
-  end
-
   def update_translation_changeset(translation, attrs) do
     translation
     |> Translation.changeset(attrs)
@@ -45,7 +39,7 @@ defmodule Receptar.Translations do
     |> Enum.map(fn tr -> do_update_translation(translatable, tr) end)
   end
 
-  def update_translations(translatable, attrs) do
+  def update_translations_changeset(translatable, attrs) do
     language = attrs.language
 
     translatable.translations

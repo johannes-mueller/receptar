@@ -397,14 +397,6 @@ defmodule ReceptarWeb.TranslationsLiveTest do
 
       assert view |> has_element?("span#translation-content-sk-#{translatable_id}", "soľ")
     end
-
-    test "translation done sends done signal", %{conn: conn, session: session} do
-      {:ok, view, _html} = live_isolated(conn, TranslationsTestLiveView, session: session)
-
-      view |> element("button.translation-done") |> render_click()
-
-      IO.warn("assertion missing")
-    end
   end
 end
 

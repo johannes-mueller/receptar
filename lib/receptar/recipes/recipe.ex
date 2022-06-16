@@ -41,7 +41,8 @@ defmodule Receptar.Recipes.Recipe do
   defp update_title(%{data: recipe} = changeset, %{language: language, title: title}) do
     new_translation = %{language: language, content: title}
 
-    %{changeset | changes: Map.put(changeset.changes, :translations, Receptar.Translations.update_translations(recipe, new_translation))}
+    update = Receptar.Translations.update_translations_changeset(recipe, new_translation)
+    %{changeset | changes: Map.put(changeset.changes, :translations, update)}
   end
 
   defp update_title(changeset, _attrs) do

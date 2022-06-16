@@ -373,7 +373,6 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	      }}}
     end
 
-    @tag :skip
     test "substance edit request without language parameter does not fail",
       %{conn: conn, session: session} do
 
@@ -720,51 +719,6 @@ defmodule ReceptarWeb.IngredientLiveTest do
       |> render()
 
       refute html =~ ~r/disabled/
-    end
-
-    test "translate div present when translate_sustance true", %{conn: conn} do
-      substance = Receptar.Substances.search("salo", "eo") |> List.first
-      session = %{
-	"ingredient" => %{
-	  amount: Decimal.new("1.0"),
-	  unit: %{name: "litro"},
-	  substance: substance,
-	  number: 1
-	},
-	"language" => "eo",
-      }
-
-      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
-
-      IO.warn("test still needed?")
-      # view |> element("a#translate-substance-btn") |> render_click()
-
-      # assert view |> element("div.translate-edit-frame") |> has_element?()
-    end
-
-    test "translate div not present when translate_sustance false", %{conn: conn} do
-      session = %{
-	"ingredient" => %{
-	  amount: Decimal.new("1.0"),
-	  unit: %{name: "litro"},
-	  substance: %Substance{name: "vino", kind: :vegan},
-	  number: 1
-	},
-	"language" => "eo",
-      }
-
-      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
-
-      refute view |> element("div.translate-edit-frame") |> has_element?()
-    end
-
-    @tag :skip
-    test "examine params", %{conn: conn, session: session} do
-      {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
-
-      view
-      |> element("form")
-      |> render_submit(%{foo: "bar"})
     end
   end
 end

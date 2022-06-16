@@ -1,6 +1,7 @@
 defmodule Receptar.Instructions.Instruction do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Receptar.Translations
 
   schema "instructions" do
     belongs_to :recipe, Receptar.Recipes.Recipe
@@ -27,7 +28,8 @@ defmodule Receptar.Instructions.Instruction do
 
   defp update_translations(
     %{data: instruction} = changeset,
-    %{language: language, content: content}) do
+    %{language: _l, content: _c} = translation
+  ) do
 
     instruction = if not Ecto.assoc_loaded?(instruction.translations) do
       Map.put(instruction, :translations, [])
@@ -36,12 +38,9 @@ defmodule Receptar.Instructions.Instruction do
     end
 
     instruction = Map.put_new(instruction, :translations, [])
-    new_translation =
-      %{language: language, content: content}
-      |> then(& Receptar.Translations.update_translations(instruction, &1))
+    new_translation = Translations.update_translations_changeset(instruction, translation)
 
     %{changeset | changes: Map.put(changeset.changes, :translations, new_translation)}
-
   end
   defp update_translations(changeset, _attrs) do
     changeset

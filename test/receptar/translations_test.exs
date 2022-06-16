@@ -60,29 +60,34 @@ defmodule Receptar.TranslatablesTest do
       |> assert
     end
 
-    @tag :skip
     test "update translations add new translation" do
       substance = substance_by_name("salo")
 
-      Translations.update_translations(substance, %{language: "sk", content: "soľ"})
+      translations = [%{language: "sk", content: "soľ"} | substance.translations]
+      Translations.update_translations(substance, translations)
 
       assert [
 	%{language: "eo", content: "salo"},
 	%{language: "de", content: "Salz"},
 	%{language: "sk", content: "soľ"},
-      ] = substance_by_name("salo").translations
+      ] = Substances.get_substance!(substance.id).translations
     end
 
-    @tag :skip
     test "update translations change translation" do
       substance = substance_by_name("salo")
+      translations =
+	substance.translations
+	|> Enum.map(fn
+	  %{language: "eo"} -> %{language: "eo", content: "saalo"}
+	  tr -> tr
+        end)
 
-      Translations.update_translations(substance, %{language: "eo", content: "saalo"})
+      Translations.update_translations(substance, translations)
 
       assert [
 	%{language: "de", content: "Salz"},
 	%{language: "eo", content: "saalo"},
-      ] = substance_by_name("saalo").translations
+      ] = Enum.sort(Substances.get_substance!(substance.id).translations)
     end
 
     test "add a multiple translations to a substance actually adds them" do
@@ -125,23 +130,6 @@ defmodule Receptar.TranslatablesTest do
 	%{language: "eo", content: "kuiri nudelojn"},
 	%{language: "de", content: "Nudeln kochen"},
       ] = translations
-    end
-
-    test "change translation actually changes it" do
-      substance = Substances.search("froma", "eo") |> List.first
-      translation = substance.translations
-      |> Enum.filter(&(&1.language == "eo"))
-      |> List.first
-
-      {:ok, new_translation} = Translations.update_translation(translation, %{content: "fromaĝo"})
-      assert new_translation.content ==  "fromaĝo"
-
-      new_translation = Substances.get_substance!(substance.id)
-      |> then(&(&1.translations))
-      |> Enum.filter(&(&1.language == "eo"))
-      |> List.first
-
-      assert new_translation.content == "fromaĝo"
     end
 
     test "known languages are [eo, de]" do
