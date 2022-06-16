@@ -185,6 +185,36 @@ defmodule ReceptarWeb.RecipeControllerTest do
 	assert html_response_stripped(conn, 200) =~ ~r/class="translation-missing"/
       end
     end
+
+    test "create recipe redirects to live view", %{conn: conn} do
+      recipe_initials = %{language: "eo", content: "Granda kino"}
+      conn = post(conn, Routes.recipe_path(conn, :create), recipe_initials)
+
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn, 302) == "/recipe/#{id}"
+    end
+
+    for language <- ["eo", "de"] do
+      test "create recipe empty title redirects to new #{language}", %{conn: conn} do
+	language = unquote(language)
+	recipe_initials = %{language: language, content: ""}
+	conn = post(conn, Routes.recipe_path(conn, :create), recipe_initials)
+
+	expected = "<input type=\"hidden\" name=\"language\" value=\"#{language}\""
+	assert html_response(conn, 200) =~ expected
+	assert html_response(conn, 200) =~ "Enter new recipe title"
+      end
+
+    test "new recipe renders form with hidden input #{language}", %{conn: conn} do
+	language = unquote(language)
+	conn = get(conn, Routes.recipe_path(conn, :new, language: language))
+
+	expected = "<input type=\"hidden\" name=\"language\" value=\"#{language}\""
+	assert html_response(conn, 200) =~ "Enter new recipe title"
+	assert html_response(conn, 200) =~ expected
+      end
+    end
+
   end
 
   test "search form redirect if no user authenticated", %{conn: conn} do

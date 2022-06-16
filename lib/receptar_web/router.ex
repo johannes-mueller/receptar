@@ -27,7 +27,8 @@ defmodule ReceptarWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     get "/search", RecipeController, :search
-    live "/recipe/new", RecipeLive
+    get "/recipe/new", RecipeController, :new
+    post "/recipe/create", RecipeController, :create
     live "/recipe/:id/", RecipeLive
   end
 

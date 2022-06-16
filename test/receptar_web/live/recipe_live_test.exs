@@ -31,13 +31,6 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	assert socket.assigns.edit_title == false
     end
 
-    test "initially edit_title flag true unknown recipe", %{socket: socket} do
-	{:ok, socket} =
-	  RecipeLive.mount(%{}, nil, socket)
-
-	assert socket.assigns.edit_title == true
-    end
-
     test "edit-title event sets edit_title to true", %{socket: socket} do
 	recipe_id = recipe_id("granda kino")
 
@@ -333,16 +326,13 @@ defmodule ReceptarWeb.RecipeLiveTest do
       assert html =~ ~r/<h1.*>.*<input.* value="Granda kino".*<\/h1>/
     end
 
-    test "create new recipe title form empty", %{conn: conn} do
-      {:ok, view, _html} = live(conn, "/recipe/new")
-
-      assert view
-      |> element("h1 form")
-      |> render() =~ ~r|value=""|
-    end
-
     test "create recipe title form submit button is disabled", %{conn: conn} do
-      {:ok, view, _html} = live(conn, "/recipe/new")
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("h1")
+      |> render_click()
 
       html = view
       |> element("h1 form")
@@ -352,7 +342,12 @@ defmodule ReceptarWeb.RecipeLiveTest do
     end
 
     test "create recipe title form submit button is enabled after input", %{conn: conn} do
-      {:ok, view, _html} = live(conn, "/recipe/new")
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("h1")
+      |> render_click()
 
       html = view
       |> element("h1 form")

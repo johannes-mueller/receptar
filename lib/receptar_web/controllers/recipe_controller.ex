@@ -20,13 +20,26 @@ defmodule ReceptarWeb.RecipeController do
     render(conn, "show.html", recipe: recipe)
   end
 
-  def query_recipe(params) do
+  def new(conn, params) do
+    language = Helpers.determine_language(params)
+    render(conn, "new.html", language: language)
+  end
+
+  def create(conn, %{"language" => _, "content" => _c} = translation) do
+    case Recipes.create_recipe(%{translations: [translation]}) do
+      {:ok, recipe} ->
+	conn |> redirect(to: "/recipe/#{recipe.id}")
+      {:error, changeset} ->
+	%{changes: %{translations: [%Ecto.Changeset{} = changeset]}} = changeset
+	%{changes: %{language: language}} = changeset
+	conn |> render("new.html", changeset: changeset, language: language)
+    end
+  end
+
+  def query_recipe(%{"id" => id} = params) do
     language = Helpers.determine_language(params)
 
-    case params do
-      %{"id" => id} -> Recipes.get_recipe!(id)
-      _ -> Recipes.new_recipe()
-    end
+    Recipes.get_recipe!(id)
     |> Recipes.translate(language)
   end
 

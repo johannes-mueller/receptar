@@ -241,22 +241,17 @@ defmodule Receptar.RecipeTest do
     end
 
     test "create an empty recipe" do
-      assert {:ok, %Recipe{id: id}} = Recipes.create_recipe(%{})
+      recipe_initials = %{
+	translations: [%{language: "sk", content: "Bryndzové halušky"}]
+      }
+      assert {:ok, %Recipe{id: id}} =
+	Recipes.create_recipe(recipe_initials)
 
       assert %{
-	translations: [],
+	translations: [%{language: "sk", content: "Bryndzové halušky"}],
 	ingredients: [],
 	instructions: []
       } = Recipes.get_recipe!(id)
-    end
-
-    test "new recipe" do
-      assert %{
-	id: _id,
-	translations: [],
-	ingredients: [],
-	instructions: []
-      } = Recipes.new_recipe()
     end
 
     test "translate an empty recipe" do

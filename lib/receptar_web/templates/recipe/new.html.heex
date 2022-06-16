@@ -1,0 +1,8 @@
+<h1>New recipe</h1>
+
+<.form for %{} let={f} action={Routes.recipe_path(@conn, :create)}>
+<%= label f, "Enter new recipe title" %>
+<input class="translation-content" name="content">
+<input type="hidden" name="language" value={@language}>
+<%= submit "Save" %>
+</.form>
