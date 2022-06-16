@@ -79,8 +79,9 @@ defmodule ReceptarWeb.RecipeLive do
     {:noreply, socket |> assign(recipe: recipe |> Recipes.translate(language))}
   end
 
-  def handle_info({:update_translations, %{translatable: translatable}}, socket) do
-    Translations.update_translations(translatable, translatable.translations)
+  def handle_info({:update_translations, update}, socket) do
+    %{translatable: translatable, translations: translations} = update
+    Translations.update_translations(translatable, translations)
 
     recipe_id = socket.assigns.recipe.id
     updated_recipe = Recipes.get_recipe!(recipe_id)

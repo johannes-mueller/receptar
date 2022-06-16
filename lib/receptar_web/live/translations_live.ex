@@ -5,6 +5,7 @@ defmodule ReceptarWeb.TranslationsLive do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(translations: assigns.translatable.translations)
      |> sort_translations_by_languages
      |> assign(active_languages: [])
     }
@@ -27,12 +28,15 @@ defmodule ReceptarWeb.TranslationsLive do
   end
 
   def handle_event("submit-new-translation", %{"language" => language, "content" => content}, socket) do
-    translatable = socket.assigns.translatable
-    translations = [%{language: language, content: content} | translatable.translations]
+    translations = socket.assigns.translations
+    translations = [
+      %{language: language, content: content} |
+      Enum.filter(translations, & &1.language != language)
+    ]
 
     {:noreply,
      socket
-     |> assign(translatable: %{translatable | translations: translations})
+     |> assign(translations: translations)
      |> sort_translations_by_languages
     }
   end
@@ -46,23 +50,30 @@ defmodule ReceptarWeb.TranslationsLive do
       %{
 	parent_module: parent_module,
 	parent_id: parent_id,
-	translatable: translatable
+	translatable: translatable,
+	translations: translations
       }
     } = socket
 
-    send_update(parent_module, id: parent_id, update_translations: translatable)
+    send_update(
+      parent_module,
+      id: parent_id,
+      update_translations: %{
+	translatable: translatable,
+	translations: translations
+      }
+    )
 
     {:noreply, socket}
   end
 
   defp sort_translations_by_languages(socket) do
-    translatable = socket.assigns.translatable
     sorted_translations =
-      translatable.translations
+      socket.assigns.translations
       |> Enum.sort(& &1.language <= &2.language)
 
     socket
-    |> assign(translatable: %{translatable | translations: sorted_translations})
+    |> assign(translations: sorted_translations)
   end
 
   defp deactivate_language(socket, language) do
@@ -75,18 +86,17 @@ defmodule ReceptarWeb.TranslationsLive do
 
   defp update_translations(socket, language, content) do
     translations =
-      socket.assigns.translatable.translations
+      socket.assigns.translations
       |> Enum.reject(& &1.language == language)
 
     existing_translation =
-      socket.assigns.translatable.translations
+      socket.assigns.translations
       |> Enum.find(& &1.language == language)
 
     socket
-    |> assign(translatable: %{
-	  socket.assigns.translatable | translations: [
-	    %{existing_translation | content: content} | translations
-	  ]
-    })
+    |> assign(translations: [
+	  %{existing_translation | content: content} | translations
+	]
+    )
   end
 end

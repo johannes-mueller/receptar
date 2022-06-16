@@ -250,21 +250,30 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 
       [%{substance: substance} | _] = ingredients
 
-      substance_updated = %{
-	substance |
-	translations: [
-	  %{language: "sk", content: "cestovina"} | substance.translations]
-      }
+      translations_updated = [
+	%{language: "sk", content: "cestovina"} | substance.translations
+      ]
 
       {:ok, _socket} =
-	IngredientsLive.update(%{update_translations: substance_updated}, socket)
+	IngredientsLive.update(
+	  %{
+	    update_translations: %{
+	      translatable: substance,
+	      translations: translations_updated
+	    }
+	  },
+	  socket
+	)
 
-      assert_received({
-	:update_translations,
-	%{
-	  translatable: ^substance_updated
+      assert_received(
+	{
+	  :update_translations,
+	  %{
+	    translatable: ^substance,
+	    translations: ^translations_updated
+	  }
 	}
-      })
+      )
     end
 
     for {number, remianing} <- [{1, [2]}, {2, [1]}] do
@@ -361,7 +370,12 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       [first_ingredient | _] = ingredients
 
       {:ok, socket} =
-	IngredientsLive.update(%{update_translations: first_ingredient}, socket)
+	IngredientsLive.update(
+	  %{
+	    update_translations: first_ingredient,
+	    translations: %{}
+	  },
+	  socket)
 
       assert %Phoenix.LiveView.Socket{
 	assigns: %{translate_item: nil}

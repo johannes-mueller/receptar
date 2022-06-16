@@ -1,5 +1,5 @@
 <div class="translate-edit-frame">
-    <%= for tr <- @translatable.translations do %>
+    <%= for tr <- @translations do %>
 	<%= if tr.language in @active_languages do %>
 	    <form id={idfy("change-translation-form-"<>tr.language, @id )}
 		  phx-submit="submit-changed-translation"

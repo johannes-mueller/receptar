@@ -211,14 +211,18 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	}
       } = socket.assigns
 
-      substance_updated = %{
-	substance |
-	translations: [
-	  %{language: "sk", content: "cestovina"} | substance.translations]
-      }
+      translations_updated = [
+	%{language: "sk", content: "cestovina"} | substance.translations
+      ]
 
       {:noreply, socket} =
-	RecipeLive.handle_info({:update_translations, %{translatable: substance_updated}}, socket)
+	RecipeLive.handle_info(
+	  {
+	    :update_translations,
+	    %{translatable: substance, translations: translations_updated}
+	  },
+	  socket
+	)
 
       new_substance = Substances.get_by_translation("cestovina", "sk")
       assert new_substance.id == substance.id
@@ -248,16 +252,22 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	}
       } = socket.assigns
 
-      substance_updated = %{
-	substance |
-	translations: substance.translations |> Enum.map(fn
-	    %{language: "eo"} = tr -> %{tr | content: "nuuudeloj"}
-	    tr -> tr
-	  end)
-      }
+      translations_updated =
+	substance.translations
+	|> Enum.map(fn
+	%{language: "eo"} = tr -> %{tr | content: "nuuudeloj"}
+	tr -> tr
+        end)
+
 
       {:noreply, socket} =
-	RecipeLive.handle_info({:update_translations, %{translatable: substance_updated}}, socket)
+	RecipeLive.handle_info(
+	  {:update_translations,
+	   %{
+	     translatable: substance,
+	     translations: translations_updated
+	   }
+	  }, socket)
 
       new_substance = Substances.get_by_translation("nuuudeloj", "eo")
       assert new_substance.id == substance.id

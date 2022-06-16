@@ -40,7 +40,9 @@ defmodule Receptar.Translations do
   end
 
   def update_translations(translatable, [_|_] = translations) do
-    Enum.map(translations, fn tr -> do_update_translation(translatable, tr) end)
+    translations
+    |> Enum.map(&map_to_existing_translation(&1, translatable))
+    |> Enum.map(fn tr -> do_update_translation(translatable, tr) end)
   end
 
   def update_translations(translatable, attrs) do
@@ -55,6 +57,19 @@ defmodule Receptar.Translations do
 			Map.put(acc, language, zero_changeset(tl))
                     end)
     |> Map.values
+  end
+
+  defp map_to_existing_translation(translation, translatable) do
+    translatable.translations
+    |> Enum.find(& &1.language == translation.language)
+    |> then(fn
+      %Translation{id: id} -> %Translation{
+			      id: id,
+			      language: translation.language,
+			      content: translation.content
+			  }
+      _ -> translation
+    end)
   end
 
   defp do_update_translation(_translatable, %Translation{language: language, content: content} = translation) do

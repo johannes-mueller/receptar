@@ -22,22 +22,24 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       }
     end
 
-    test "default empty active_languages", %{socket: socket, translatable: translatable} do
+    test "default empty active_languages", fixtures do
+      %{socket: socket, translatable: translatable} = fixtures
       assigns = %{translatable: translatable}
       {:ok, socket} = TranslationsLive.update(assigns, socket)
 
       assert socket.assigns.active_languages == []
     end
 
-    test "translations sorted by language", %{socket: socket, translatable: translatable} do
+    test "translations sorted by language", fixtures do
+      %{socket: socket, translatable: translatable} = fixtures
       assigns = %{translatable: translatable}
       {:ok, socket} = TranslationsLive.update(assigns, socket)
 
-      assert [%{language: "de"}, %{language: "eo"}] = socket.assigns.translatable.translations
+      assert [%{language: "de"}, %{language: "eo"}] = socket.assigns.translations
     end
 
-
-    test "activate-language event activates language", %{socket: socket, translatable: translatable} do
+    test "activate-language event activates language", fixtures do
+      %{socket: socket, translatable: translatable} = fixtures
       assigns = %{translatable: translatable}
       {:ok, socket} = TranslationsLive.update(assigns, socket)
 
@@ -53,7 +55,8 @@ defmodule ReceptarWeb.TranslationsLiveTest do
     end
 
     for language <- ["eo", "de"] do
-      test "submit translation content deactivates #{language}", %{socket: socket, translatable: translatable} do
+      test "submit translation content deactivates #{language}", fixtures do
+	%{socket: socket, translatable: translatable} = fixtures
 	language = unquote(language)
 	assigns = %{translatable: translatable}
 	{:ok, socket} = TranslationsLive.update(assigns, socket)
@@ -92,13 +95,13 @@ defmodule ReceptarWeb.TranslationsLiveTest do
 	{:noreply, socket} =
 	  TranslationsLive.handle_event("submit-changed-translation", attrs, socket)
 
-	assert socket.assigns.translatable.translations
+	assert socket.assigns.translations
 	|> Enum.any?(fn
 	  %Translation{id: ^translation_id, language: ^language, content: ^content} -> true
 	  _ -> false
 	end)
 
-	refute socket.assigns.translatable.translations
+	refute socket.assigns.translations
 	|> Enum.any?(fn
 	  %{language: ^language, content: ^orig_content} -> true
 	  _ -> false
@@ -107,27 +110,36 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       end
     end
 
-    test "submit changed translation order persists", %{socket: socket, translatable: translatable} do
+    test "submit changed translation order persists", fixtures do
+      %{socket: socket, translatable: translatable} = fixtures
       assigns = %{translatable: translatable}
       {:ok, socket} = TranslationsLive.update(assigns, socket)
 
       {:noreply, socket} =
-	TranslationsLive.handle_event("submit-changed-translation", %{"language" => "eo", "content" => "saalo"}, socket)
+	TranslationsLive.handle_event(
+	  "submit-changed-translation",
+	  %{"language" => "eo", "content" => "saalo"},
+	  socket
+	)
 
-      assert [%{language: "de"}, %{language: "eo"}] = socket.assigns.translatable.translations
+      assert [%{language: "de"}, %{language: "eo"}] = socket.assigns.translations
     end
 
     for {language, content} <- [{"sk", "soľ"}, {"fr", "sel"}] do
-      test "submit-new-translation #{language} adds translation", %{socket: socket, translatable: translatable} do
+      test "submit-new-translation #{language} adds translation", fixtures do
+	%{socket: socket, translatable: translatable} = fixtures
 	language = unquote(language)
 	content = unquote(content)
 	assigns = %{translatable: translatable}
 	{:ok, socket} = TranslationsLive.update(assigns, socket)
 
 	{:noreply, socket} =
-	  TranslationsLive.handle_event("submit-new-translation", %{"language" => language, "content" => content}, socket)
+	  TranslationsLive.handle_event(
+	    "submit-new-translation",
+	    %{"language" => language, "content" => content},
+	    socket)
 
-	socket.assigns.translatable.translations
+	socket.assigns.translations
 	|> Enum.any?(fn
 	  %{language: ^language, content: ^content} -> true
 	  _ -> false
@@ -137,16 +149,21 @@ defmodule ReceptarWeb.TranslationsLiveTest do
     end
 
     for {language, content} <- [{"sk", "soľ"}, {"fr", "sel"}] do
-      test "submit-new-translation #{language} saves translation", %{socket: socket, translatable: translatable} do
+      test "submit-new-translation #{language} saves translation", fixtures do
+	%{socket: socket, translatable: translatable} = fixtures
 	language = unquote(language)
 	content = unquote(content)
 	assigns = %{translatable: translatable}
 	{:ok, socket} = TranslationsLive.update(assigns, socket)
 
 	{:noreply, socket} =
-	  TranslationsLive.handle_event("submit-new-translation", %{"language" => language, "content" => content}, socket)
+	  TranslationsLive.handle_event(
+	    "submit-new-translation",
+	    %{"language" => language, "content" => content},
+	    socket
+	  )
 
-	socket.assigns.translatable.translations
+	socket.assigns.translations
 	|> Enum.any?(fn
 	  %{language: ^language, content: ^content} -> true
 	  _ -> false
@@ -156,18 +173,47 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       end
     end
 
-    test "submit new translation order persists", %{socket: socket, translatable: translatable} do
+    test "submit-new-translation does not duplicate langauge entry do", fixtures do
+      %{socket: socket, translatable: translatable} = fixtures
+	assigns = %{translatable: translatable}
+	{:ok, socket} = TranslationsLive.update(assigns, socket)
+
+	{:noreply, socket} =
+	  TranslationsLive.handle_event(
+	    "submit-new-translation",
+	    %{"language" => "eo", "content" => "saalo"},
+	    socket
+	  )
+
+	new_entries =
+	  socket.assigns.translations
+	  |> Enum.filter(& &1.language == "eo")
+
+	assert length(new_entries) == 1
+    end
+
+    test "submit new translation order persists", fixtures do
+      %{socket: socket, translatable: translatable} = fixtures
       assigns = %{translatable: translatable}
       {:ok, socket} = TranslationsLive.update(assigns, socket)
 
       {:noreply, socket} =
-	TranslationsLive.handle_event("submit-new-translation", %{"language" => "sk", "content" => "soľ"}, socket)
+	TranslationsLive.handle_event(
+	  "submit-new-translation",
+	  %{"language" => "sk", "content" => "soľ"},
+	  socket
+	)
 
-      assert [%{language: "de"}, %{language: "eo"}, %{language: "sk"}] = socket.assigns.translatable.translations
+      assert [
+	%{language: "de"},
+	%{language: "eo"},
+	%{language: "sk"}
+      ] = socket.assigns.translations
     end
 
     for language <- ["eo", "de"] do
-      test "cancel translation content deactivates #{language}", %{socket: socket, translatable: translatable} do
+      test "cancel translation content deactivates #{language}", fixtures do
+	%{socket: socket, translatable: translatable} = fixtures
 	language = unquote(language)
 	assigns = %{translatable: translatable}
 	{:ok, socket} = TranslationsLive.update(assigns, socket)
@@ -183,7 +229,10 @@ defmodule ReceptarWeb.TranslationsLiveTest do
       end
     end
 
-    for {module, module_id} <- [{ReceptarWeb.IngredientsLive, "ingredients"}, {ReceptarWeb.RecipeLive, "recipe"}] do
+    for {module, module_id} <- [
+	  {ReceptarWeb.IngredientsLive, "ingredients"},
+	  {ReceptarWeb.RecipeLive, "recipe"}
+	] do
       test "translations done send update done to #{module}", fixtures do
         %{socket: socket, translatable: translatable} = fixtures
         module = unquote(module)
@@ -197,10 +246,23 @@ defmodule ReceptarWeb.TranslationsLiveTest do
 
         {:ok, socket} = TranslationsLive.update(assigns, socket)
 
+	{:noreply, socket} =
+	  TranslationsLive.handle_event(
+	    "submit-new-translation",
+	    %{"language" => "eo", "content" => "saalo"},
+	    socket
+	  )
+
         {:noreply, _socket} =
           TranslationsLive.handle_event("done", %{}, socket)
 
-	expected_translations = Enum.sort(translatable.translations, & &1.language <= &2.language)
+	expected_translations =
+	  translatable.translations
+	  |> Enum.map(fn
+	  %{language: "eo"} -> %{language: "eo", content: "saalo"}
+	  tr -> tr
+	  end)
+	  |> Enum.sort(& &1.language <= &2.language)
 
         assert_received(
           {
@@ -208,12 +270,17 @@ defmodule ReceptarWeb.TranslationsLiveTest do
             {
               ^module,
               ^module_id,
-              %{id: ^module_id, update_translations: %{translations: ^expected_translations}}
+              %{id: ^module_id, update_translations: %{
+		   translations: ^expected_translations,
+		   translatable: ^translatable
+		}
+	      }
             }
           }
         )
       end
     end
+
   end
 
   describe "Connection state" do
@@ -321,15 +388,6 @@ defmodule ReceptarWeb.TranslationsLiveTest do
     end
 
     test "view adds translation when add-translation form submits", %{conn: conn, session: session} do
-      {:ok, view, _html} = live_isolated(conn, TranslationsTestLiveView, session: session)
-      translatable_id = session["translatable"].id
-
-      view
-      |> element("form#add-translation-form-#{translatable_id}")
-      |> render_submit()
-    end
-
-    test "view adds translation when add-translation form submits and saves", %{conn: conn, session: session} do
       {:ok, view, _html} = live_isolated(conn, TranslationsTestLiveView, session: session)
       translatable_id = session["translatable"].id
 

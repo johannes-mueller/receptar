@@ -41,7 +41,7 @@ defmodule Receptar.TranslatablesTest do
 
     end
 
-    test "update_translations change translation" do
+    test "update_translations change translation does not duplicate" do
       substance = substance_by_name("salo")
       translations = substance.translations
       |> Enum.map(fn
@@ -57,6 +57,7 @@ defmodule Receptar.TranslatablesTest do
 	%{language: "eo", content: "saaalo"} -> true
 	_ -> false
       end)
+      |> assert
     end
 
     @tag :skip
