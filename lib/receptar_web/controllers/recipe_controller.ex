@@ -2,7 +2,6 @@ defmodule ReceptarWeb.RecipeController do
   use ReceptarWeb, :controller
 
   alias Receptar.Recipes
-  alias ReceptarWeb.Helpers
 
   def search(conn, params) do
     language = conn.assigns.language
@@ -16,7 +15,7 @@ defmodule ReceptarWeb.RecipeController do
     render(conn, "search.html", recipes: recipes)
   end
 
-  def new(conn, params) do
+  def new(conn, _params) do
     language = conn.assigns.language
     render(conn, "new.html", language: language)
   end
@@ -32,7 +31,7 @@ defmodule ReceptarWeb.RecipeController do
     end
   end
 
-  def query_recipe(%{"id" => id} = params, language) do
+  def query_recipe(%{"id" => id} = _params, language) do
      Recipes.get_recipe!(id)
     |> Recipes.translate(language)
   end
