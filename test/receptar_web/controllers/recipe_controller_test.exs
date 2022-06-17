@@ -135,6 +135,17 @@ defmodule ReceptarWeb.RecipeControllerTest do
 	refute html_response_stripped(conn, 200) =~ ~r/<h1.*>Granda kino<\/h1>/
       end
 
+      test "#{target} recipe id 1 \"de\"  session German title", %{conn: conn} do
+	conn =
+	  conn
+	  |> Phoenix.ConnTest.init_test_session(%{})
+	  |> put_session(:language, "de")
+	  |> get(unquote(url_function).("granda_kino"))
+
+	assert html_response_stripped(conn, 200) =~ ~r/<h1.*>Großes Kino<\/h1>/
+	refute html_response_stripped(conn, 200) =~ ~r/<h1.*>Granda kino<\/h1>/
+      end
+
       test "#{target} recipe id 1 has title page 'Sardela pico'", %{conn: conn} do
 	conn = get(conn, unquote(url_function).("sardela pico"))
 	refute html_response_stripped(conn, 200) =~ ~r/<h1.*>Granda kino<\/h1>/
@@ -200,7 +211,7 @@ defmodule ReceptarWeb.RecipeControllerTest do
 	recipe_initials = %{language: language, content: ""}
 	conn = post(conn, Routes.recipe_path(conn, :create), recipe_initials)
 
-	expected = "<input type=\"hidden\" name=\"language\" value=\"#{language}\""
+	expected = "<select name=\"language\" selected=\"#{language}\""
 	assert html_response(conn, 200) =~ expected
 	assert html_response(conn, 200) =~ "Enter new recipe title"
       end
@@ -209,7 +220,7 @@ defmodule ReceptarWeb.RecipeControllerTest do
 	language = unquote(language)
 	conn = get(conn, Routes.recipe_path(conn, :new, language: language))
 
-	expected = "<input type=\"hidden\" name=\"language\" value=\"#{language}\""
+	expected = "<select name=\"language\" selected=\"#{language}\""
 	assert html_response(conn, 200) =~ "Enter new recipe title"
 	assert html_response(conn, 200) =~ expected
       end

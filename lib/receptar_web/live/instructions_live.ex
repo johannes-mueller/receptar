@@ -6,7 +6,6 @@ defmodule ReceptarWeb.InstructionsLive do
 
   def update(params, socket) do
     socket = socket
-    |> assign(language: Helpers.determine_language(params))
     |> assign(instructions: params.instructions)
     |> assign(edit_instructions: params.edit_instructions)
     |> assign(new_instructions: [])

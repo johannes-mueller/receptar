@@ -5,7 +5,8 @@ defmodule ReceptarWeb.RecipeController do
   alias ReceptarWeb.Helpers
 
   def search(conn, params) do
-    language = Helpers.determine_language(params)
+    language = conn.assigns.language
+
     recipes = params
     |> Enum.map(&sanitize_parameters/1)
     |> Enum.into(%{})
@@ -15,13 +16,8 @@ defmodule ReceptarWeb.RecipeController do
     render(conn, "search.html", recipes: recipes)
   end
 
-  def show(conn, params) do
-    recipe = query_recipe(params)
-    render(conn, "show.html", recipe: recipe)
-  end
-
   def new(conn, params) do
-    language = Helpers.determine_language(params)
+    language = conn.assigns.language
     render(conn, "new.html", language: language)
   end
 
@@ -36,10 +32,8 @@ defmodule ReceptarWeb.RecipeController do
     end
   end
 
-  def query_recipe(%{"id" => id} = params) do
-    language = Helpers.determine_language(params)
-
-    Recipes.get_recipe!(id)
+  def query_recipe(%{"id" => id} = params, language) do
+     Recipes.get_recipe!(id)
     |> Recipes.translate(language)
   end
 

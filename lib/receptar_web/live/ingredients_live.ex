@@ -60,9 +60,9 @@ defmodule ReceptarWeb.IngredientsLive do
 
   def update(params, socket) do
     socket = socket
-    |> assign(language: Helpers.determine_language(params))
     |> assign(ingredients: params.ingredients)
     |> assign(edit_ingredients: params.edit_ingredients)
+    |> assign(language: params.language)
     |> assign(new_ingredients: [])
     |> assign(translate_item: nil)
 

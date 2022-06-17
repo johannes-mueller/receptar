@@ -15,13 +15,14 @@
 </h1>
 
 <.live_component
-    module={IngredientsLive},
+    module={IngredientsLive}
     id="ingredients"
     ingredients={@recipe.ingredients}
     edit_ingredients={@edit_ingredients}
+    language={@language}
 />
 <.live_component
-  module={InstructionsLive},
+  module={InstructionsLive}
   id="instructions"
   instructions={@recipe.instructions}
   edit_instructions={@edit_instructions}

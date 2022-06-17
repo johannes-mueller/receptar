@@ -1,8 +1,5 @@
 defmodule ReceptarWeb.Helpers do
-
-  def determine_language(%{"language" => language}), do: language
-  def determine_language(%{language: language}), do: language
-  def determine_language(%{}), do: ReceptarWeb.Cldr.default_locale.language
+  use ReceptarWeb, :controller
 
   def insert_number_at(numbers, number) do
     [

@@ -81,4 +81,9 @@ defmodule ReceptarWeb.ConnCase do
     |> Phoenix.ConnTest.init_test_session(%{})
     |> Plug.Conn.put_session(:user_token, token)
   end
+
+  def init_session(conn) do
+    conn
+    |> Phoenix.ConnTest.init_test_session(%{})
+  end
 end

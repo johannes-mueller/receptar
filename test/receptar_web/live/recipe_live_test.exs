@@ -26,7 +26,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	recipe_id = recipe_id("granda kino")
 
 	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
 	assert socket.assigns.edit_title == false
     end
@@ -35,7 +35,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	recipe_id = recipe_id("granda kino")
 
 	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
 	{:noreply, socket} =
 	  RecipeLive.handle_event("edit-title", %{}, socket)
@@ -52,7 +52,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	recipe_id = recipe_id("granda kino")
 
 	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id, "language" => language}, nil, socket)
+	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => language}, socket)
 
 	{:noreply, socket} =
 	  RecipeLive.handle_event("submit-title", %{"title" => title}, socket)
@@ -70,7 +70,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	recipe_id = recipe_id("granda kino")
 
 	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id, "language" => "eo"}, nil, socket)
+	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
 	socket = %{socket | assigns: %{socket.assigns | edit_title: true}}
 
@@ -84,7 +84,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	recipe_id = recipe_id("granda kino")
 
       {:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id, "language" => "eo"}, nil, socket)
+	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
 	socket = %{socket | assigns: %{socket.assigns | edit_title: true}}
 
@@ -109,7 +109,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	  recipe_id = recipe_id("granda kino")
 
 	  {:ok, socket} =
-	    RecipeLive.mount(%{"id" => recipe_id, "language" => language}, nil, socket)
+	    RecipeLive.mount(%{"id" => recipe_id}, %{"language" => language}, socket)
 
 	  {:noreply, socket} =
 	    RecipeLive.handle_info(
@@ -153,7 +153,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	recipe_id = recipe_id("granda kino")
 
 	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id, "language" => language}, nil, socket)
+	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => language}, socket)
 
 	{:noreply, socket} =
 	  RecipeLive.handle_info(
@@ -184,7 +184,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
       recipe_id = recipe_id("granda kino")
 
       {:ok, socket} =
-	RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
       {:noreply, socket} =
 	RecipeLive.handle_event("title-change", %{"title" => ""}, socket)
@@ -196,7 +196,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
       recipe_id = recipe_id("granda kino")
 
       {:ok, socket} =
-	RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
       %{
 	recipe: %{
@@ -237,7 +237,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
       recipe_id = recipe_id("granda kino")
 
       {:ok, socket} =
-	RecipeLive.mount(%{"id" => recipe_id}, nil, socket)
+	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
       %{
 	recipe: %{

@@ -3,6 +3,10 @@
 <.form for %{} let={f} action={Routes.recipe_path(@conn, :create)}>
 <%= label f, "Enter new recipe title" %>
 <input class="translation-content" name="content">
-<input type="hidden" name="language" value={@language}>
+<select name="language" selected={@language}>
+    <%= for lang <- ReceptarWeb.Cldr.known_locale_names() do %>
+        <option value={lang}><%= lang %></option>
+    <% end %>
+</select>
 <%= submit "Save" %>
 </.form>

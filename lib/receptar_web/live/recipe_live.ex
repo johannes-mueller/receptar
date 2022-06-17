@@ -4,19 +4,17 @@ defmodule ReceptarWeb.RecipeLive do
   alias Receptar.Recipes
   alias Receptar.Translations
 
-  alias ReceptarWeb.Helpers
-
   import ReceptarWeb.RecipeController
 
   alias ReceptarWeb.InstructionsLive
   alias ReceptarWeb.IngredientsLive
 
-  def mount(params, _session, socket) do
-    language = Helpers.determine_language(params)
+  def mount(params, session, socket) do
+    %{"language" => language} = session
 
     socket = socket
     |> assign(language: language)
-    |> assign(recipe: query_recipe(params))
+    |> assign(recipe: query_recipe(params, language))
     |> prepare_form()
     |> assign(edit_ingredients: [])
     |> assign(edit_instructions: [])
@@ -36,7 +34,7 @@ defmodule ReceptarWeb.RecipeLive do
 
   def handle_event("submit-title", %{"title" => title}, socket) do
     recipe = socket.assigns.recipe
-    language = Helpers.determine_language(socket.assigns)
+    language = socket.assigns.language
 
     {:ok, recipe} = Recipes.update_recipe(recipe, %{title: title, language: language})
 

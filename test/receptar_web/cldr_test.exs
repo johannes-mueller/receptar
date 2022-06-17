@@ -1,6 +1,7 @@
 defmodule ReceptarWeb.CldrTest do
   import Assertions
-  use ExUnit.Case
+  use ReceptarWeb.ConnCase
+  use ReceptarWeb, :controller
 
   test "test default locale" do
     locale = ReceptarWeb.Cldr.default_locale

@@ -28,7 +28,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       	recipe_by_title("granda kino").ingredients
 	|> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       assert %Phoenix.LiveView.Socket{
@@ -41,7 +41,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       	recipe_by_title("granda kino").ingredients
 	|> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       {:noreply, socket} =
@@ -64,7 +64,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       	recipe_by_title("granda kino").ingredients
 	|> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       {:noreply, socket} =
@@ -83,7 +83,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       	recipe_by_title("granda kino").ingredients
 	|> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       {:noreply, _socket} =
@@ -94,7 +94,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       test "append ingredient to event #{recipe_name}", %{socket: socket} do
 	recipe = recipe_by_title(unquote(recipe_name))
 
-	params = %{ingredients: recipe.ingredients, edit_ingredients: []}
+	params = %{ingredients: recipe.ingredients, edit_ingredients: [], language: "eo"}
 	{:ok, socket} = IngredientsLive.update(params, socket)
 
 	original_ingredients = Ingredients.translate(recipe.ingredients, "eo")
@@ -126,7 +126,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
     end
 
     test "cancel after append", %{socket: socket} do
-      params = %{ingredients: [], edit_ingredients: []}
+      params = %{ingredients: [], edit_ingredients: [], language: "eo"}
 
       {:ok, socket} = IngredientsLive.update(params, socket)
 
@@ -140,7 +140,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
     end
 
     test "cancel after two appends", %{socket: socket} do
-      params = %{ingredients: [], edit_ingredients: []}
+      params = %{ingredients: [], edit_ingredients: [], language: "eo"}
 
       {:ok, socket} = IngredientsLive.update(params, socket)
 
@@ -166,7 +166,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	recipe_by_title("granda kino").ingredients
         |> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       {:noreply, socket} =
@@ -188,7 +188,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	recipe_by_title("granda kino").ingredients
         |> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       {:noreply, socket} =
@@ -213,7 +213,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       ingredients = recipe_by_title("Tinusa bulko").ingredients
       |> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: [1]}
+      params = %{ingredients: ingredients, edit_ingredients: [1], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       new_ingredient = %{
@@ -281,7 +281,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	ingredients = recipe_by_title("Tinusa bulko").ingredients
 	|> Ingredients.translate("eo")
 
-	params = %{ingredients: ingredients, edit_ingredients: [1, 2]}
+	params = %{ingredients: ingredients, edit_ingredients: [1, 2], language: "eo"}
 	{:ok, socket} = IngredientsLive.update(params, socket)
 
 	{:ok, socket} =
@@ -301,7 +301,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 
 	  recipe = recipe_by_title("granda kino") |> Receptar.Recipes.translate("eo")
 
-	  params = %{ingredients: recipe.ingredients, edit_ingredients: []}
+	  params = %{ingredients: recipe.ingredients, edit_ingredients: [], language: "eo"}
 	  {:ok, socket} = IngredientsLive.update(params, socket)
 
 	  {:noreply, _socket} =
@@ -324,7 +324,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       	recipe_by_title("granda kino").ingredients
 	|> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       assert %Phoenix.LiveView.Socket{
@@ -341,7 +341,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       	  recipe_by_title("granda kino").ingredients
 	|> Ingredients.translate("eo")
 
-	params = %{ingredients: ingredients, edit_ingredients: []}
+	params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
 	{:ok, socket} = IngredientsLive.update(params, socket)
 
 	attrs = %{"number" => number_string}
@@ -361,7 +361,7 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       	recipe_by_title("granda kino").ingredients
       |> Ingredients.translate("eo")
 
-      params = %{ingredients: ingredients, edit_ingredients: []}
+      params = %{ingredients: ingredients, edit_ingredients: [], language: "eo"}
       {:ok, socket} = IngredientsLive.update(params, socket)
 
       {:noreply, socket} =
@@ -387,7 +387,13 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
     setup do
       insert_test_data()
       %{ingredient: %{
-	   substance: %Substance{id: 2342, translations: [%{language: "eo", content: "salo"}, %{language: "de", content: "Salz"}]},
+	   substance: %Substance{
+	     id: 2342,
+	     translations: [
+	       %{language: "eo", content: "salo"},
+	       %{language: "de", content: "Salz"}
+	     ]
+	   },
 	   amount: Decimal.new("23.0"),
 	   unit: %{name: "gramo"},
 	   number: 1
@@ -567,6 +573,7 @@ defmodule ReceptarWeb.IngredientsTestLiveView do
     id=\"ingredients\"
     ingredients={@ingredients}
     edit_ingredients={@edit_ingredients}
+    language=\"eo\"
     />"
   end
 
