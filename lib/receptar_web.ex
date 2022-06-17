@@ -127,6 +127,11 @@ defmodule ReceptarWeb do
 	end
       end
 
+      def conn_params_without_language(%Plug.Conn{params: params}) do
+	allowed_fields = ["title", "class"]
+	Map.filter(params, fn {k, _v} -> k in allowed_fields end)
+      end
+
     end
   end
 

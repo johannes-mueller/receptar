@@ -15,11 +15,12 @@ defmodule ReceptarWeb.RecipeControllerTest do
       assert html_response(conn, 200) =~ "<h1>No recipes found.</h1>"
     end
 
-    test "missing language field does not fail", %{conn: conn} do
-      get(conn, "/search?title=foobar")
+    test "search for 'granda' in Esperanto finds one recipe", %{conn: conn} do
+      conn = get(conn, "/search?language=eo&title=granda")
+      assert html_response(conn, 200) =~ "<h1>One recipe found.</h1>"
     end
 
-    test "search for 'granda' in Esperanto finds one recipe", %{conn: conn} do
+    test "search for 'granda' in Esperanto by parameter finds one recipe", %{conn: conn} do
       conn = get(conn, "/search?language=eo&title=granda")
       assert html_response(conn, 200) =~ "<h1>One recipe found.</h1>"
     end

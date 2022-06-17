@@ -12,5 +12,4 @@ defmodule ReceptarWeb.Helpers do
     ]
   end
 
-
 end

@@ -22,7 +22,6 @@
           <%= render "_user_menu.html", assigns %>
           <%= link "New recipe", to: "/recipe/new" %>
           <%= form_for @conn, Routes.recipe_path(@conn, :search), [method: :get], fn f -> %>
-          <%= select f, :language, Receptar.Translations.known_languages %>
           <%= search_input f, :title %>
           <%= submit "Go" %>
           <% end %>
@@ -36,6 +35,9 @@
 		      <% end %>
 		  <% end %>
 	      </select>
+	      <%= for {param, value} <- conn_params_without_language(@conn) do %>
+		  <input type="hidden" name={param} value={value}>
+	      <% end %>
 	  </form>
         </nav>
         Space for the logo
