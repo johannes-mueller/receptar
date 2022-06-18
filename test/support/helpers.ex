@@ -3,8 +3,8 @@ defmodule Receptar.TestHelpers do
   alias Receptar.Recipes
   alias Receptar.Substances
 
-  def recipe_by_title(title) do
-    Recipes.search(%{"title" => title}, "eo")
+  def recipe_by_title(title, language \\ "eo") do
+    Recipes.search(%{"title" => title}, language)
     |> List.first
     |> Receptar.Repo.preload([:instructions])
   end

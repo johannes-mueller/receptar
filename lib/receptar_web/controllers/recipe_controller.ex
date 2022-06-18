@@ -20,8 +20,9 @@ defmodule ReceptarWeb.RecipeController do
     render(conn, "new.html", language: language)
   end
 
-  def create(conn, %{"language" => _, "content" => _c} = translation) do
-    case Recipes.create_recipe(%{translations: [translation]}) do
+  def create(conn, %{"title" => title}) do
+    language = conn.assigns.language
+    case Recipes.create_recipe(%{translations: [%{language: language, content: title}]}) do
       {:ok, recipe} ->
 	conn |> redirect(to: "/recipe/#{recipe.id}")
       {:error, changeset} ->
