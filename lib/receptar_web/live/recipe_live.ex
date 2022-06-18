@@ -62,7 +62,7 @@ defmodule ReceptarWeb.RecipeLive do
 
     recipe =
       Recipes.get_recipe!(recipe.id)
-      |> Recipes.translate("eo")
+      |> Recipes.translate(language)
 
     {:noreply, socket |> assign(recipe: recipe)}
   end

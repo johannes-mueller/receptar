@@ -129,6 +129,13 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	      socket
 	    )
 
+	  assert [
+	    %{
+	      unit: %{name: ^unit_name},
+	      substance: %{name: ^substance_name}
+	    }
+	  ] = socket.assigns.recipe.ingredients
+
 	  assert [%{
 		     substance: %{id: ^expected_susbstance_id},
 		     number: 1,
@@ -141,7 +148,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 			unit: %{id: ^expected_unit_id}
 		      }
 		    ]
-	  } = Recipes.get_recipe!(recipe_id) |> Recipes.translate("eo")
+	  } = Recipes.get_recipe!(recipe_id)
 	end
     end
 
