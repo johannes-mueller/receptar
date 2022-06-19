@@ -102,7 +102,7 @@ defmodule Receptar.OrderableTest do
 	%{number: 1, foo: 'a'},
 	%{number: 2, foo: 'b'},
 	%{number: 3, foo: 'c'}
-      ] = orderables |> Orderables.pull(%{number: 3, foo: 'b'})
+      ] = Orderables.pull(orderables, 3)
     end
 
     test "pull first item does not change", %{orderables: orderables} do
@@ -110,7 +110,7 @@ defmodule Receptar.OrderableTest do
 	%{number: 1, foo: 'a'},
 	%{number: 2, foo: 'c'},
 	%{number: 3, foo: 'b'},
-      ] = orderables |> Orderables.pull(%{number: 1, foo: 'a'})
+      ] = Orderables.pull(orderables, 1)
     end
 
     test "push first item", %{orderables: orderables} do
@@ -118,7 +118,7 @@ defmodule Receptar.OrderableTest do
 	%{number: 1, foo: 'c'},
 	%{number: 2, foo: 'a'},
 	%{number: 3, foo: 'b'},
-      ] = orderables |> Orderables.push(%{number: 1, foo: 'a'})
+      ] = Orderables.push(orderables, 1)
     end
 
     test "push last item does not change", %{orderables: orderables} do
@@ -126,7 +126,7 @@ defmodule Receptar.OrderableTest do
 	%{number: 1, foo: 'a'},
 	%{number: 2, foo: 'c'},
 	%{number: 3, foo: 'b'},
-      ] = orderables |> Orderables.push(%{number: 3, foo: 'b'})
+      ] = Orderables.push(orderables, 3)
     end
   end
 

@@ -50,31 +50,31 @@ defmodule Receptar.Orderables do
     item.number < length(orderables)
   end
 
-  def pull(orderables, item) when item.number == 1 do
+  def pull(orderables, number) when number == 1 do
     orderables
     |> Enum.sort(& &1.number < &2.number)
   end
 
-  def pull(orderables, item) do
+  def pull(orderables, number) do
     orderables
     |> Enum.map(fn
-      o when o.number == item.number -> %{o | number: o.number - 1}
-      o when o.number == item.number - 1 -> %{o | number: o.number + 1}
+      o when o.number == number -> %{o | number: o.number - 1}
+      o when o.number == number - 1 -> %{o | number: o.number + 1}
       o -> o
     end)
     |> Enum.sort(& &1.number < &2.number)
   end
 
-  def push(orderables, item) when item.number >= length(orderables) do
+  def push(orderables, number) when number >= length(orderables) do
     orderables
     |> Enum.sort(& &1.number < &2.number)
   end
 
-  def push(orderables, item) do
+  def push(orderables, number) do
     orderables
     |> Enum.map(fn
-      o when o.number == item.number -> %{o | number: o.number + 1}
-      o when o.number == item.number + 1 -> %{o | number: o.number - 1}
+      o when o.number == number -> %{o | number: o.number + 1}
+      o when o.number == number + 1 -> %{o | number: o.number - 1}
       o -> o
     end)
     |> Enum.sort(& &1.number < &2.number)

@@ -89,7 +89,9 @@ defmodule ReceptarWeb.InstructionsLive do
       :update_instructions,
       %{
 	instructions: Orderables.delete(socket.assigns.instructions, %{number: number}),
-	edit_instructions: edit_instructions}}
+	edit_instructions: edit_instructions
+      }
+    }
 
     {:noreply, socket}
   end
@@ -110,6 +112,38 @@ defmodule ReceptarWeb.InstructionsLive do
       %{
 	instructions: instructions,
 	edit_instructions: edit_instructions
+      }
+    }
+
+    {:noreply, socket}
+  end
+
+  def handle_event("push-instruction", %{"number" => number}, socket) do
+    number = String.to_integer(number)
+    instructions =
+      socket.assigns.instructions
+      |> Orderables.push(number)
+
+    send self(), {
+      :update_instructions,
+      %{
+	instructions: instructions
+      }
+    }
+
+    {:noreply, socket}
+  end
+
+  def handle_event("pull-instruction", %{"number" => number}, socket) do
+    number = String.to_integer(number)
+    instructions =
+      socket.assigns.instructions
+      |> Orderables.pull(number)
+
+    send self(), {
+      :update_instructions,
+      %{
+	instructions: instructions
       }
     }
 

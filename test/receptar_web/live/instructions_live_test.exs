@@ -262,13 +262,15 @@ defmodule ReceptarWeb.InstructionsLiveTest do
 	{:noreply, _socket} =
 	  InstructionsLive.handle_event("delete-instruction", %{"number" => number_string}, socket)
 
-	assert_received({
-	  :update_instructions,
-	  %{
-	    instructions: ^expected_instructions,
-	    edit_instructions: ^expected_edit_instructions
+	assert_received(
+	  {
+	    :update_instructions,
+	    %{
+	      instructions: ^expected_instructions,
+	      edit_instructions: ^expected_edit_instructions
+	    }
 	  }
-	    })
+	)
       end
     end
 
@@ -338,7 +340,53 @@ defmodule ReceptarWeb.InstructionsLiveTest do
       assert socket.assigns.edit_instructions == [1, 3]
       assert socket.assigns.new_instructions == [1, 3]
     end
-  end
+
+    test "push instruction 1", %{socket: socket} do
+      instructions =
+	recipe_by_title("granda kino").instructions
+        |> Instructions.translate("eo")
+
+      params = %{instructions: instructions, edit_instructions: []}
+      {:ok, socket} = InstructionsLive.update(params, socket)
+
+      InstructionsLive.handle_event("push-instruction", %{"number" => "1"}, socket)
+
+      assert_received(
+	  {
+	    :update_instructions,
+	    %{
+	      instructions: [
+		%{number: 1, content: "aldoni tinuson"},
+		%{number: 2, content: "kuiri nudelojn"},
+	      ],
+	    }
+	  }
+	)
+    end
+
+    test "pull instruction 2", %{socket: socket} do
+      instructions =
+	recipe_by_title("granda kino").instructions
+        |> Instructions.translate("eo")
+
+      params = %{instructions: instructions, edit_instructions: []}
+      {:ok, socket} = InstructionsLive.update(params, socket)
+
+      InstructionsLive.handle_event("pull-instruction", %{"number" => "2"}, socket)
+
+      assert_received(
+	  {
+	    :update_instructions,
+	    %{
+	      instructions: [
+		%{number: 1, content: "aldoni tinuson"},
+		%{number: 2, content: "kuiri nudelojn"},
+	      ],
+	    }
+	  }
+	)
+    end
+end
 
   describe "Connection state" do
     setup do

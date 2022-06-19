@@ -32,8 +32,24 @@
              phx-click="delete-instruction"
              phx-target={@myself}
              phx-value-number={instruction.number}>
-            Delete
+              Delete
           </a>
+	  <a href="#"
+	     id={idfy("push-instruction", instruction.number)}
+	     class="push-item-button"
+	     phx-click="push-instruction"
+	     phx-target={@myself}
+	     phx-value-number={instruction.number}>
+	      Down
+	  </a>
+	  <a href="#"
+	     id={idfy("pull-instruction", instruction.number)}
+	     class="pull-item-button"
+	     phx-click="pull-instruction"
+	     phx-target={@myself}
+	     phx-value-number={instruction.number}>
+	      Up
+	  </a>
         </li>
         <% end %>
   </ul>
