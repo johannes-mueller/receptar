@@ -41,6 +41,22 @@
 		   phx-value-number={ingredient.number}>
 		    Delete
 		</a>
+		<a href="#"
+		   id={idfy("push-ingredient", ingredient.number)}
+		   class="push-item-button"
+		   phx-click="push-ingredient"
+		   phx-target={@myself}
+		   phx-value-number={ingredient.number}>
+		    Down
+		</a>
+		<a href="#"
+		   id={idfy("pull-ingredient", ingredient.number)}
+		   class="pull-item-button"
+		   phx-click="pull-ingredient"
+		   phx-target={@myself}
+		   phx-value-number={ingredient.number}>
+		    Up
+		</a>
             </li>
 	    <%= if @translate_item == {ingredient.number, :amount} do %>
 		AMOUNT

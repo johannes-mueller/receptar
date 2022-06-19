@@ -307,17 +307,66 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	  {:noreply, _socket} =
 	    IngredientsLive.handle_event("delete-ingredient", %{"number" => number}, socket)
 
-	  assert_received({
-	    :update_ingredients,
-	    %{
-	      ingredients: [
-		%{substance: %Substance{name: ^remaining_1}, number: 1},
-		%{substance: %Substance{name: ^remaining_2}, number: 2}
-	      ]
+	  assert_received(
+	    {
+	      :update_ingredients,
+	      %{
+		ingredients: [
+		  %{substance: %Substance{name: ^remaining_1}, number: 1},
+		  %{substance: %Substance{name: ^remaining_2}, number: 2}
+		]
+	      }
 	    }
-	      })
+	  )
 	end
     end
+
+    test "push ingredient number 1", %{socket: socket} do
+      recipe = recipe_by_title("granda kino") |> Receptar.Recipes.translate("eo")
+
+      params = %{ingredients: recipe.ingredients, edit_ingredients: [], language: "eo"}
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      {:noreply, _socket} =
+	IngredientsLive.handle_event("push-ingredient", %{"number" => "1"}, socket)
+
+      assert_received(
+	{
+	  :update_ingredients,
+	  %{
+	    ingredients: [
+	      %{substance: %Substance{name: "tinuso"}, number: 1},
+	      %{substance: %Substance{name: "nudeloj"}, number: 2},
+	      %{substance: %Substance{name: "salo"}, number: 3},
+	    ]
+	  }
+	}
+      )
+    end
+
+    test "pull ingredient number 3", %{socket: socket} do
+      recipe = recipe_by_title("granda kino") |> Receptar.Recipes.translate("eo")
+
+      params = %{ingredients: recipe.ingredients, edit_ingredients: [], language: "eo"}
+      {:ok, socket} = IngredientsLive.update(params, socket)
+
+      {:noreply, _socket} =
+	IngredientsLive.handle_event("pull-ingredient", %{"number" => "3"}, socket)
+
+      assert_received(
+	{
+	  :update_ingredients,
+	  %{
+	    ingredients: [
+	      %{substance: %Substance{name: "nudeloj"}, number: 1},
+	      %{substance: %Substance{name: "salo"}, number: 2},
+	      %{substance: %Substance{name: "tinuso"}, number: 3},
+	    ]
+	  }
+	}
+      )
+    end
+
 
     test "by default no substance and amount to be translated", %{socket: socket} do
       ingredients =

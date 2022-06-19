@@ -125,6 +125,32 @@ defmodule ReceptarWeb.IngredientsLive do
     {:noreply, socket}
   end
 
+  def handle_event("push-ingredient", %{"number" => number}, socket) do
+    number = String.to_integer(number)
+
+    ingredients = Orderables.push(socket.assigns.ingredients, number)
+
+    send self(), {
+      :update_ingredients,
+      %{ingredients: ingredients}
+    }
+
+    {:noreply, socket}
+  end
+
+  def handle_event("pull-ingredient", %{"number" => number}, socket) do
+    number = String.to_integer(number)
+
+    ingredients = Orderables.pull(socket.assigns.ingredients, number)
+
+    send self(), {
+      :update_ingredients,
+      %{ingredients: ingredients}
+    }
+
+    {:noreply, socket}
+  end
+
   def handle_event("translate-" <> item, %{"number" => number}, socket) do
     {:noreply,
      socket
