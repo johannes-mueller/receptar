@@ -10,11 +10,9 @@ defmodule Receptar.Ingredients do
     ])
   end
 
-  def translate([ingredient | tail], language) do
-    [translate(ingredient, language) | translate(tail, language)]
+  def translate(ingredients, language) when is_list(ingredients) do
+    Enum.map(ingredients, & translate(&1, language))
   end
-
-  def translate([], _language), do: []
 
   def translate(ingredient, language) do
     ingredient
