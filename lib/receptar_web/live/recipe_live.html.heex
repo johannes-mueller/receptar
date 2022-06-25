@@ -1,18 +1,15 @@
-<h1 phx-click="edit-title">
-    <%= if @edit_title do %>
-	<form phx-submit="submit-title" phx-change="title-change">
-	    <input name="title" value={tr_form(@recipe.title)}>
-	    <%= if @submit_title_disabled do %>
-		<button class="submit-button" type="submit" disabled>Submit</button>
-	    <% else %>
-		<button class="submit-button" type="submit">Submit</button>
-	    <% end %>
-	    <button phx-click="cancel-edit-title" type="button">Cancel</button>
-	</form>
+<%= if @edit_title do %>
+    <.live_component
+    module={SingleTranslationLive}
+    id={idfy("recipe-title", @recipe.id)}
+    translatable={@recipe}
+    language={@language}
+    />
     <% else %>
+    <h1 phx-click="edit-title">
 	<%= tr(@recipe.title) %>
-    <% end %>
-</h1>
+    </h1>
+<% end %>
 
 <.live_component
     module={IngredientsLive}

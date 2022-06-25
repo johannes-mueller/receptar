@@ -23,73 +23,91 @@ defmodule ReceptarWeb.RecipeLiveTest do
     end
 
     test "initially edit_title flag false known recipe", %{socket: socket} do
-	recipe_id = recipe_id("granda kino")
+      recipe_id = recipe_id("granda kino")
 
-	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
+      {:ok, socket} =
+	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
-	assert socket.assigns.edit_title == false
+      assert socket.assigns.edit_title == false
     end
 
     test "edit-title event sets edit_title to true", %{socket: socket} do
-	recipe_id = recipe_id("granda kino")
+      recipe_id = recipe_id("granda kino")
 
-	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
+      {:ok, socket} =
+	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
 
-	{:noreply, socket} =
-	  RecipeLive.handle_event("edit-title", %{}, socket)
+      {:noreply, socket} =
+	RecipeLive.handle_event("edit-title", %{}, socket)
 
-	assert socket.assigns.edit_title == true
+      assert socket.assigns.edit_title == true
     end
 
 
-    for {language, title} <- [{"eo", "Grandega kino"}, {"de", "Epochales Theater"}] do
-      test "submit-title (#{language})", %{socket: socket} do
+    for {language, title} <- [
+	  {"eo", "Grandega kino"},
+	  {"de", "Epochales Theater"},
+	  {"sk", "veľké kino"}
+	] do
+      test "update-translation of title in (#{language})", %{socket: socket} do
 	language = unquote(language)
 	title = unquote(title)
 
-	recipe_id = recipe_id("granda kino")
+	recipe = recipe_by_title("granda kino")
 
 	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => language}, socket)
+	  RecipeLive.mount(%{"id" => recipe.id}, %{"language" => language}, socket)
+
+	translations_updated = [%{language: language, content: title}]
 
 	{:noreply, socket} =
-	  RecipeLive.handle_event("submit-title", %{"title" => title}, socket)
+	  RecipeLive.handle_info(
+	    {
+	      :update_translations,
+	      %{translatable: recipe, translations: translations_updated}
+	    },
+	    socket
+	  )
 
 	assert socket.assigns.recipe.title == title
 
-	recipe = Recipes.get_recipe!(recipe_id)
+	recipe = Recipes.get_recipe!(recipe.id)
 	|> Recipes.translate(language)
 
 	assert recipe.title == title
       end
     end
 
-    test "submit-title sets edit_title to false", %{socket: socket} do
-	recipe_id = recipe_id("granda kino")
-
-	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
-
-	socket = %{socket | assigns: %{socket.assigns | edit_title: true}}
-
-	{:noreply, socket} =
-	  RecipeLive.handle_event("submit-title", %{"title" => "foo"}, socket)
-
-	assert socket.assigns.edit_title == false
-    end
-
-    test "cancel-edit-title event sets edit_title to false", %{socket: socket} do
-	recipe_id = recipe_id("granda kino")
+    test "cancel-translation resets edit_title", %{socket: socket} do
+      recipe = recipe_by_title("granda kino")
 
       {:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
+	RecipeLive.mount(%{"id" => recipe.id}, %{"language" => "eo"}, socket)
+
+      {:noreply, socket} =
+	RecipeLive.handle_event("edit-title", %{}, socket)
+
+      {:noreply, socket} = RecipeLive.handle_info({:cancel_translation, recipe}, socket)
+
+      assert socket.assigns.edit_title == false
+    end
+
+    test "update-translation of title sets edit_title to false", %{socket: socket} do
+	recipe = recipe_by_title("granda kino")
+
+	{:ok, socket} =
+	  RecipeLive.mount(%{"id" => recipe.id}, %{"language" => "eo"}, socket)
 
 	socket = %{socket | assigns: %{socket.assigns | edit_title: true}}
 
 	{:noreply, socket} =
-	  RecipeLive.handle_event("cancel-edit-title", %{}, socket)
+	  RecipeLive.handle_info(
+	    {
+	      :update_translations,
+	      %{translatable: recipe, translations: [%{language: "eo", content: "uuuu"}]}
+	    },
+	    socket
+	  )
 
 	assert socket.assigns.edit_title == false
     end
@@ -185,18 +203,6 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	recipe = Recipes.get_recipe!(recipe_id) |> Recipes.translate(language)
 	assert [%{content: ^content, number: 1}] = recipe.instructions
       end
-    end
-
-    test "submit_title_disabled true after title clear", %{socket: socket} do
-      recipe_id = recipe_id("granda kino")
-
-      {:ok, socket} =
-	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
-
-      {:noreply, socket} =
-	RecipeLive.handle_event("title-change", %{"title" => ""}, socket)
-
-      assert socket.assigns.submit_title_disabled == true
     end
 
     test "add translation substance", %{socket: socket} do
@@ -317,8 +323,8 @@ defmodule ReceptarWeb.RecipeLiveTest do
       |> element("h1")
       |> render_click()
 
-      assert html =~ ~r/<form phx-submit="submit-title"/
-      assert html =~ ~r/<button.*phx-click="cancel-edit-title"/
+      assert html =~ ~r/<form phx-submit="submit"/
+      assert html =~ ~r/<button.*phx-click="cancel/
       assert html =~ ~r/<button.*type="button"/
     end
 
@@ -330,9 +336,9 @@ defmodule ReceptarWeb.RecipeLiveTest do
       |> element("h1")
       |> render_click()
 
-      assert html =~ ~r/<h1.*>.*<input.* value="Granda kino".*<\/h1>/
-    end
+      assert html =~ ~r/<input.* value="Granda kino"/    end
 
+    @tag :skip  # must be handled in SingleTranslationLive
     test "create recipe title form submit button is disabled", %{conn: conn} do
       id = recipe_id("granda kino")
       {:ok, view, _html} = live(conn, "/recipe/#{id}")
@@ -348,6 +354,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
       assert html =~ ~r/<button[^>]* type="submit"[^>]*disabled.*>/
     end
 
+    @tag :skip  # must be handled in SingleTranslationLive
     test "create recipe title form submit button is enabled after input", %{conn: conn} do
       id = recipe_id("granda kino")
       {:ok, view, _html} = live(conn, "/recipe/#{id}")

@@ -1,8 +1,6 @@
 defmodule ReceptarWeb.SingleTranslationLive do
   use ReceptarWeb, :live_component
 
-  alias Receptar.Translations.Translation
-
   def update(assigns, socket) do
     %{language: language} = assigns
 
@@ -24,10 +22,11 @@ defmodule ReceptarWeb.SingleTranslationLive do
       language: language
     } = socket.assigns
 
-    update = %{
-      update_translations: %{
+    update = {
+      :update_translations, %{
 	translatable: translatable,
 	translations: [%{language: language, content: content}]
+
       }
     }
 
@@ -37,22 +36,16 @@ defmodule ReceptarWeb.SingleTranslationLive do
   end
 
   def handle_event("cancel", _attrs, socket) do
-    do_send_update(socket, %{cancel_translation: socket.assigns.translatable})
+    do_send_update(socket, {:cancel_translation, socket.assigns.translatable})
     {:noreply, socket}
   end
 
-  defp do_send_update(socket, update) do
-    %{assigns:
-      %{
-	parent_module: parent_module,
-	parent_id: parent_id,
-      }
-    } = socket
+  defp do_send_update(%{assigns: %{parent_module: pm, parent_id: pid}}, {key, value}) do
+    send_update(pm, Map.put(%{id: pid}, key, value))
+  end
 
-    send_update(
-      parent_module,
-      Map.merge(update, %{id: parent_id})
-    )
+  defp do_send_update(_socket, update) do
+    send self(), update
   end
 
 end

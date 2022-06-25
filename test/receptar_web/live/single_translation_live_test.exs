@@ -83,7 +83,7 @@ defmodule ReceptarWeb.SingleTranslationLiveTest do
 	  )
 	end
 
-	test "cancel event sends update to #{module}", fixtures do
+	test "cancel event sends update to component #{module}", fixtures do
           module = unquote(module)
 	  module_id = unquote(module_id)
 	  language = unquote(language)
@@ -110,6 +110,21 @@ defmodule ReceptarWeb.SingleTranslationLiveTest do
 	    }
 	  )
 	end
+    end
+
+    test "cancel event sends update to view", fixtures do
+      %{socket: socket, translatable: translatable} = fixtures
+      assigns = %{
+	translatable: translatable,
+	language: "eo"
+      }
+      {:ok, socket} = SingleTranslationLive.update(assigns, socket)
+
+      {:noreply, _socket} =
+	SingleTranslationLive.handle_event("cancel", %{}, socket)
+
+      assert_received({:cancel_translation, ^translatable})
+
     end
   end
 

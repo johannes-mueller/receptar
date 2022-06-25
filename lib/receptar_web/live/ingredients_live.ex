@@ -16,7 +16,6 @@ defmodule ReceptarWeb.IngredientsLive do
   end
 
   def update(%{cancel_translation: ingredient}, socket) do
-    IO.inspect(socket.assigns.translate_item)
     {:ok, socket |> assign(translate_item: nil)}
   end
 
