@@ -1,0 +1,14 @@
+<div>
+    <ul class="translations">
+	<%= for tr <- @translatable.translations do %>
+	    <li class={"translation-" <> tr.language}><%= tr.content %></li>
+	<% end %>
+    </ul>
+    <form phx-submit="submit" phx-target={@myself} id={idfy("edit-translation", @id)}>
+	<label class={"edit-translation-label-" <> @language}>Translation</label>
+	<input name="content" class="edit-translation-input" value={@content}>
+	<button type="button" class="cancel" phx-click="cancel" phx-target={@myself}>Cancel</button>
+	<button type="submit">Submit</button>
+	<button type="Reset">Reset</button>
+    </form>
+</div>

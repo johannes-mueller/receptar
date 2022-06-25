@@ -63,11 +63,12 @@
 	    <% end %>
 	    <%= if @translate_item == {ingredient.number, :substance} do %>
 		<.live_component
-		  module={TranslationsLive}
+		  module={SingleTranslationLive}
 		  id={idfy("translations-substance", ingredient.number)}
 		  translatable={ingredient.substance}
 		  parent_module={ReceptarWeb.IngredientsLive}
 		  parent_id="ingredients"
+		  language={@language}
 		/>
 	    <% end %>
 

@@ -5,7 +5,6 @@ defmodule ReceptarWeb.TranslationsLiveTest do
   import Phoenix.LiveViewTest
   import Phoenix.LiveView.Helpers
 
-#  import Receptar.TestHelpers
   alias Receptar.Translations.Translation
   alias ReceptarWeb.TranslationsLive
   alias ReceptarWeb.TranslationsTestLiveView

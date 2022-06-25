@@ -8,9 +8,15 @@ defmodule ReceptarWeb.IngredientsLive do
 
   alias ReceptarWeb.IngredientLive
   alias ReceptarWeb.TranslationsLive
+  alias ReceptarWeb.SingleTranslationLive
 
   def update(%{update_translations: update}, socket) do
     send self(), {:update_translations, update}
+    {:ok, socket |> assign(translate_item: nil)}
+  end
+
+  def update(%{cancel_translation: ingredient}, socket) do
+    IO.inspect(socket.assigns.translate_item)
     {:ok, socket |> assign(translate_item: nil)}
   end
 
