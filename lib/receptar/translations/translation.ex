@@ -16,7 +16,7 @@ defmodule Receptar.Translations.Translation do
   @doc false
   def changeset(translation, attrs) do
     translation
-    |> cast(attrs, [:content, :language, :substance_id, :instruction_id, :unit_id])
+    |> cast(attrs, [:content, :language, :substance_id, :instruction_id, :unit_id, :recipe_id])
     |> validate_required([:content, :language])
   end
 

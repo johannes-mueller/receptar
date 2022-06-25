@@ -132,6 +132,19 @@ defmodule Receptar.TranslatablesTest do
       ] = translations
     end
 
+    test "add a translation to a recipe actually adds it" do
+      recipe = recipe_by_title("granda kino")
+      Translations.add_translation(recipe, %{language: "sk", content: "Veľké kino"})
+
+      translations = recipe_by_title("granda kino").translations
+
+      assert [
+	%{language: "eo", content: "Granda kino"},
+	%{language: "de", content: "Großes Kino"},
+	%{language: "sk", content: "Veľké kino"}
+      ] = translations
+    end
+
     test "known languages are [eo, de]" do
       assert_lists_equal Translations.known_languages(), ["eo", "de"]
     end
