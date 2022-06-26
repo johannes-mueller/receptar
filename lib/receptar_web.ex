@@ -115,6 +115,9 @@ defmodule ReceptarWeb do
 	|> Decimal.to_string(:xsd)
       end
 
+      def render_servings(%{servings: 1}), do: "one serving"
+      def render_servings(%{servings: servings}), do: "#{servings} servings"
+
       def maybe_add_to_list(number, list) do
 	case Integer.parse(number) do
 	  :error -> list

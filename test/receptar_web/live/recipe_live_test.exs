@@ -12,37 +12,34 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
   alias ReceptarWeb.RecipeLive
 
-  defp create_socket() do
-    %{socket: %Phoenix.LiveView.Socket{}}
-  end
-
   describe "Socket state RecipeLiveTest" do
     setup do
       insert_test_data()
-      create_socket()
+
+      recipe_id = recipe_id("granda kino")
+      {:ok, socket} =
+	RecipeLive.mount(
+	  %{"id" => recipe_id}, %{"language" => "eo"},
+	  %Phoenix.LiveView.Socket{}
+	)
+
+      %{socket: socket}
     end
 
     test "initially edit_title flag false known recipe", %{socket: socket} do
-      recipe_id = recipe_id("granda kino")
-
-      {:ok, socket} =
-	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
-
       assert socket.assigns.edit_title == false
     end
 
+    test "initially edit_servings flag false known recipe", %{socket: socket} do
+      assert socket.assigns.edit_servings == false
+    end
+
     test "edit-title event sets edit_title to true", %{socket: socket} do
-      recipe_id = recipe_id("granda kino")
-
-      {:ok, socket} =
-	RecipeLive.mount(%{"id" => recipe_id}, %{"language" => "eo"}, socket)
-
       {:noreply, socket} =
 	RecipeLive.handle_event("edit-title", %{}, socket)
 
       assert socket.assigns.edit_title == true
     end
-
 
     for {language, title} <- [
 	  {"eo", "Grandega kino"},
@@ -81,9 +78,6 @@ defmodule ReceptarWeb.RecipeLiveTest do
     test "cancel-translation resets edit_title", %{socket: socket} do
       recipe = recipe_by_title("granda kino")
 
-      {:ok, socket} =
-	RecipeLive.mount(%{"id" => recipe.id}, %{"language" => "eo"}, socket)
-
       {:noreply, socket} =
 	RecipeLive.handle_event("edit-title", %{}, socket)
 
@@ -94,9 +88,6 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
     test "update-translation of title sets edit_title to false", %{socket: socket} do
 	recipe = recipe_by_title("granda kino")
-
-	{:ok, socket} =
-	  RecipeLive.mount(%{"id" => recipe.id}, %{"language" => "eo"}, socket)
 
 	socket = %{socket | assigns: %{socket.assigns | edit_title: true}}
 
@@ -110,6 +101,42 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	  )
 
 	assert socket.assigns.edit_title == false
+    end
+
+    test "edit-servings event sets edit_servings flag", %{socket: socket} do
+      {:noreply, socket} = RecipeLive.handle_event("edit-servings", %{}, socket)
+      assert socket.assigns.edit_servings == true
+    end
+
+    test "submit-edit-servings resets edit_servings flag", %{socket: socket} do
+      socket = %{socket | assigns: %{socket.assigns | edit_servings: true}}
+      {:noreply, socket} = RecipeLive.handle_event("submit-servings", %{"servings" => "3"}, socket)
+      assert socket.assigns.edit_servings == false
+    end
+
+    for servings <- [3, 4] do
+      test "submit-edit-servings updates recipe to #{servings} servings", %{socket: socket} do
+	servings = unquote(servings)
+	recipe_id = socket.assigns.recipe.id
+
+	socket = %{socket | assigns: %{socket.assigns | edit_servings: true}}
+	{:noreply, socket} = RecipeLive.handle_event("submit-servings", %{"servings" => "#{servings}"}, socket)
+
+	assert socket.assigns.recipe.servings == servings
+	assert Receptar.Recipes.get_recipe!(recipe_id).servings == servings
+      end
+    end
+
+    test "submit-edit-servings non integer input does not fail", %{socket: socket} do
+      socket = %{socket | assigns: %{socket.assigns | edit_servings: true}}
+      {:noreply, socket} = RecipeLive.handle_event("submit-servings", %{"servings" => "uuuh"}, socket)
+      assert socket.assigns.recipe.servings == 2
+    end
+
+    test "cancel-edit-servings event resets edit_servings flag", %{socket: socket} do
+      socket = %{socket | assigns: %{socket.assigns | edit_servings: true}}
+      {:noreply, socket} = RecipeLive.handle_event("cancel-edit-servings", %{}, socket)
+      assert socket.assigns.edit_servings == false
     end
 
     for {substance_name, unit_name, language} <- [
@@ -336,7 +363,8 @@ defmodule ReceptarWeb.RecipeLiveTest do
       |> element("h1")
       |> render_click()
 
-      assert html =~ ~r/<input.* value="Granda kino"/    end
+      assert html =~ ~r/<input.* value="Granda kino"/
+    end
 
     @tag :skip  # must be handled in SingleTranslationLive
     test "create recipe title form submit button is disabled", %{conn: conn} do
@@ -369,6 +397,61 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
       refute html =~ ~r/<button[^>]* type="submit"[^>]*disabled.*>/
     end
+
+    test "click on edit-servings-button makes edit-servings-form appear", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("form[phx-submit=\"submit-servings\"]")
+
+      view
+      |> element("button#edit-servings-button")
+      |> render_click()
+
+      assert view |> has_element?("form[phx-submit=\"submit-servings\"]")
+    end
+
+    test "submit edit-servings-form succeeds", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button#edit-servings-button")
+      |> render_click()
+
+      view
+      |> element("form[phx-submit=\"submit-servings\"]")
+      |> render_submit()
+    end
+
+    test "cancel edit-servings-form succeeds", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button#edit-servings-button")
+      |> render_click()
+
+      view
+      |> element("button.cancel")
+      |> render_click()
+    end
+
+    for {servings, recipe} <- [{2, "granda kino"}, {1, "sardela pico"}] do
+      test "servings input for #{recipe} defaults to %{servings}", %{conn: conn} do
+	id = recipe_id(unquote(recipe))
+	{:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+	view
+	|> element("button#edit-servings-button")
+	|> render_click()
+
+	assert view
+	|> element("form input")
+	|> render() =~ ~r/value="#{unquote(servings)}"/
+      end
+    end
+
   end
 
   describe "No authenticated user" do

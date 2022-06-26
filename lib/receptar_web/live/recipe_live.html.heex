@@ -9,6 +9,21 @@
     <h1 phx-click="edit-title">
 	<%= tr(@recipe.title) %>
     </h1>
+    <div>
+	<span>For <%= render_servings(@recipe) %>.</span>
+	<button type="button" id="edit-servings-button" phx-click="edit-servings">
+	    Change
+	</button>
+	<%= if @edit_servings do %>
+	    <form phx-submit="submit-servings">
+		<input type="number" name="servings" value={@recipe.servings}><button type="submit">Submit</button>
+		<button class="cancel" type="button" phx-click="cancel-edit-servings">
+		    Cancel
+		</button>
+		<button type="reset">Reset</button>
+	    </form>
+	<% end %>
+    </div>
 <% end %>
 
 <.live_component

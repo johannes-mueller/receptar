@@ -193,6 +193,14 @@ defmodule Receptar.RecipeTest do
       } = result
     end
 
+    test "servings number of recipe is present" do
+      result = Recipes.search(%{"title" => "Großes Kino"}, "de")
+      |> Recipes.translate("eo")
+      |> List.first
+
+      assert result.servings == 2
+    end
+
     test "delete known recipe actually deletes it" do
       recipe = Recipes.search(%{"title" => "granda kino"}, "eo") |> List.first
 
@@ -248,6 +256,7 @@ defmodule Receptar.RecipeTest do
 	Recipes.create_recipe(recipe_initials)
 
       assert %{
+	servings: 2,
 	translations: [%{language: "sk", content: "Bryndzové halušky"}],
 	ingredients: [],
 	instructions: []
@@ -271,6 +280,7 @@ defmodule Receptar.RecipeTest do
       unit_id_2 = Units.get_by_translation("gramo", "eo").id
 
       recipe =  %{
+	servings: 3,
 	translations: [
 	  %{language: "eo", content: "Fromaĝa pico"}
 	],
@@ -292,6 +302,7 @@ defmodule Receptar.RecipeTest do
 
       assert %Recipe{
 	id: ^id,
+	servings: 3,
 	translations: [
 	  %{content: "Fromaĝa pico"}
 	],

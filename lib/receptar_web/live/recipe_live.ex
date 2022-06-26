@@ -28,10 +28,33 @@ defmodule ReceptarWeb.RecipeLive do
   defp prepare_form(socket) do
     socket
     |> assign(edit_title: socket.assigns.recipe.translations == [])
+    |> assign(edit_servings: false)
   end
 
   def handle_event("edit-title", _attrs, socket) do
     {:noreply, socket |> assign(edit_title: true)}
+  end
+
+  def handle_event("edit-servings", _attrs, socket) do
+    {:noreply, assign(socket, edit_servings: true)}
+  end
+
+  def handle_event("submit-servings", %{"servings" => servings}, socket) do
+    socket = case Integer.parse(servings) do
+	       {value, _} ->
+		 recipe = socket.assigns.recipe
+		 Recipes.update_recipe(recipe, %{servings: value})
+		 socket
+		 |> assign(edit_servings: false)
+		 |> assign(recipe: %{recipe | servings: value})
+	       :error -> socket
+	     end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("cancel-edit-servings", _attrs, socket) do
+    {:noreply, assign(socket, edit_servings: false)}
   end
 
   def handle_info({:update_ingredients, %{ingredients: ingredients}}, socket) do

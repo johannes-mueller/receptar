@@ -7,6 +7,7 @@ defmodule Receptar.Recipes.Recipe do
   alias Receptar.Instructions.Instruction
 
   schema "recipes" do
+    field :servings, :integer
     has_many :translations, Receptar.Translations.Translation, on_replace: :delete
     has_many :ingredients, Receptar.Ingredients.Ingredient, on_replace: :delete
     has_many :instructions, Receptar.Instructions.Instruction, on_replace: :delete
@@ -18,7 +19,7 @@ defmodule Receptar.Recipes.Recipe do
   def changeset(recipe, attrs) do
     attrs = Map.put_new(attrs, :language, nil)
     recipe
-    |> cast(attrs, [])
+    |> cast(attrs, [:servings])
     |> cast_assoc(:translations)
     |> put_assoc(:ingredients, cast_new_ingredients(attrs))
     |> put_assoc(:instructions, cast_new_instructions(attrs))
@@ -32,7 +33,7 @@ defmodule Receptar.Recipes.Recipe do
       |> retranslate_instructions
 
     recipe
-    |> cast(attrs, [])
+    |> cast(attrs, [:servings])
     |> update_title(attrs)
     |> cast_assoc(:ingredients)
     |> cast_assoc(:instructions, with: &Instruction.update_changeset/2)

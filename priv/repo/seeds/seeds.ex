@@ -128,6 +128,7 @@ defmodule Receptar.Seeder do
   @recipes [
     %{
       translations: [eo: "Granda kino", de: "Großes Kino"],
+      servings: 2,
       ingredients: [
 	{2, "tinuso", 250.0, "gramo"},
 	{1, "nudeloj", 0.5, "kilogramo"},
@@ -147,6 +148,7 @@ defmodule Receptar.Seeder do
     },
     %{
       translations: [eo: "Sardela pico", de: "Sardellenpizza"],
+      servings: 1,
       ingredients: [
 	{2, "sardeloj", 150.0, "gramo"},
 	{1, "pasto", 1.0, "kilogramo"},
@@ -169,6 +171,7 @@ defmodule Receptar.Seeder do
     },
     %{
       translations: [eo: "Fromaĝa bulko", de: "Käsebrötchen"],
+      servings: 1,
       ingredients: [
 	{1, "pasto", 200, "gramo"},
 	{2, "fromago", 20, "gramo"},
@@ -177,6 +180,7 @@ defmodule Receptar.Seeder do
     },
     %{
       translations: [eo: "Sukera bulko", de: "Zuckerbrötchen"],
+      servings: 1,
       ingredients: [
 	{1, "pasto", 200, "gramo"},
 	{2, "sukero", 20, "gramo"},
@@ -185,6 +189,7 @@ defmodule Receptar.Seeder do
     },
     %{
       translations: [eo: "Tinusa bulko", de: "Thunfischbrötchen"],
+      servings: 1,
       ingredients: [
 	{1, "pasto", 200, "gramo"},
 	{2, "tinuso", 20, "gramo"},
