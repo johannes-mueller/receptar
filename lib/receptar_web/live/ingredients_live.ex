@@ -7,16 +7,15 @@ defmodule ReceptarWeb.IngredientsLive do
   alias ReceptarWeb.Helpers
 
   alias ReceptarWeb.IngredientLive
-  alias ReceptarWeb.TranslationsLive
   alias ReceptarWeb.SingleTranslationLive
 
   def update(%{update_translations: update}, socket) do
     send self(), {:update_translations, update}
-    {:ok, socket |> assign(translate_item: nil)}
+    {:ok, socket |> assign(edit_item: nil)}
   end
 
-  def update(%{cancel_translation: ingredient}, socket) do
-    {:ok, socket |> assign(translate_item: nil)}
+  def update(%{cancel_translation: _ingredient}, socket) do
+    {:ok, socket |> assign(edit_item: nil)}
   end
 
   def update(%{submit_ingredient: ingredient}, socket) do
@@ -69,7 +68,7 @@ defmodule ReceptarWeb.IngredientsLive do
     |> assign(edit_ingredients: params.edit_ingredients)
     |> assign(language: params.language)
     |> assign(new_ingredients: [])
-    |> assign(translate_item: nil)
+    |> assign(edit_item: nil)
 
     {:ok, socket}
   end
@@ -77,6 +76,30 @@ defmodule ReceptarWeb.IngredientsLive do
   def handle_event("edit-ingredient", %{"number" => number}, socket) do
     edit_list = maybe_add_to_list(number, socket.assigns.edit_ingredients)
     {:noreply, socket |> assign(edit_ingredients: edit_list)}
+  end
+
+  def handle_event("submit-amount-edit", attrs, socket) do
+    %{"number" => number, "amount" => amount} = attrs
+
+    our_ingredient =
+      socket.assigns.ingredients
+      |> Enum.find(& &1.number == String.to_integer(number))
+      |> Map.put(:amount, Decimal.new(amount))
+
+    ingredients = Orderables.replace(socket.assigns.ingredients, our_ingredient)
+
+    send self(), {:update_ingredients, %{ingredients: ingredients}}
+
+    {
+      :noreply,
+      socket
+      |> assign(ingredients: ingredients)
+      |> assign(edit_item: nil)
+    }
+  end
+
+  def handle_event("cancel-amount-edit-" <> _number, _attrs, socket) do
+    {:noreply, socket |> assign(edit_item: nil)}
   end
 
   def handle_event("append-ingredient", _attrs, socket) do
@@ -156,17 +179,17 @@ defmodule ReceptarWeb.IngredientsLive do
     {:noreply, socket}
   end
 
-  def handle_event("translate-" <> item, %{"number" => number}, socket) do
+  def handle_event("edit-" <> item, %{"number" => number}, socket) do
     {:noreply,
      socket
-     |> assign(translate_item: {String.to_integer(number), String.to_atom(item)})
+     |> assign(edit_item: {String.to_integer(number), String.to_atom(item)})
     }
   end
 
   def handle_info(:translation_done, _attrs, socket) do
     {:noreply,
      socket
-     |> assign(translate_item: nil)
+     |> assign(edit_item: nil)
     }
   end
 end

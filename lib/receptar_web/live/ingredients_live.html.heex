@@ -10,21 +10,29 @@
 		    language={@language}
 		    />
                 <% else %>
-		    <span id={idfy("ingredient", ingredient.number)}
-			  phx-click="edit-ingredient"
-			  phx-value-number={ingredient.number}
-			  phx-target={@myself}>
-			<span class="amount-quantity"><%= render_amount(ingredient) %></span>
-			<span class="amount-unit"><%= tr(ingredient.unit.name) %></span>
-			<button id={idfy("translate-amount", ingredient.number)} type="button"
-				   phx-click="translate-amount" phx-value-number={ingredient.number} phx-target={@myself}>
-			    TR
-			</button>
-			<span class="ingredient-substance"><%= tr(ingredient.substance.name) %></span>
-			<button id={idfy("translate-substance", ingredient.number)} type="button"
-				   phx-click="translate-substance" phx-value-number={ingredient.number} phx-target={@myself}>
-			    TR
-			</button>
+		    <span id={idfy("ingredient", ingredient.number)}>
+			<span class="amount-quantity"
+			      id={idfy("ingredient-amount", ingredient.number)}
+			      phx-click="edit-amount"
+			      phx-value-number={ingredient.number}
+			      phx-target={@myself}>
+			    <%= render_amount(ingredient) %>
+			</span>
+			<span class="amount-unit"
+			      id={idfy("ingredient-unit", ingredient.number)}
+			      phx-click="edit-unit"
+			      phx-value-number={ingredient.number}
+			      phx-target={@myself}>
+			    <%= tr(ingredient.unit.name) %>
+			</span>
+			<span
+			    class="ingredient-substance"
+			    id={idfy("ingredient-substance", ingredient.number)}
+			    phx-click="edit-substance"
+			    phx-value-number={ingredient.number}
+			    phx-target={@myself}>
+			    <%= tr(ingredient.substance.name) %>
+			</span>
 		    </span>
 		<% end %>
 		<a href="#"
@@ -58,10 +66,28 @@
 		    Up
 		</a>
             </li>
-	    <%= if @translate_item == {ingredient.number, :amount} do %>
-		AMOUNT
-	    <% end %>
-	    <%= if @translate_item == {ingredient.number, :substance} do %>
+	    <%= if @edit_item == {ingredient.number, :amount} do %>
+		<form id={idfy("edit-amount", ingredient.number)} phx-submit="submit-amount-edit" phx-target={@myself}>
+		    <input name="amount" value={render_amount(ingredient)} type="number">
+		    <input name="number" value={ingredient.number} type="hidden">
+		    <button type="submit">Submit</button>
+		    <button class="cancel" type="button" phx-click={idfy("cancel-amount-edit", ingredient.number)} phx-target={@myself}>
+			Cancel
+		    </button>
+		    <button type="reset">Reset</button>
+		</form>
+            <% end %>
+		<%= if @edit_item == {ingredient.number, :unit} do %>
+		<.live_component
+		  module={SingleTranslationLive}
+		  id={idfy("translations-unit", ingredient.number)}
+		  translatable={ingredient.unit}
+		  parent_module={ReceptarWeb.IngredientsLive}
+  		  parent_id="ingredients"
+		  language={@language}
+		/>
+            <% end %>
+	    <%= if @edit_item == {ingredient.number, :substance} do %>
 		<.live_component
 		  module={SingleTranslationLive}
 		  id={idfy("translations-substance", ingredient.number)}
