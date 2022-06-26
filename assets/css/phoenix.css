@@ -99,3 +99,33 @@ header nav a {
     margin: 2rem 1rem;
   }
 }
+
+/* from here our additions */
+
+ul.translations {
+    list-style-type: none;
+}
+
+.translation-de::before,
+.translation-en::before,
+.translation-eo::before,
+.translation-sk::before {
+    content: "";
+    width: 1.5em;
+    height: 1em;
+    margin-right: 3px;
+    background-size: 1.5em 1em;
+    display: inline-block;
+}
+.translation-de::before{
+    background-image: url(/images/de.svg);
+}
+.translation-en::before{
+    background-image: url(/images/en.svg);
+}
+.translation-eo::before{
+    background-image: url(/images/eo.svg);
+}
+.translation-sk::before{
+    background-image: url(/images/sk.svg);
+}
