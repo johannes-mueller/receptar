@@ -14,6 +14,11 @@ config :receptar, ReceptarWeb.Endpoint, cache_static_manifest: "priv/static/cach
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :ex_cldr,
+  default_locale: "eo",
+  locales: ["eo", "de", "sk", "en"]
+
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
