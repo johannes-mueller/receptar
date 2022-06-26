@@ -3,11 +3,57 @@ defmodule ReceptarWeb.InstructionsLive do
 
   alias Receptar.Orderables
   alias ReceptarWeb.Helpers
+  alias ReceptarWeb.SingleTranslationLive
+
+
+  def update(%{update_translations: %{translatable: %{translations: []}} = update}, socket) do
+    %{translatable: %{number: number}, translations: translations} = update
+
+    instructions = socket.assigns.instructions
+
+    content =
+      translations
+      |> Enum.find(& &1.language == socket.assigns.language)
+      |> then(& &1.content)
+
+    new_instruction = %{content: content, number: number, translations: translations}
+    instructions = Orderables.replace(instructions, new_instruction)
+
+    send self(), {:update_instructions, %{instructions: instructions}}
+
+    {:ok, socket}
+  end
+
+  def update(%{update_translations: update}, socket) do
+    send self(), {:update_translations, update}
+
+    %{translatable: %{number: number}} = update
+
+    edit_instructions =
+      socket.assigns.edit_instructions
+      |> Enum.filter(& &1 != number)
+
+    {:ok, socket |> assign(edit_instructions: edit_instructions)}
+  end
+
+  def update(%{cancel_translation: %{number: number}}, socket) do
+    instructions =
+      socket.assigns.instructions
+      |> Enum.filter(& &1.number != number or &1.content != "")
+
+    {
+      :ok,
+      socket
+      |> assign(instructions: instructions)
+      |> assign(edit_instructions: [])
+    }
+  end
 
   def update(params, socket) do
     socket = socket
     |> assign(instructions: params.instructions)
     |> assign(edit_instructions: params.edit_instructions)
+    |> assign(language: params.language)
     |> assign(new_instructions: [])
 
     {:ok, socket}
@@ -18,39 +64,12 @@ defmodule ReceptarWeb.InstructionsLive do
     {:noreply, socket |> assign(edit_instructions: edit_list)}
   end
 
-  def handle_event("cancel-edit-instruction", %{"number" => number}, socket) do
-    number = case Integer.parse(number) do
-	       {number, ""} -> number
-	       _ -> 0
-	     end
-
-    instructions =
-      socket.assigns.instructions
-      |> Enum.filter(& not (&1.number == number and number in socket.assigns.new_instructions))
-
-    new_instructions =
-      socket.assigns.new_instructions
-      |> Enum.filter(& &1 != number)
-
-    edit_instructions =
-      socket.assigns.edit_instructions
-      |> Enum.filter(& &1 != number)
-
-    {
-      :noreply,
-      socket
-      |> assign(edit_instructions: edit_instructions)
-      |> assign(new_instructions: new_instructions)
-      |> assign(instructions: instructions)
-    }
-  end
-
   def handle_event("append-instruction", _attrs, socket) do
     instructions = socket.assigns.instructions
 
     {new_number, new_instructions} =
       instructions
-      |> Orderables.append(%{content: ""})
+      |> Orderables.append(%{content: "", translations: []})
 
     {:noreply,
      socket
@@ -65,7 +84,7 @@ defmodule ReceptarWeb.InstructionsLive do
 
     {_new_number, instructions} =
       socket.assigns.instructions
-      |> Orderables.insert_before(%{content: ""}, %{number: number})
+      |> Orderables.insert_before(%{content: "", translations: []}, %{number: number})
 
     edit_instructions = Helpers.insert_number_at(socket.assigns.edit_instructions, number)
     new_instructions = Helpers.insert_number_at(socket.assigns.new_instructions, number)
@@ -89,28 +108,6 @@ defmodule ReceptarWeb.InstructionsLive do
       :update_instructions,
       %{
 	instructions: Orderables.delete(socket.assigns.instructions, %{number: number}),
-	edit_instructions: edit_instructions
-      }
-    }
-
-    {:noreply, socket}
-  end
-
-  def handle_event("submit-instruction-" <> number, %{"instruction-content" => content}, socket) do
-    number = String.to_integer(number)
-    instructions = socket.assigns.instructions
-
-    new_instruction = %{number: number, content: content}
-    instructions = Orderables.replace(instructions, new_instruction)
-
-    edit_instructions =
-      socket.assigns.edit_instructions
-      |> Enum.filter(& &1 != number)
-
-    send self(), {
-      :update_instructions,
-      %{
-	instructions: instructions,
 	edit_instructions: edit_instructions
       }
     }

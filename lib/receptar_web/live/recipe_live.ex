@@ -85,7 +85,4 @@ defmodule ReceptarWeb.RecipeLive do
   defp handle_translation_updates(socket, _translatable) do
     socket
   end
-
-
-
 end

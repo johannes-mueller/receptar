@@ -471,8 +471,8 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
       {:noreply, socket} =
 	IngredientsLive.handle_event("translate-substance", %{"number" => "2"}, socket)
 
-      [first_ingredient | tail] = ingredients
-      [second_ingredient | _] = tail
+      [first_ingredient | _tail] = ingredients
+      #[second_ingredient | _] = tail
 
       {:ok, socket} =
 	IngredientsLive.update(

@@ -2,56 +2,55 @@
   <ul class="instructions-list">
     <%= for instruction <- @instructions do %>
 	<li class="instruction-list-entry">
-          <%= if instruction.number in @edit_instructions do %>
-          <form phx-submit={idfy("submit-instruction", instruction.number)} phx-target={@myself}>
-            <textarea name="instruction-content"><%= instruction.content %></textarea>
-            <button type="submit">Save</button>
-            <button type="button"
-                    class="cancel-button"
-                    phx-target={@myself}
-                    phx-click="cancel-edit-instruction"
-                    phx-value-number={instruction.number}>Cancel</button>
-          </form>
-          <% else %>
-          <span id={idfy("instruction", instruction.number)}
-                phx-click="edit-instruction"
-                phx-target={@myself}
-                phx-value-number={instruction.number}>
-            <%= tr(instruction.content) %>
-          </span>
-          <% end %>
-          <a href="#"
-             id={idfy("insert-instruction", instruction.number)}
-             phx-click="insert-instruction"
-             phx-target={@myself}
-             phx-value-number={instruction.number}>
-            Insert
-          </a>
-          <a href="#"
-             id={idfy("delete-instruction", instruction.number)}
-             phx-click="delete-instruction"
-             phx-target={@myself}
-             phx-value-number={instruction.number}>
-              Delete
-          </a>
-	  <a href="#"
-	     id={idfy("push-instruction", instruction.number)}
-	     class="push-item-button"
-	     phx-click="push-instruction"
-	     phx-target={@myself}
-	     phx-value-number={instruction.number}>
-	      Down
-	  </a>
-	  <a href="#"
-	     id={idfy("pull-instruction", instruction.number)}
-	     class="pull-item-button"
-	     phx-click="pull-instruction"
-	     phx-target={@myself}
-	     phx-value-number={instruction.number}>
-	      Up
-	  </a>
+            <%= if instruction.number in @edit_instructions do %>
+		<.live_component
+		module={SingleTranslationLive}
+		id={idfy("instruction", instruction.number)}
+		translatable={instruction}
+		parent_module={ReceptarWeb.InstructionsLive}
+		parent_id="instructions"
+		language={@language}
+		/>
+	    <% else %>
+		<span id={idfy("instruction", instruction.number)}
+                      phx-click="edit-instruction"
+                      phx-target={@myself}
+                      phx-value-number={instruction.number}>
+		    <%= tr(instruction.content) %>
+		</span>
+            <% end %>
+            <a href="#"
+               id={idfy("insert-instruction", instruction.number)}
+               phx-click="insert-instruction"
+               phx-target={@myself}
+               phx-value-number={instruction.number}>
+		Insert
+            </a>
+            <a href="#"
+               id={idfy("delete-instruction", instruction.number)}
+               phx-click="delete-instruction"
+               phx-target={@myself}
+               phx-value-number={instruction.number}>
+		Delete
+            </a>
+	    <a href="#"
+	       id={idfy("push-instruction", instruction.number)}
+	       class="push-item-button"
+	       phx-click="push-instruction"
+	       phx-target={@myself}
+	       phx-value-number={instruction.number}>
+		Down
+	    </a>
+	    <a href="#"
+	       id={idfy("pull-instruction", instruction.number)}
+	       class="pull-item-button"
+	       phx-click="pull-instruction"
+	       phx-target={@myself}
+	       phx-value-number={instruction.number}>
+		Up
+	    </a>
         </li>
-        <% end %>
+    <% end %>
   </ul>
   <a href="#"
      id="append-instruction"
