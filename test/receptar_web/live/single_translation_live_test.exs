@@ -171,7 +171,7 @@ defmodule ReceptarWeb.SingleTranslationLiveTest do
       |> render_click()  # no assertion necessary (enforces phx-target={@myself})
     end
 
-    test "known target language has empty input field", %{conn: conn, session: session} do
+    test "known target language has input field with known value", %{conn: conn, session: session} do
       session = Map.merge(session, %{"language" => "eo"})
       {:ok, view, _html} = live_isolated(conn, SingleTranslationLiveView, session: session)
       translatable_id = session["translatable"].id
@@ -180,6 +180,34 @@ defmodule ReceptarWeb.SingleTranslationLiveTest do
       |> element("form#edit-translation-#{translatable_id} input.edit-translation-input")
       |> render() =~ ~r/value="salo"/
     end
+
+    for {language, content} <- [{"eo", "preparado"}, {"de", "Vorbereitung"}] do
+      test "known target language #{language}has textarea field with known value for Instruction",
+	%{conn: conn, session: session} do
+
+	instruction = %Receptar.Instructions.Instruction{
+	  id: 2342,
+	  translations: [
+	    %{language: "eo", content: "preparado"},
+	    %{language: "de", content: "Vorbereitung"}
+	  ]
+	}
+	session = Map.merge(session,
+	  %{
+	    "language" => unquote(language),
+	    "translatable" => instruction
+	  }
+	)
+
+	{:ok, view, _html} = live_isolated(conn, SingleTranslationLiveView, session: session)
+	translatable_id = session["translatable"].id
+
+	assert view
+	|> element("form#edit-translation-#{translatable_id} textarea.edit-translation-input")
+	|> render() =~ ~r/>#{unquote(content)}<\/textarea>/
+      end
+    end
+
 
     for language <- ["en", "sk"] do
       test "target language #{language} is rendered in label as flag", %{conn: conn, session: session} do

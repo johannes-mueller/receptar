@@ -40,6 +40,14 @@ defmodule ReceptarWeb.SingleTranslationLive do
     {:noreply, socket}
   end
 
+  def render_input_widget(%Receptar.Instructions.Instruction{}, content) do
+    raw "<textarea name=\"content\" class=\"edit-translation-input\">#{content}</textarea>"
+  end
+
+  def render_input_widget(_translatable, content) do
+    raw "<input name=\"content\" class=\"edit-translation-input\" value=\"#{content}\">"
+  end
+
   defp do_send_update(%{assigns: %{parent_module: pm, parent_id: pid}}, {key, value}) do
     send_update(pm, Map.put(%{id: pid}, key, value))
   end
