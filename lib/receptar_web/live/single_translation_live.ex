@@ -11,7 +11,7 @@ defmodule ReceptarWeb.SingleTranslationLive do
     {
       :ok,
       socket
-      |> assign(assigns)
+      |> assign(Map.put_new(assigns, :textarea, false))
       |> assign(content: translation.content)
     }
   end
@@ -38,14 +38,6 @@ defmodule ReceptarWeb.SingleTranslationLive do
   def handle_event("cancel", _attrs, socket) do
     do_send_update(socket, {:cancel_translation, socket.assigns.translatable})
     {:noreply, socket}
-  end
-
-  def render_input_widget(%Receptar.Instructions.Instruction{}, content) do
-    raw "<textarea name=\"content\" class=\"edit-translation-input\">#{content}</textarea>"
-  end
-
-  def render_input_widget(_translatable, content) do
-    raw "<input name=\"content\" class=\"edit-translation-input\" value=\"#{content}\">"
   end
 
   defp do_send_update(%{assigns: %{parent_module: pm, parent_id: pid}}, {key, value}) do

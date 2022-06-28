@@ -6,7 +6,11 @@
     </ul>
     <form phx-submit="submit" phx-target={@myself} id={idfy("edit-translation", @id)}>
 	<label class={"edit-translation-label-" <> @language}>Translation</label>
-	<%= render_input_widget @translatable, @content %>
+	<%= if @textarea do %>
+	    <textarea name="content" class="edit-translation-input"><%= @content %></textarea>
+	<% else %>
+	    <input name="content" class="edit-translation-input" value={@content}>
+	<% end %>
 	<button type="button" class="cancel" phx-click="cancel" phx-target={@myself}>Cancel</button>
 	<button type="submit">Submit</button>
 	<button type="Reset">Reset</button>

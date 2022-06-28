@@ -577,8 +577,16 @@ end
       {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
       view
-      |> element("form")
+      |> element("form#edit-translation-instruction-1")
       |> render_submit()
+    end
+
+    test "edit-instruction form has textarea", %{conn: conn, instruction: instruction} do
+      session = %{"instructions" => [instruction], "edit_instructions" => [1],  "language" => "eo"}
+      {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
+
+      assert view
+      |> has_element?("form#edit-translation-instruction-1 textarea")
     end
   end
 end

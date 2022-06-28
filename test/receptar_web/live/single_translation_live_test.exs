@@ -182,7 +182,7 @@ defmodule ReceptarWeb.SingleTranslationLiveTest do
     end
 
     for {language, content} <- [{"eo", "preparado"}, {"de", "Vorbereitung"}] do
-      test "known target language #{language}has textarea field with known value for Instruction",
+      test "known target language #{language} has textarea field with known value for Instruction",
 	%{conn: conn, session: session} do
 
 	instruction = %Receptar.Instructions.Instruction{
@@ -195,7 +195,8 @@ defmodule ReceptarWeb.SingleTranslationLiveTest do
 	session = Map.merge(session,
 	  %{
 	    "language" => unquote(language),
-	    "translatable" => instruction
+	    "translatable" => instruction,
+	    "textarea" => true
 	  }
 	)
 
@@ -263,6 +264,18 @@ defmodule ReceptarWeb.SingleTranslationLiveView do
 
   alias ReceptarWeb.SingleTranslationLive
 
+  def render(%{textarea: _yn} = assigns) do
+    ~H"<.live_component
+    module={SingleTranslationLive}
+    id={@translatable.id}
+    translatable={@translatable}
+    textarea={@textarea}
+    parent_module={@parent_module}
+    parent_id={@parent_id}
+    language={@language}
+    />"
+  end
+
   def render(assigns) do
     ~H"<.live_component
     module={SingleTranslationLive}
@@ -287,6 +300,11 @@ defmodule ReceptarWeb.SingleTranslationLiveView do
       |> assign(language: language)
       |> assign(parent_module: parent_module)
       |> assign(parent_id: parent_id)
+
+    socket = case session do
+	       %{"textarea" => yn} -> assign(socket, textarea: yn)
+	       _ -> socket
+	     end
 
     {:ok, socket}
   end
