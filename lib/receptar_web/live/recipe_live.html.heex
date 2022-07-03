@@ -52,6 +52,27 @@
 	<% end %>
     <% end %>
 </div>
+<div>
+    <%= if @edit_reference do %>
+	<form phx-submit="submit-reference">
+	    <label for="reference">Reference:</label><input name="reference" value={@recipe.reference || ""}>
+	    <button class="cancel-button" type="button" phx-click="cancel-edit-reference">
+		Cancel
+	    </button>
+	    <button class="reset-button" type="reset">Reset</button>
+	    <button class="submit-button">Submit</button>
+	</form>
+    <% else %>
+	<%= if @recipe.reference do %>
+	    <span>Recipe reference:</span>
+	    <span class="recipe-reference"><%= render_reference(@recipe) %></span>
+	    <button class="edit-button" phx-click="edit-reference">Edit reference</button>
+	    <button type="button" class="delete-button" phx-click="delete-reference">Delete</button>
+	<% else %>
+	    <span>No reference given</span><button class="add-button" phx-click="edit-reference">Add</button>
+	<% end %>
+    <% end %>
+</div>
 
 <.live_component
     module={IngredientsLive}

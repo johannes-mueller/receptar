@@ -129,6 +129,7 @@ defmodule Receptar.Seeder do
     %{
       translations: [eo: "Granda kino", de: "Großes Kino"],
       servings: 2,
+      reference: "ia podkasto",
       recipe_description: %{
 	translations: [
 	  %{"language" => "eo", "content" => "Vere granda kino"},
@@ -178,6 +179,7 @@ defmodule Receptar.Seeder do
     %{
       translations: [eo: "Fromaĝa bulko", de: "Käsebrötchen"],
       servings: 1,
+      reference: "testa fantazio",
       ingredients: [
 	{1, "pasto", 200, "gramo"},
 	{2, "fromago", 20, "gramo"},
@@ -187,6 +189,7 @@ defmodule Receptar.Seeder do
     %{
       translations: [eo: "Sukera bulko", de: "Zuckerbrötchen"],
       servings: 1,
+      reference: "https://sukera-bulko.org",
       ingredients: [
 	{1, "pasto", 200, "gramo"},
 	{2, "sukero", 20, "gramo"},

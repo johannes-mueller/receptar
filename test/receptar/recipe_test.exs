@@ -176,6 +176,23 @@ defmodule Receptar.RecipeTest do
       assert [%{description: nil}] = result
     end
 
+    test "reference of sardela pico is nil" do
+      result = Recipes.search(%{"title" => "Sardellenpizza"}, "de")
+      assert [%{reference: nil}] = result
+    end
+
+    test "reference of granda kino is ia podkasto" do
+      result = Recipes.search(%{"title" => "granda kino"}, "eo")
+      assert [%{reference: "ia podkasto"}] = result
+    end
+
+    test "deleting reference makes reference nil" do
+      [recipe |_] = Recipes.search(%{"title" => "granda kino"}, "eo")
+      Recipes.update_recipe(recipe, %{reference: nil})
+      result = Recipes.search(%{"title" => "granda kino"}, "eo")
+      assert [%{reference: nil}] = result
+    end
+
     test "translated instruction names of recipe 'Großes Kino' to Esperanto" do
       result = Recipes.search(%{"title" => "Großes Kino"}, "de")
       |> Recipes.translate("eo")

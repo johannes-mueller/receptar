@@ -29,8 +29,9 @@ defmodule ReceptarWeb.RecipeLive do
   defp prepare_form(socket) do
     socket
     |> assign(edit_title: socket.assigns.recipe.translations == [])
-    |> assign(edit_description: false)
     |> assign(edit_servings: false)
+    |> assign(edit_description: false)
+    |> assign(edit_reference: false)
   end
 
   def handle_event("edit-title", _attrs, socket) do
@@ -82,6 +83,37 @@ defmodule ReceptarWeb.RecipeLive do
 
   def handle_event("cancel-edit-description", %{}, socket) do
     {:noreply, socket |> assign(edit_description: false)}
+  end
+
+  def handle_event("edit-reference", %{}, socket) do
+    {:noreply, socket |> assign(edit_reference: true)}
+  end
+
+  def handle_event("submit-reference", %{"reference" => reference}, socket) do
+    %{recipe: recipe} = socket.assigns
+    {:ok, recipe} = Recipes.update_recipe(recipe, %{reference: reference})
+
+    {
+      :noreply,
+      socket
+      |> assign(recipe: recipe)
+      |> assign(edit_reference: false)
+    }
+  end
+
+  def handle_event("cancel-edit-reference", %{}, socket) do
+    {:noreply, socket |> assign(edit_reference: false)}
+  end
+
+  def handle_event("delete-reference", %{}, socket) do
+    %{recipe: recipe} = socket.assigns
+    {:ok, recipe} = Recipes.update_recipe(recipe, %{reference: nil})
+
+    {
+      :noreply,
+      socket
+      |> assign(recipe: recipe)
+    }
   end
 
   def handle_info({:update_ingredients, %{ingredients: ingredients}}, socket) do
@@ -144,5 +176,13 @@ defmodule ReceptarWeb.RecipeLive do
 
   defp handle_translation_updates(socket, _translatable) do
     socket
+  end
+
+  def render_reference(%{reference: reference} = _recipe) do
+    if URI.parse(reference).scheme do
+      raw "<a href=\"#{reference}\">#{reference}</a>"
+    else
+      reference
+    end
   end
 end

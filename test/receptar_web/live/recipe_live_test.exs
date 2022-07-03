@@ -501,6 +501,167 @@ defmodule ReceptarWeb.RecipeLiveTest do
       |> render_submit()  # no assertion possible as processing leaves the process
     end
 
+    for {title, reference} <- [
+	  {"granda kino", "ia podkasto"},
+	  {"fromaĝa bulko", "testa fantazio"}
+	] do
+	test "reference of #{title} is #{reference}", %{conn: conn} do
+	  id = recipe_id(unquote(title))
+	  {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+	  refute view |> has_element?("button.add-button[phx-click=edit-reference]")
+	  assert view |> has_element?("button.edit-button[phx-click=edit-reference]")
+
+	  assert view
+	  |> element("span.recipe-reference")
+	  |> render() =~ unquote(reference)
+	end
+
+	test "edit-reference default is set to #{reference} and reset when reset button clicked", %{conn: conn} do
+	  id = recipe_id(unquote(title))
+	  reference = unquote(reference)
+	  {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+	  view
+	  |> element("button.edit-button[phx-click=edit-reference]")
+	  |> render_click()
+
+	  refute view |> has_element?("button.edit-button[phx-click=edit-reference]")
+
+	  assert view
+	  |> element("form[phx-submit=submit-reference] input[name=reference]")
+	  |> render() =~ ~r/value="#{reference}"/
+	end
+    end
+
+    test "sukera bulko reference rendered as link", %{conn: conn} do
+      id = recipe_id("sukera bulko")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      assert view
+      |> element("span.recipe-reference a[href=\"https://sukera-bulko.org\"]")
+      |> render() =~ ">https://sukera-bulko.org</a>"
+    end
+
+    test "granda kino not rendered as link", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("span.recipe-reference a")
+    end
+
+    test "sardela pico does not have reference but add-button to add reference", %{conn: conn} do
+      id = recipe_id("sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("span.recipe-reference")
+
+      assert view |> has_element?("button.add-button[phx-click=edit-reference]")
+      refute view |> has_element?("button.edit-button[phx-click=edit-reference]")
+    end
+
+    test "edit-reference for sardela pico default is empty", %{conn: conn} do
+      id = recipe_id("sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button.add-button[phx-click=edit-reference]")
+      |> render_click()
+
+      refute view |> has_element?("button.add-button[phx-click=edit-reference]")
+
+      assert view
+      |> element("form[phx-submit=submit-reference] input[name=reference]")
+      |> render() =~ ~r/value=""/
+    end
+
+    test "click add reference and fill form submits reference", %{conn: conn} do
+      id = recipe_id("sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("form[phx-submit=submit-reference]")
+
+      view
+      |> element("button.add-button[phx-click=edit-reference]")
+      |> render_click()
+
+      refute view |> has_element?("button.add-button[phx-click=edit-reference]")
+      refute view |> has_element?("button.edit-button[phx-click=edit-reference]")
+
+      view
+      |> element("form[phx-submit=submit-reference]")
+      |> render_submit(%{reference: "added reference"})
+
+      assert view
+      |> element("span.recipe-reference")
+      |> render() =~ "added reference"
+
+      refute view |> has_element?("button.add-button[phx-click=edit-reference]")
+      assert view |> has_element?("button.edit-button[phx-click=edit-reference]")
+    end
+
+    test "click edit reference and fill form submits reference", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("form[phx-submit=submit-reference]")
+
+      view
+      |> element("button.edit-button[phx-click=edit-reference]")
+      |> render_click()
+
+      refute view |> has_element?("button.add-button[phx-click=edit-reference]")
+      refute view |> has_element?("button.edit-button[phx-click=edit-reference]")
+
+      view
+      |> element("form[phx-submit=submit-reference]")
+      |> render_submit(%{reference: "changed reference"})
+
+      assert view
+      |> element("span.recipe-reference")
+      |> render() =~ "changed reference"
+
+      refute view |> has_element?("button.add-button[phx-click=edit-reference]")
+      assert view |> has_element?("button.edit-button[phx-click=edit-reference]")
+    end
+
+    test "cancel-edit-reference cancels", %{conn: conn} do
+      id = recipe_id("sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button.add-button[phx-click=edit-reference]")
+      |> render_click()
+
+      view
+      |> element("button.cancel-button[phx-click=cancel-edit-reference]")
+      |> render_click()
+
+      refute view |> has_element?("form[phx-submit=submit-reference]")
+      assert view |> has_element?("button.add-button[phx-click=edit-reference]")
+      refute view |> has_element?("button.edit-button[phx-click=edit-reference]")
+    end
+
+    test "sardela pico deos not have delete-reference button", %{conn: conn} do
+      id = recipe_id("sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("button.delete-button[phx-click=delete-reference]")
+    end
+
+    test "delete-reference deletes the reference", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button.delete-button[phx-click=delete-reference]")
+      |> render_click()
+
+      assert view |> has_element?("button.add-button[phx-click=edit-reference]")
+      refute view |> has_element?("button.edit-button[phx-click=edit-reference]")
+      refute view |> has_element?("button.delete-button[phx-click=delete-reference]")
+    end
+
     test "title has a form element after edit-title event", %{conn: conn} do
       id = recipe_id("granda kino")
       {:ok, view, _html} = live(conn, "/recipe/#{id}")

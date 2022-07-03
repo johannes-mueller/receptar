@@ -9,6 +9,7 @@ defmodule Receptar.Recipes.Recipe do
 
   schema "recipes" do
     field :servings, :integer
+    field :reference, :string
     has_one :recipe_description, Receptar.Recipes.RecipeDescription, on_replace: :delete
     has_many :translations, Receptar.Translations.Translation, on_replace: :delete
     has_many :ingredients, Receptar.Ingredients.Ingredient, on_replace: :delete
@@ -21,7 +22,7 @@ defmodule Receptar.Recipes.Recipe do
   def changeset(recipe, attrs) do
     attrs = Map.put_new(attrs, :language, nil)
     recipe
-    |> cast(attrs, [:servings])
+    |> cast(attrs, [:servings, :reference])
     |> cast_assoc(:translations)
     |> put_assoc(:recipe_description, cast_new_description(attrs))
     |> put_assoc(:ingredients, cast_new_ingredients(attrs))
@@ -36,7 +37,7 @@ defmodule Receptar.Recipes.Recipe do
       |> retranslate_instructions
 
     recipe
-    |> cast(attrs, [:servings])
+    |> cast(attrs, [:servings, :reference])
     |> update_title(attrs)
     |> update_description(attrs)
     |> cast_assoc(:ingredients)
