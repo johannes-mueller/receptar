@@ -90,6 +90,10 @@ defmodule Receptar.Recipes.Recipe do
     |> Repo.insert!
   end
 
+  defp cast_new_description(%{description: nil} = _attrs) do
+    nil
+  end
+
   defp cast_new_description(%{description: content, language: language} = _attrs) do
     %RecipeDescription{}
     |> RecipeDescription.changeset(%{translations: [%{language: language, content: content}]})

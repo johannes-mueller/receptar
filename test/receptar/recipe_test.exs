@@ -176,6 +176,14 @@ defmodule Receptar.RecipeTest do
       assert [%{description: nil}] = result
     end
 
+    test "delete recipe description deletes it" do
+      [recipe] = Recipes.search(%{"title" => "Großes Kino"}, "de")
+      {:ok, result} = Recipes.update_recipe(recipe, %{description: nil})
+
+      assert result.recipe_description == nil
+      assert Recipes.get_recipe!(recipe.id).recipe_description == nil
+    end
+
     test "reference of sardela pico is nil" do
       result = Recipes.search(%{"title" => "Sardellenpizza"}, "de")
       assert [%{reference: nil}] = result

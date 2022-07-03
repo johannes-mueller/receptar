@@ -431,6 +431,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
       refute view |> has_element?("button.edit-button[phx-click=\"edit-description\"]")
       assert view |> has_element?("p.no-recipe-description")
       assert view |> has_element?("button.add-button[phx-click=\"edit-description\"]")
+      refute view |> has_element?("button.delete-button[phx-click=delete-description]")
     end
 
     test "add-button for description click makes edit-description form appear", %{conn: conn} do
@@ -495,11 +496,24 @@ defmodule ReceptarWeb.RecipeLiveTest do
 
       refute view |> has_element?("form[phx-submit=submit-description]")
       refute view |> has_element?("button.edit-button[phx-click=\"edit-description\"]")
+      refute view |> has_element?("button.delete-button[phx-click=delete-description]")
 
       view
       |> element("form#edit-translation-recipe-description-#{id}")
       |> render_submit()  # no assertion possible as processing leaves the process
     end
+
+    test "delete-description deletes description", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button.delete-button[phx-click=delete-description]")
+      |> render_click()
+
+      assert view |> has_element?("button.add-button[phx-click=edit-description]")
+    end
+
 
     for {title, reference} <- [
 	  {"granda kino", "ia podkasto"},

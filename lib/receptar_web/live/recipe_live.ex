@@ -85,6 +85,14 @@ defmodule ReceptarWeb.RecipeLive do
     {:noreply, socket |> assign(edit_description: false)}
   end
 
+  def handle_event("delete-description", %{}, socket) do
+    {:ok, recipe} =
+      socket.assigns.recipe
+      |> Recipes.update_recipe(%{description: nil})
+
+    {:noreply, socket |> assign(recipe: recipe |> Recipes.translate(socket.assigns.language))}
+  end
+
   def handle_event("edit-reference", %{}, socket) do
     {:noreply, socket |> assign(edit_reference: true)}
   end

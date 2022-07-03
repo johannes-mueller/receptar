@@ -38,6 +38,7 @@
 	    <% else %>
 	    <p class="recipe-description"><%= tr(@recipe.description) %></p>
 	    <button class="edit-button" phx-click="edit-description">Edit</button>
+	    <button class="delete-button" phx-click="delete-description">Delete</button>
 	<% end %>
     <% else %>
 	<%= if @edit_description do %>
