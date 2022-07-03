@@ -3,6 +3,7 @@ defmodule Receptar.Recipes do
   import Ecto.Query
 
   alias Receptar.Recipes.Recipe
+  alias Receptar.Recipes.RecipeDescription
   alias Receptar.Instructions.Instruction
   alias Receptar.Instructions
   alias Receptar.Ingredients.Ingredient
@@ -102,26 +103,13 @@ defmodule Receptar.Recipes do
     base_query()
     |> build_query(criteria, language)
     |> Repo.all
-    |> Repo.preload([
-      :translations,
-      ingredients: from(i in Ingredient,
-	order_by: i.number,
-	preload: [{:substance, :translations}, {:unit, :translations}]
-      ),
-      instructions: from(i in Instruction,
-	order_by: i.number,
-	preload: [:translations])
-    ])
+    |> preload_assocs
     |> Enum.map(&fill_ingredients_kind_fields/1)
   end
 
   def get_recipe!(id) do
     Repo.get!(Recipe, id)
-    |> Repo.preload([
-      :translations,
-      ingredients: from(i in Ingredient, order_by: i.number, preload: [{:substance, :translations}, {:unit, :translations}]),
-      instructions: from(i in Instruction, order_by: i.number, preload: [:translations])
-    ])
+    |> preload_assocs
     |> fill_ingredients_kind_fields
   end
 
@@ -137,7 +125,6 @@ defmodule Receptar.Recipes do
     recipe
     |> Recipe.update_changeset(attrs)
     |> Repo.update
-
   end
 
   def delete_recipe(recipe) do
@@ -155,8 +142,26 @@ defmodule Receptar.Recipes do
 
     recipe
     |> Map.put(:title, translation)
+    |> Map.put(:description, RecipeDescription.translate(recipe.recipe_description, language))
     |> Map.put(:ingredients, Ingredients.translate(recipe.ingredients, language))
     |> Map.put(:instructions, Instructions.translate(recipe.instructions, language))
+  end
+
+  defp preload_assocs(recipe_s) do
+    recipe_s
+    |> Repo.preload(
+      [
+	:translations,
+	recipe_description: :translations,
+	ingredients: from(i in Ingredient,
+	  order_by: i.number,
+	  preload: [{:substance, :translations}, {:unit, :translations}]
+	),
+	instructions: from(i in Instruction,
+	  order_by: i.number,
+	  preload: [:translations])
+      ]
+    )
   end
 
   def fill_ingredients_kind_fields(recipe) do

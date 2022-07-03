@@ -17,11 +17,7 @@
 <ul class="search-result">
   <%= for recipe <- @recipes do %>
       <li class="recipe-list-entry">
-	<%=
-	  link recipe.title,
-	  to: "/recipe/#{recipe.id}",
-	  class: "recipe-link"
-	  %>
+	  <%= link recipe.title, to: "/recipe/#{recipe.id}", class: "recipe-link" %>
       </li>
       <% end %>
 </ul>

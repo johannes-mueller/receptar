@@ -122,7 +122,7 @@ defmodule Receptar.RecipeTest do
       assert result == %{ recipe | ingredients: [], instructions: [] }
     end
 
-    test "translated title of recipe 1 to Esperanto is 'Granda kino'" do
+    test "translated title of recipe 'Großes Kino' to Esperanto is 'Granda kino'" do
       recipe = Recipes.search(%{"title" => "Großes Kino"}, "de") |> List.first
 
       result = Recipes.get_recipe!(recipe.id)
@@ -130,7 +130,7 @@ defmodule Receptar.RecipeTest do
       assert %{title: "Granda kino"} = result
     end
 
-    test "translated title of recipe 1 to German is 'Großes Kino'" do
+    test "translated title of recipe 'granda kino' to German is 'Großes Kino'" do
       recipe = Recipes.search(%{"title" => "granda kino"}, "eo") |> List.first
 
       result = Recipes.get_recipe!(recipe.id)
@@ -138,7 +138,7 @@ defmodule Receptar.RecipeTest do
       assert %{title: "Großes Kino"} = result
     end
 
-    test "translated title of recipe 1 to unknown language is :translation_missing" do
+    test "translated title of recipe 'granda kino' to unknown language is :translation_missing" do
       recipe = Recipes.search(%{"title" => "granda kino"}, "eo") |> List.first
 
       result = Recipes.get_recipe!(recipe.id)
@@ -152,7 +152,31 @@ defmodule Receptar.RecipeTest do
       assert [%{title: "Großes Kino"}] = result
     end
 
-    test "translated instruction names of recipe 1 to Esperanto" do
+    test "translated description of searched recipe 'Großes Kino' to German" do
+      result = Recipes.search(%{"title" => "Großes Kino"}, "de")
+      |> Recipes.translate("de")
+      assert [%{description: "Echt ganz großes Kino"}] = result
+    end
+
+    test "translated description of searched recipe 'Großes Kino' to Esperanto" do
+      result = Recipes.search(%{"title" => "Großes Kino"}, "de")
+      |> Recipes.translate("eo")
+      assert [%{description: "Vere granda kino"}] = result
+    end
+
+    test "translated description of searched recipe 'Großes Kino' to unknown" do
+      result = Recipes.search(%{"title" => "Großes Kino"}, "de")
+      |> Recipes.translate("und")
+      assert [%{description: :translation_missing}] = result
+    end
+
+    test "translated description of searched recipe 'Sardellenpizza' to Esperanto" do
+      result = Recipes.search(%{"title" => "Sardellenpizza"}, "de")
+      |> Recipes.translate("eo")
+      assert [%{description: nil}] = result
+    end
+
+    test "translated instruction names of recipe 'Großes Kino' to Esperanto" do
       result = Recipes.search(%{"title" => "Großes Kino"}, "de")
       |> Recipes.translate("eo")
       |> List.first
@@ -165,7 +189,7 @@ defmodule Receptar.RecipeTest do
       } = result
     end
 
-    test "translated ingredients of recipe 1 to Esperanto" do
+    test "translated ingredients of recipe 'Großes Kino' to Esperanto" do
       result = Recipes.search(%{"title" => "Großes Kino"}, "de")
       |> Recipes.translate("eo")
       |> List.first
@@ -179,7 +203,7 @@ defmodule Receptar.RecipeTest do
       } = result
     end
 
-    test "translated ingredient units of recipe 1 to Esperanto" do
+    test "translated ingredient units of recipe 'Großes Kino' to Esperanto" do
       result = Recipes.search(%{"title" => "Großes Kino"}, "de")
       |> Recipes.translate("eo")
       |> List.first
@@ -367,6 +391,46 @@ defmodule Receptar.RecipeTest do
 
       end
     end
+
+    test "add description new" do
+      recipe = Recipes.search(%{"title" => "sardela pico"}, "eo")
+      |> List.first
+      |> Recipes.translate("eo")
+
+      Recipes.update_recipe(recipe, %{description: "Vera sardela pico", language: "eo"})
+
+      new_recipe = Recipes.get_recipe!(recipe.id)
+      |> Recipes.translate("eo")
+
+      assert new_recipe.description == "Vera sardela pico"
+    end
+
+    test "change description" do
+      recipe = Recipes.search(%{"title" => "granda kino"}, "eo")
+      |> List.first
+      |> Recipes.translate("eo")
+
+      Recipes.update_recipe(recipe, %{description: "Vere grandeeega kino", language: "eo"})
+
+      new_recipe = Recipes.get_recipe!(recipe.id)
+      |> Recipes.translate("eo")
+
+      assert new_recipe.description == "Vere grandeeega kino"
+    end
+
+    test "add description translation" do
+      recipe = Recipes.search(%{"title" => "granda kino"}, "eo")
+      |> List.first
+      |> Recipes.translate("eo")
+
+      Recipes.update_recipe(recipe, %{description: "naozaj skvelé kino", language: "sk"})
+
+      new_recipe = Recipes.get_recipe!(recipe.id)
+      |> Recipes.translate("sk")
+
+      assert new_recipe.description == "naozaj skvelé kino"
+    end
+
 
     test "add ingredient with known substance actually adds it" do
       recipe = Recipes.search(%{"title" => "granda kino"}, "eo") |> List.first

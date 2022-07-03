@@ -7,6 +7,7 @@ defmodule Receptar.Translations.Translation do
     field :language, :string
     belongs_to :substance, Receptar.Substances.Substance
     belongs_to :recipe, Receptar.Recipes.Recipe
+    belongs_to :recipe_description, Receptar.Recipes.RecipeDescription
     belongs_to :unit, Receptar.Units.Unit
     belongs_to :instruction, Receptar.Instructions.Instruction
 
@@ -16,7 +17,15 @@ defmodule Receptar.Translations.Translation do
   @doc false
   def changeset(translation, attrs) do
     translation
-    |> cast(attrs, [:content, :language, :substance_id, :instruction_id, :unit_id, :recipe_id])
+    |> cast(attrs, [
+	  :content,
+	  :language,
+	  :substance_id,
+	  :instruction_id,
+	  :unit_id,
+	  :recipe_id,
+	  :recipe_description_id
+	])
     |> validate_required([:content, :language])
   end
 

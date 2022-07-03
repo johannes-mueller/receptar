@@ -3,11 +3,13 @@ defmodule Receptar.Recipes.Recipe do
   import Ecto.Changeset
 
   alias Receptar.Repo
+  alias Receptar.Recipes.RecipeDescription
   alias Receptar.Ingredients.Ingredient
   alias Receptar.Instructions.Instruction
 
   schema "recipes" do
     field :servings, :integer
+    has_one :recipe_description, Receptar.Recipes.RecipeDescription, on_replace: :delete
     has_many :translations, Receptar.Translations.Translation, on_replace: :delete
     has_many :ingredients, Receptar.Ingredients.Ingredient, on_replace: :delete
     has_many :instructions, Receptar.Instructions.Instruction, on_replace: :delete
@@ -21,6 +23,7 @@ defmodule Receptar.Recipes.Recipe do
     recipe
     |> cast(attrs, [:servings])
     |> cast_assoc(:translations)
+    |> put_assoc(:recipe_description, cast_new_description(attrs))
     |> put_assoc(:ingredients, cast_new_ingredients(attrs))
     |> put_assoc(:instructions, cast_new_instructions(attrs))
     |> validate_required([])
@@ -35,6 +38,7 @@ defmodule Receptar.Recipes.Recipe do
     recipe
     |> cast(attrs, [:servings])
     |> update_title(attrs)
+    |> update_description(attrs)
     |> cast_assoc(:ingredients)
     |> cast_assoc(:instructions, with: &Instruction.update_changeset/2)
   end
@@ -46,9 +50,12 @@ defmodule Receptar.Recipes.Recipe do
     %{changeset | changes: Map.put(changeset.changes, :translations, update)}
   end
 
-  defp update_title(changeset, _attrs) do
-    changeset
+  defp update_title(changeset, _attrs), do: changeset
+
+  def update_description(changeset, %{language: _l, description: _d} = attrs) do
+    put_assoc(changeset, :recipe_description, cast_new_description(attrs))
   end
+  def update_description(changeset, _attrs), do: changeset
 
   defp retranslate_ingredients(%{ingredients: ingredients} = attrs) do
     ingredients =
@@ -71,6 +78,26 @@ defmodule Receptar.Recipes.Recipe do
 
   def from_struct_if_necessary(%_{} = struct, _language), do: Map.from_struct(struct)
   def from_struct_if_necessary(%{} = map, language), do: Map.put(map, :language, language)
+
+  defp cast_new_description(%{recipe_description: %RecipeDescription{} = description}) do
+    description
+  end
+
+  defp cast_new_description(%{recipe_description: description, language: language}) do
+    %RecipeDescription{}
+    |> RecipeDescription.changeset(maybe_retranslate(description, language))
+    |> Repo.insert!
+  end
+
+  defp cast_new_description(%{description: content, language: language} = _attrs) do
+    %RecipeDescription{}
+    |> RecipeDescription.changeset(%{translations: [%{language: language, content: content}]})
+    |> Repo.insert!
+  end
+
+  defp cast_new_description(_attrs) do
+    nil
+  end
 
   defp cast_new_ingredients(%{ingredients: ingredients, language: language}) do
     Enum.map(ingredients, & cast_if_new_ingredient(&1, language))
@@ -100,12 +127,12 @@ defmodule Receptar.Recipes.Recipe do
     |> Repo.insert!
   end
 
-  defp maybe_retranslate(instruction, language) do
-    case instruction do
-      %{translations: _translations} -> instruction
-      _ -> Map.put(instruction, :translations, [%{
+  defp maybe_retranslate(translatable, language) do
+    case translatable do
+      %{translations: _translations} -> translatable
+      _ -> Map.put(translatable, :translations, [%{
 						   language: language,
-						   content: instruction.content
+						   content: translatable.content
 						}])
     end
   end

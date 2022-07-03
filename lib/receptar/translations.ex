@@ -105,6 +105,7 @@ defmodule Receptar.Translations do
       %Receptar.Instructions.Instruction{} -> :instruction_id
       %Receptar.Units.Unit{} -> :unit_id
       %Receptar.Recipes.Recipe{} -> :recipe_id
+      %Receptar.Recipes.RecipeDescription{} -> :recipe_description_id
     end
   end
 end

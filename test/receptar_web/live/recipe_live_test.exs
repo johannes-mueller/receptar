@@ -103,6 +103,37 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	assert socket.assigns.edit_title == false
     end
 
+    test "cancel-translation of description sets edit_description to false", %{socket: socket} do
+	recipe = recipe_by_title("granda kino")
+
+	socket = %{socket | assigns: %{socket.assigns | edit_description: true}}
+
+	{:noreply, socket} = RecipeLive.handle_info({:cancel_translation, recipe.recipe_description}, socket)
+
+	assert socket.assigns.edit_description == false
+    end
+
+    test "update-translation of description sets edit_description to false", %{socket: socket} do
+	recipe = recipe_by_title("granda kino")
+
+	socket = %{socket | assigns: %{socket.assigns | edit_description: true}}
+
+	{:noreply, socket} =
+	  RecipeLive.handle_info(
+	    {
+	      :update_translations,
+	      %{translatable: recipe.recipe_description, translations: [%{language: "eo", content: "uuuu"}]}
+	    },
+	    socket
+	  )
+
+	assert socket.assigns.edit_description == false
+    end
+
+    test "initally edit_description is false", %{socket: socket} do
+      assert socket.assigns.edit_description == false
+    end
+
     test "edit-servings event sets edit_servings flag", %{socket: socket} do
       {:noreply, socket} = RecipeLive.handle_event("edit-servings", %{}, socket)
       assert socket.assigns.edit_servings == true
@@ -333,13 +364,141 @@ defmodule ReceptarWeb.RecipeLiveTest do
       register_and_log_in_user(%{conn: conn})
     end
 
-    test "title does initially not have a form element", %{conn: conn} do
+    test "page does initially not have a form element", %{conn: conn} do
       id = recipe_id("granda kino")
       {:ok, view, _html} = live(conn, "/recipe/#{id}")
 
-      refute view
-      |> element("h1 form")
-      |> has_element?
+      refute view |> has_element?("form")
+    end
+
+    test "h1 title is shown in Esperanto", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      assert view |> element("h1") |> render() =~ ~r/Granda kino/
+    end
+
+    test "h1 title is translation missing in slovak", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}?language=sk")
+
+      assert view |> element("h1") |> render() =~ ~r/Translation missing/
+    end
+
+    test "h1 title is shown in German", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}?language=de")
+
+      assert view |> element("h1") |> render() =~ ~r/Großes Kino/
+    end
+
+    test "p description is shown in Esperanto", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      assert view
+      |> element("p.recipe-description")
+      |> render() =~ ~r/Vere granda kino/
+    end
+
+    test "p description is shown in German", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}?language=de")
+
+      assert view
+      |> element("p.recipe-description")
+      |> render() =~ ~r/Echt ganz großes Kino/
+    end
+
+    test "description is translation missing in slovak", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}?language=sk")
+
+      refute view |> has_element?("p.no-recipe-description")
+      refute view |> has_element?("button.add-button[phx-click=\"edit-description\"]")
+
+      assert view
+      |> element("p.recipe-description")
+      |> render() =~ ~r/Translation missing/
+      assert view |> has_element?("button.edit-button[phx-click=\"edit-description\"]")
+    end
+
+    test "no description is shown for recipe without description", %{conn: conn} do
+      id = recipe_id("Sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("p.recipe-description")
+      refute view |> has_element?("button.edit-button[phx-click=\"edit-description\"]")
+      assert view |> has_element?("p.no-recipe-description")
+      assert view |> has_element?("button.add-button[phx-click=\"edit-description\"]")
+    end
+
+    test "add-button for description click makes edit-description form appear", %{conn: conn} do
+      id = recipe_id("Sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("form[phx-submit=submit-description]")
+
+      view
+      |> element("button.add-button[phx-click=\"edit-description\"]")
+      |> render_click()
+
+      assert view |> has_element?("form[phx-submit=submit-description]")
+      refute view |> has_element?("button.add-button[phx-click=\"edit-description\"]")
+    end
+
+    test "submit description makes description appear", %{conn: conn} do
+      id = recipe_id("Sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button.add-button[phx-click=\"edit-description\"]")
+      |> render_click()
+
+      view
+      |> element("form[phx-submit=submit-description]")
+      |> render_submit(%{description: "Vere estas sardela pico"})
+
+      refute view |> has_element?("form[phx-submit=submit-description]")
+      assert view
+      |> element("p.recipe-description")
+      |> render() =~ ~r/Vere estas sardela pico/
+
+      recipe = Recipes.get_recipe!(id) |> Recipes.translate("eo")
+      assert recipe.description == "Vere estas sardela pico"
+    end
+
+    test "cancel description makes description form disappear", %{conn: conn} do
+      id = recipe_id("Sardela pico")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      view
+      |> element("button.add-button[phx-click=\"edit-description\"]")
+      |> render_click()
+
+      view
+      |> element("button[phx-click=\"cancel-edit-description\"]")
+      |> render_click()
+
+      refute view |> has_element?("form[phx-submit=submit-description]")
+    end
+
+    test "edit-button for description click makes translation edit form appear", %{conn: conn} do
+      id = recipe_id("granda kino")
+      {:ok, view, _html} = live(conn, "/recipe/#{id}")
+
+      refute view |> has_element?("form[phx-submit=submit-description]")
+
+      view
+      |> element("button.edit-button[phx-click=\"edit-description\"]")
+      |> render_click()
+
+      refute view |> has_element?("form[phx-submit=submit-description]")
+      refute view |> has_element?("button.edit-button[phx-click=\"edit-description\"]")
+
+      view
+      |> element("form#edit-translation-recipe-description-#{id}")
+      |> render_submit()  # no assertion possible as processing leaves the process
     end
 
     test "title has a form element after edit-title event", %{conn: conn} do

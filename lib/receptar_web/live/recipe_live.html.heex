@@ -5,26 +5,53 @@
     translatable={@recipe}
     language={@language}
     />
-    <% else %>
+<% else %>
     <h1 phx-click="edit-title">
 	<%= tr(@recipe.title) %>
     </h1>
-    <div>
-	<span>For <%= render_servings(@recipe) %>.</span>
-	<button type="button" id="edit-servings-button" phx-click="edit-servings">
-	    Change
-	</button>
-	<%= if @edit_servings do %>
-	    <form phx-submit="submit-servings">
-		<input type="number" name="servings" value={@recipe.servings}><button type="submit">Submit</button>
-		<button class="cancel" type="button" phx-click="cancel-edit-servings">
-		    Cancel
-		</button>
-		<button type="reset">Reset</button>
-	    </form>
-	<% end %>
-    </div>
 <% end %>
+<div>
+    <span>For <%= render_servings(@recipe) %>.</span>
+    <button type="button" id="edit-servings-button" phx-click="edit-servings">
+	Change
+    </button>
+    <%= if @edit_servings do %>
+	<form phx-submit="submit-servings">
+	    <input type="number" name="servings" value={@recipe.servings}><button type="submit">Submit</button>
+	    <button class="cancel" type="button" phx-click="cancel-edit-servings">
+		Cancel
+	    </button>
+	    <button type="reset">Reset</button>
+	</form>
+    <% end %>
+</div>
+<div>
+    <%= if @recipe.description do %>
+	<%= if @edit_description do %>
+	    <.live_component
+	    module={SingleTranslationLive}
+	    id={idfy("recipe-description", @recipe.id)}
+	    translatable={@recipe.recipe_description}
+	    textarea={true}
+	    language={@language}
+	    />
+	    <% else %>
+	    <p class="recipe-description"><%= tr(@recipe.description) %></p>
+	    <button class="edit-button" phx-click="edit-description">Edit</button>
+	<% end %>
+    <% else %>
+	<%= if @edit_description do %>
+	    <form phx-submit="submit-description">
+		<textarea name="description"></textarea>
+		<button type="submit">Submit</button>
+		<button type="button" phx-click="cancel-edit-description">Cancel</button>
+	    </form>
+	<% else %>
+	    <p class="no-recipe-description">no description available</p>
+	    <button class="add-button" phx-click="edit-description">Add</button>
+	<% end %>
+    <% end %>
+</div>
 
 <.live_component
     module={IngredientsLive}

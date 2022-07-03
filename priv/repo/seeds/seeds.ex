@@ -129,6 +129,12 @@ defmodule Receptar.Seeder do
     %{
       translations: [eo: "Granda kino", de: "Großes Kino"],
       servings: 2,
+      recipe_description: %{
+	translations: [
+	  %{"language" => "eo", "content" => "Vere granda kino"},
+	  %{"language" => "de", "content" => "Echt ganz großes Kino"}
+	]
+      },
       ingredients: [
 	{2, "tinuso", 250.0, "gramo"},
 	{1, "nudeloj", 0.5, "kilogramo"},

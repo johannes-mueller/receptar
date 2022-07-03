@@ -3,6 +3,7 @@ defmodule ReceptarWeb.RecipeLive do
 
   alias Receptar.Recipes
   alias Receptar.Recipes.Recipe
+  alias Receptar.Recipes.RecipeDescription
   alias Receptar.Translations
 
   import ReceptarWeb.RecipeController
@@ -28,6 +29,7 @@ defmodule ReceptarWeb.RecipeLive do
   defp prepare_form(socket) do
     socket
     |> assign(edit_title: socket.assigns.recipe.translations == [])
+    |> assign(edit_description: false)
     |> assign(edit_servings: false)
   end
 
@@ -57,6 +59,31 @@ defmodule ReceptarWeb.RecipeLive do
     {:noreply, assign(socket, edit_servings: false)}
   end
 
+  def handle_event("edit-description", _attrs, socket) do
+    {:noreply, socket |> assign(edit_description: true)}
+  end
+
+  def handle_event("submit-description", %{"description" => description}, socket) do
+    %{language: language, recipe: recipe} = socket.assigns
+    {:ok, recipe} = Recipes.update_recipe(recipe,
+      %{
+	description: description,
+	language: language
+      }
+    )
+
+    {
+      :noreply,
+      socket
+      |> assign(edit_description: false)
+      |> assign(recipe: Recipes.translate(recipe, language))
+    }
+  end
+
+  def handle_event("cancel-edit-description", %{}, socket) do
+    {:noreply, socket |> assign(edit_description: false)}
+  end
+
   def handle_info({:update_ingredients, %{ingredients: ingredients}}, socket) do
     language = socket.assigns.language
 
@@ -69,10 +96,6 @@ defmodule ReceptarWeb.RecipeLive do
       |> Recipes.translate(language)
 
     {:noreply, socket |> assign(recipe: recipe)}
-  end
-
-  def handle_info({:cancel_translation, _translatable}, socket) do
-    {:noreply, socket |> assign(edit_title: false)}
   end
 
   def handle_info({:update_instructions, attrs}, socket) do
@@ -100,9 +123,23 @@ defmodule ReceptarWeb.RecipeLive do
     }
   end
 
+  def handle_info({:cancel_translation, _translatable}, socket) do
+    {
+      :noreply,
+      socket
+      |> assign(edit_title: false)
+      |> assign(edit_description: false)
+    }
+  end
+
   defp handle_translation_updates(socket, %Recipe{} = _translatable) do
     socket
     |> assign(edit_title: false)
+  end
+
+  defp handle_translation_updates(socket, %RecipeDescription{} = _translatable) do
+    socket
+    |> assign(edit_description: false)
   end
 
   defp handle_translation_updates(socket, _translatable) do
