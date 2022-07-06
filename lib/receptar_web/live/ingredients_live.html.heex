@@ -68,7 +68,7 @@
             </li>
 	    <%= if @edit_item == {ingredient.number, :amount} do %>
 		<form id={idfy("edit-amount", ingredient.number)} phx-submit="submit-amount-edit" phx-target={@myself}>
-		    <input name="amount" value={render_amount(ingredient)} type="number">
+		    <input name="amount" value={render_amount(ingredient)} type="number" step="0.1">
 		    <input name="number" value={ingredient.number} type="hidden">
 		    <button type="submit">Submit</button>
 		    <button class="cancel" type="button" phx-click={idfy("cancel-amount-edit", ingredient.number)} phx-target={@myself}>

@@ -530,10 +530,10 @@ defmodule ReceptarWeb.IngredientLiveTest do
     end
 
     for selector <- [
-	  "form #amount-input-1",
-	  "form #substance-input-1",
-	  "form #unit-input-1"]
-      do
+	  "form input[name=\"amount\"][type=\"number\"][step=\"0.1\"][value=\"\"]",
+	  "form input[name=\"substance-name\"][value=\"\"]",
+	  "form input[name=\"unit-name\"][value=\"\"]"
+	] do
 
       test "by default all #{selector} is blank", %{conn: conn} do
 	session = %{
@@ -547,28 +547,20 @@ defmodule ReceptarWeb.IngredientLiveTest do
 	}
 	{:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
 
-	html = view
-	|> element(unquote(selector))
-	|> render()
-
-	assert html =~ ~r/value=""/
+	assert view |> has_element?(unquote(selector))
       end
     end
 
-    for {selector, value} <- [
-	  {"form #amount-input-2", "1.3"},
-	  {"form #substance-input-2", "salo"},
-	  {"form #unit-input-2", "gramo"}
+    for selector <- [
+	  "form input[name=\"amount\"][type=\"number\"][step=\"0.1\"][value=\"1.3\"]",
+	  "form input[name=\"substance-name\"][value=\"salo\"]",
+	  "form input[name=\"unit-name\"][value=\"gramo\"]",
 	] do
 
 	test "#{selector} take value from ingredient", %{conn: conn, session: session} do
 	  {:ok, view, _html} = live_isolated(conn, IngredientTestLiveView, session: session)
 
-	  html = view
-	  |> element(unquote(selector))
-	  |> render()
-
-	  assert html =~ ~r/value="#{unquote(value)}"/
+	  assert view |> has_element?(unquote(selector))
 	end
     end
 

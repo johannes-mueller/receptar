@@ -649,12 +649,8 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	|> element("#ingredient-amount-#{number}")
 	|> render_click()
 
-	html = view
-	|> element("form#edit-amount-#{number} input[name=\"amount\"]")
-	|> render()
-
-	assert html =~ ~r/value="#{expected_numbers[number]}"/
-	assert html =~ ~r/type="number"/
+	selector = "input[name=\"amount\"][type=\"number\"][step=\"0.1\"][value=\"#{expected_numbers[number]}\"]"
+	assert view |> has_element?("form#edit-amount-#{number} " <> selector)
       end
     end
 

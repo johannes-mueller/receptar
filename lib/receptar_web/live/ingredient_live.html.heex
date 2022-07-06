@@ -5,6 +5,7 @@
            phx-debounce="700"
            autocomplete="off"
            type="number"
+	   step="0.1"
            value={@amount_value}>
     <label for={idfy("unit-input", @id)}>Unit</label>
     <input id={idfy("unit-input", @id)}
