@@ -683,16 +683,17 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 
     test "append ingredient", %{conn: conn} do
       session = %{"ingredients" => []}
-      {:ok, view, html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+      {:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
 
-      refute html =~ ~r/<form.*phx-submit="submit"/
+      refute view |> has_element?("form[phx-submit=\"submit\"]")
 
-      html = view
-      |> element("a#append-ingredient")
+      button_click = "[phx-click=\"append-ingredient\"]"
+
+      view
+      |> element("button.add-button" <> button_click)
       |> render_click()
-      |> strip_html_code
 
-      assert html =~ ~r/<form.*phx-submit="submit"/
+      assert view |> has_element?("form[phx-submit=\"submit\"]")
     end
 
     for number <- [1, 2] do
@@ -704,16 +705,12 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	}
 	{:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
 
-	delete_element = view
-	|> element("a#delete-ingredient-#{number}")
+	button_click = "[phx-click=\"delete-ingredient\"]"
+	button_value = "[phx-value-number=\"#{number}\"]"
 
-	render_click(delete_element)
-
-	html = delete_element
-	|> render()
-
-	assert html =~ ~r/phx-click="delete-ingredient"/
-	assert html =~ ~r/phx-value-number="#{number}"/
+	view
+	|> element("button.delete-button" <> button_click <> button_value)
+	|> render_click()
       end
 
       test "ingredient #{number} has insert button", %{conn: conn, ingredient: ingredient} do
@@ -724,16 +721,44 @@ defmodule ReceptarWeb.IngerdientsLiveTest do
 	}
 	{:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
 
-	insert_element = view
-	|> element("a#insert-ingredient-#{number}")
+	button_click = "[phx-click=\"insert-ingredient\"]"
+	button_value = "[phx-value-number=\"#{number}\"]"
 
-	render_click(insert_element)
+	view
+	|> element("button.add-button" <> button_click <> button_value)
+	|> render_click()
+      end
 
-	html = insert_element
-	|> render()
+      test "ingredient #{number} has push button", %{conn: conn, ingredient: ingredient} do
+	number = unquote(number)
+	session = %{
+	  "ingredients" => [%{ingredient | number: number}],
+	  "edit_ingredients" => []
+	}
+	{:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
 
-	assert html =~ ~r/phx-click="insert-ingredient"/
-	assert html =~ ~r/phx-value-number="#{number}"/
+	button_click = "[phx-click=\"push-ingredient\"]"
+	button_value = "[phx-value-number=\"#{number}\"]"
+
+	view
+	|> element("button.down-button" <> button_click <> button_value)
+	|> render_click()
+      end
+
+      test "ingredient #{number} has pull button", %{conn: conn, ingredient: ingredient} do
+	number = unquote(number)
+	session = %{
+	  "ingredients" => [%{ingredient | number: number}],
+	  "edit_ingredients" => []
+	}
+	{:ok, view, _html} = live_isolated(conn, IngredientsTestLiveView, session: session)
+
+	button_click = "[phx-click=\"pull-ingredient\"]"
+	button_value = "[phx-value-number=\"#{number}\"]"
+
+	view
+	|> element("button.up-button" <> button_click <> button_value)
+	|> render_click()
       end
 
     end

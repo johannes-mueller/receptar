@@ -441,7 +441,7 @@ end
       refute view |> has_element?("form#edit-translation-instruction-1")
 
       view
-      |> element("a#append-instruction")
+      |> element("button.add-button[phx-click=\"append-instruction\"]")
       |> render_click()
 
       assert view |> has_element?("form#edit-translation-instruction-1")
@@ -451,40 +451,28 @@ end
       session = %{"instructions" => [instruction], "language" => "eo"}
       {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
-      html = view
-      |> element("#instruction-1")
-      |> render()
-
-      assert html =~ ~r/phx-value-number="1"/
       refute view |> has_element?("form#edit-translation-instruction-2")
 
-      html = view
-      |> element("a#append-instruction")
+      view
+      |> element("button.add-button[phx-click=\"append-instruction\"]")
       |> render_click()
-      |> strip_html_code
 
       assert view |> has_element?("form#edit-translation-instruction-2")
-      assert html =~ ~r/id="delete-instruction-2"[^>]*phx-value-number="2"/
+      assert view |> has_element?("button[phx-click=delete-instruction][phx-value-number=\"2\"]")
     end
 
     test "append third instruction", %{conn: conn, instruction: instruction} do
       session = %{"instructions" => [instruction, %{instruction | number: 2}], "language" => "eo"}
       {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
-      html = view
-      |> element("#instruction-2")
-      |> render()
-
-      assert html =~ ~r/phx-value-number="2"/
       refute view |> has_element?("form#edit-translation-instruction-3")
 
-      html = view
-      |> element("a#append-instruction")
+      view
+      |> element("button.add-button[phx-click=\"append-instruction\"]")
       |> render_click()
-      |> strip_html_code
 
       assert view |> has_element?("form#edit-translation-instruction-3")
-      assert html =~ ~r/id="delete-instruction-3"[^>]*phx-value-number="3"/
+      assert view |> has_element?("button[phx-click=delete-instruction][phx-value-number=\"3\"]")
     end
 
     for number <- [1, 2] do
@@ -501,14 +489,11 @@ end
 	}
 	{:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
-	html = view
-	|> element("#instruction-#{number}")
-	|> render()
-
-	assert html =~ ~r/phx-value-number="#{number}"/
+	phx_click = "[phx-click=\"edit-instruction\"]"
+	phx_value_number = "[phx-value-number=\"#{number}\"]"
 
 	view
-	|> element("#instruction-#{number}")
+	|> element("#instruction-#{number}" <> phx_click <> phx_value_number)
 	|> render_click()
       end
     end
@@ -531,19 +516,22 @@ end
 	{:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
 	view
-	|> element("form button.cancel")
+	|> element("form button.cancel-button")
 	|> render_click()
       end
     end
 
     test "delete instruction", %{conn: conn, instruction: instruction} do
       session = %{"instructions" => [instruction], "edit_instructions" => [],  "language" => "eo"}
-      {:ok, view, html} = live_isolated(conn, InstructionsTestLiveView, session: session)
+      {:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
-      assert html =~ ~r/id="instruction-1"/
+      assert view |> has_element?("#instruction-1")
+
+      phx_click = "[phx-click=\"delete-instruction\"]"
+      phx_value_number = "[phx-value-number=\"1\"]"
 
       view
-      |> element("#delete-instruction-1")
+      |> element("button.delete-button" <> phx_click <> phx_value_number)
       |> render_click()
     end
 
@@ -560,17 +548,49 @@ end
 		   }
 	{:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
 
-	html = view
-	|> element("#insert-instruction-#{number}")
-	|> render()
-
-	assert html =~ ~r/phx-value-number="#{number}"/
+	phx_click = "[phx-click=\"insert-instruction\"]"
+	phx_value_number = "[phx-value-number=\"#{number}\"]"
 
 	view
-	|> element("#instruction-#{number}")
+	|> element("button.add-button" <> phx_click <> phx_value_number)
+	|> render_click()
+      end
+
+      test "instruction #{number} has push button", %{conn: conn, instruction: instruction} do
+	number = unquote(number)
+	session = %{
+	  "instructions" => [%{instruction | number: number}],
+	  "edit_instructions" => [],
+	  "language" => "eo"
+	}
+	{:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
+
+	button_click = "[phx-click=\"push-instruction\"]"
+	button_value = "[phx-value-number=\"#{number}\"]"
+
+	view
+	|> element("button.down-button" <> button_click <> button_value)
+	|> render_click()
+      end
+
+      test "instruction #{number} has pull button", %{conn: conn, instruction: instruction} do
+	number = unquote(number)
+	session = %{
+	  "instructions" => [%{instruction | number: number}],
+	  "edit_instructions" => [],
+	  "language" => "eo"
+	}
+	{:ok, view, _html} = live_isolated(conn, InstructionsTestLiveView, session: session)
+
+	button_click = "[phx-click=\"pull-instruction\"]"
+	button_value = "[phx-value-number=\"#{number}\"]"
+
+	view
+	|> element("button.up-button" <> button_click <> button_value)
 	|> render_click()
       end
     end
+
 
     test "submit instruction", %{conn: conn, instruction: instruction} do
       session = %{"instructions" => [instruction], "edit_instructions" => [1],  "language" => "eo"}

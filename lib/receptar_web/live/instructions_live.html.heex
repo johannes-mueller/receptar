@@ -1,7 +1,7 @@
 <div id="instructions">
   <ul class="instructions-list">
     <%= for instruction <- @instructions do %>
-	<li class="instruction-list-entry">
+	<li class="instruction-list-entry editable-item">
             <%= if instruction.number in @edit_instructions do %>
 		<.live_component
 		module={SingleTranslationLive}
@@ -20,43 +20,40 @@
 		    <%= tr(instruction.content) %>
 		</span>
             <% end %>
-            <a href="#"
-               id={idfy("insert-instruction", instruction.number)}
-               phx-click="insert-instruction"
-               phx-target={@myself}
-               phx-value-number={instruction.number}>
-		Insert
-            </a>
-            <a href="#"
-               id={idfy("delete-instruction", instruction.number)}
-               phx-click="delete-instruction"
-               phx-target={@myself}
-               phx-value-number={instruction.number}>
-		Delete
-            </a>
-	    <a href="#"
-	       id={idfy("push-instruction", instruction.number)}
-	       class="push-item-button"
-	       phx-click="push-instruction"
-	       phx-target={@myself}
-	       phx-value-number={instruction.number}>
-		Down
-	    </a>
-	    <a href="#"
-	       id={idfy("pull-instruction", instruction.number)}
-	       class="pull-item-button"
-	       phx-click="pull-instruction"
-	       phx-target={@myself}
-	       phx-value-number={instruction.number}>
-		Up
-	    </a>
+	    <div class="edit-button-group">
+		<button
+		    class="add-button"
+		    id={idfy("insert-instruction", instruction.number)}
+		    phx-click="insert-instruction"
+		    phx-target={@myself}
+		    phx-value-number={instruction.number}/>
+		<button
+		    class="delete-button"
+		    id={idfy("delete-instruction", instruction.number)}
+		    phx-click="delete-instruction"
+		    phx-target={@myself}
+		    phx-value-number={instruction.number}/>
+		<button
+		    class="down-button"
+		    id={idfy("push-instruction", instruction.number)}
+		    class="push-item-button"
+		    phx-click="push-instruction"
+		    phx-target={@myself}
+		    phx-value-number={instruction.number}/>
+		<button
+		    class="up-button"
+		    id={idfy("pull-instruction", instruction.number)}
+		    class="pull-item-button"
+		    phx-click="pull-instruction"
+		    phx-target={@myself}
+		    phx-value-number={instruction.number}/>
+	    </div>
         </li>
     <% end %>
   </ul>
-  <a href="#"
-     id="append-instruction"
-     phx-click="append-instruction"
-     phx-target={@myself}>
-    Append instruction
-  </a>
+  <button
+      class="add-button"
+      id="append-instruction"
+      phx-click="append-instruction"
+      phx-target={@myself}/>
 </div>

@@ -1,7 +1,7 @@
 <div id="ingredients">
     <ul class="ingredients-list">
 	<%= for ingredient <- @ingredients do %>
-	    <li class="ingredient-list-entry">
+	    <li class="ingredient-list-entry editable-item">
 		<%= if ingredient.number in @edit_ingredients do %>
 		    <.live_component
 		    module={IngredientLive}
@@ -35,36 +35,34 @@
 			</span>
 		    </span>
 		<% end %>
-		<a href="#"
-		   id={idfy("insert-ingredient", ingredient.number)}
-		   phx-click="insert-ingredient"
-		   phx-target={@myself}
-		   phx-value-number={ingredient.number}>
-		    Insert
-		</a>
-		<a href="#"
-		   id={idfy("delete-ingredient", ingredient.number)}
-		   phx-click="delete-ingredient"
-		   phx-target={@myself}
-		   phx-value-number={ingredient.number}>
-		    Delete
-		</a>
-		<a href="#"
-		   id={idfy("push-ingredient", ingredient.number)}
-		   class="push-item-button"
-		   phx-click="push-ingredient"
-		   phx-target={@myself}
-		   phx-value-number={ingredient.number}>
-		    Down
-		</a>
-		<a href="#"
-		   id={idfy("pull-ingredient", ingredient.number)}
-		   class="pull-item-button"
-		   phx-click="pull-ingredient"
-		   phx-target={@myself}
-		   phx-value-number={ingredient.number}>
-		    Up
-		</a>
+		<div class="edit-button-group">
+		    <button
+			class="add-button"
+			id={idfy("insert-ingredient", ingredient.number)}
+			phx-click="insert-ingredient"
+			phx-target={@myself}
+			phx-value-number={ingredient.number}/>
+		    <button
+			class="delete-button"
+			id={idfy("delete-ingredient", ingredient.number)}
+			phx-click="delete-ingredient"
+			phx-target={@myself}
+			phx-value-number={ingredient.number}/>
+		    <button
+			class="down-button"
+			id={idfy("push-ingredient", ingredient.number)}
+			class="push-item-button"
+			phx-click="push-ingredient"
+			phx-target={@myself}
+			phx-value-number={ingredient.number}/>
+		    <button
+			class="up-button"
+			id={idfy("pull-ingredient", ingredient.number)}
+			class="pull-item-button"
+			phx-click="pull-ingredient"
+			phx-target={@myself}
+			phx-value-number={ingredient.number}/>
+		</div>
             </li>
 	    <%= if @edit_item == {ingredient.number, :amount} do %>
 		<form id={idfy("edit-amount", ingredient.number)} phx-submit="submit-amount-edit" phx-target={@myself}>
@@ -100,10 +98,9 @@
 
 	<% end %>
     </ul>
-    <a href="#"
-       id="append-ingredient"
-       phx-click="append-ingredient"
-       phx-target={@myself}>
-	Append ingredient
-    </a>
+    <button
+	class="add-button"
+	id="append-ingredient"
+	phx-click="append-ingredient"
+	phx-target={@myself}/>
 </div>

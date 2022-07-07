@@ -45,17 +45,10 @@
     </div>
     <div class="form-submit-buttons">
 	<%= if @submit_disabled do %>
-	    <button class="submit-button" type="submit" disabled>Submit</button>
+	    <button class="submit-button" type="submit" disabled/>
 	<% else %>
-	    <button class="submit-button" type="submit">Submit</button>
+	    <button class="submit-button" type="submit"/>
 	<% end %>
-	<button
-	    class="cancel-button"
-		   type="button"
-		   phx-click="cancel"
-		   phx-value-number={@ingredient.number}
-		   phx-target={@myself}>
-	    Cancel
-	</button>
+	<button class="cancel-button" type="button" phx-click="cancel" phx-value-number={@ingredient.number} phx-target={@myself}/>
     </div>
 </form>

@@ -739,7 +739,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
       refute view |> has_element?("form[phx-submit=\"submit-servings\"]")
 
       view
-      |> element("button#edit-servings-button")
+      |> element("button[phx-click=edit-servings]")
       |> render_click()
 
       assert view |> has_element?("form[phx-submit=\"submit-servings\"]")
@@ -750,11 +750,11 @@ defmodule ReceptarWeb.RecipeLiveTest do
       {:ok, view, _html} = live(conn, "/recipe/#{id}")
 
       view
-      |> element("button#edit-servings-button")
+      |> element("button[phx-click=edit-servings]")
       |> render_click()
 
       view
-      |> element("form[phx-submit=\"submit-servings\"]")
+      |> element("form[phx-submit=submit-servings]")
       |> render_submit()
     end
 
@@ -763,12 +763,18 @@ defmodule ReceptarWeb.RecipeLiveTest do
       {:ok, view, _html} = live(conn, "/recipe/#{id}")
 
       view
-      |> element("button#edit-servings-button")
+      |> element("button[phx-click=edit-servings]")
       |> render_click()
 
+      refute view |> has_element?("button[phx-click=edit-servings]")
+      assert view |> has_element?("form[phx-submit=submit-servings]")
+
       view
-      |> element("button.cancel")
+      |> element("button[phx-click=cancel-edit-servings]")
       |> render_click()
+
+      assert view |> has_element?("button[phx-click=edit-servings]")
+      refute view |> has_element?("form[phx-submit=submit-servings]")
     end
 
     for {servings, recipe} <- [{2, "granda kino"}, {1, "sardela pico"}] do
@@ -777,7 +783,7 @@ defmodule ReceptarWeb.RecipeLiveTest do
 	{:ok, view, _html} = live(conn, "/recipe/#{id}")
 
 	view
-	|> element("button#edit-servings-button")
+	|> element("button[phx-click=edit-servings]")
 	|> render_click()
 
 	assert view

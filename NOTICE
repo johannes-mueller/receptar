@@ -28,4 +28,9 @@ following hex packages:
 
 * phoenix https://github.com/phoenixframework/phoenix (MIT licensed)
 * ecto https://github.com/elixir-ecto/ecto (Apache-2 licensed)
-* phx-gen-auth https://github.com/aaronrenner/phx_gen_auth (Apache-2 licesed)
+
+
+The icons in priv/static/icons of which the font files in priv/static/fonts
+where generated are taken from https://ionic.io/ionicons (MIT licensed)
+
+The flag graphics in priv/static/images are taken from Wikipedia (CC-BY-SA)

@@ -138,12 +138,12 @@ defmodule ReceptarWeb.RecipeControllerTest do
 
       test "#{target} recipe granda kino is for 2 servings", %{conn: conn} do
 	conn = get(conn, unquote(url_function).("granda_kino") <> "?language=de")
-	assert html_response_stripped(conn, 200) =~ ~r/For 2 servings/
+	assert html_response_stripped(conn, 200) =~ ~r|<span>For</span><span>2 servings.</span>|
       end
 
       test "#{target} recipe sardela pico is for 1 servings", %{conn: conn} do
 	conn = get(conn, unquote(url_function).("sardela pico") <> "?language=de")
-	assert html_response_stripped(conn, 200) =~ ~r/For one serving/
+	assert html_response_stripped(conn, 200) =~ ~r|<span>For</span><span>one serving\.</span>|
       end
 
       test "#{target} recipe id 1 \"de\"  session German title", %{conn: conn} do
@@ -199,7 +199,7 @@ defmodule ReceptarWeb.RecipeControllerTest do
       test "#{target} instructions in class-instruction-list-entry <li>", %{conn: conn} do
 	conn = get(conn, unquote(url_function).("granda kino"))
 	assert html_response_stripped(conn, 200) =~
-	  ~r/<li class="instruction-list-entry">.*kuiri nudelojn.*<\/li>/
+	  ~r/<li class="instruction-list-entry editable-item">.*kuiri nudelojn.*<\/li>/
       end
 
       test "#{target} recipe 1 in German has translation missing tag", %{conn: conn} do

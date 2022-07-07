@@ -32,27 +32,29 @@ blockquote {
 blockquote *:last-child {
   margin-bottom: 0;
 }
+
+
 .button,
 button,
 input[type="button"],
 input[type="reset"],
 input[type="submit"] {
-  background-color: #0069d9;
-  border: 0.1rem solid #0069d9;
-  border-radius: 0.4rem;
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  font-size: 1.1rem;
-  font-weight: 700;
-  height: 3.8rem;
-  letter-spacing: 0.1rem;
-  line-height: 3.8rem;
-  padding: 0 3rem;
-  text-align: center;
-  text-decoration: none;
-  text-transform: uppercase;
-  white-space: nowrap;
+    background-color: #0069d9;
+    border: 0.1rem solid #0069d9;
+    border-radius: 0.4rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    height: 3.8rem;
+    letter-spacing: 0.1rem;
+    line-height: 3.8rem;
+    padding: 0 3rem;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
 .button:focus,
 .button:hover,
@@ -69,6 +71,7 @@ input[type="submit"]:hover {
   color: #fff;
   outline: 0;
 }
+/*
 .button[disabled],
 button[disabled],
 input[type="button"][disabled],
@@ -160,6 +163,7 @@ input[type="submit"].button-clear[disabled]:focus,
 input[type="submit"].button-clear[disabled]:hover {
   color: #0069d9;
 }
+*/
 code {
   background: #f4f5f6;
   border-radius: 0.4rem;
@@ -696,4 +700,66 @@ ul.translations {
 }
 .translation-sk::before {
   background-image: url(/images/sk.svg);
+}
+
+.add-button,
+.edit-button,
+.delete-button,
+.submit-button,
+.cancel-button,
+.reset-button,
+.up-button,
+.down-button {
+    font-size: 2rem;
+    font-family: "Receptar Icons";
+    font-weight: 400;
+    height: 3rem;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    background-color: #0069d9;
+    border: 0.1rem solid #0069d9;
+    border-radius: 0.4rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+.add-button::before { content: "\e108"; }
+.edit-button::before { content: "\e041";}
+.delete-button::before { content: "\e12c"; }
+.cancel-button::before { content: "\e10f"; }
+.submit-button::before { content: "\e029"; }
+.reset-button::before { content: "\e10e"; }
+.down-button::before { content: "\e03a"; }
+.up-button::before { content: "\e039"; }
+
+.margin-button,
+.edit-button-group
+{
+    position: absolute;
+    right: -4rem;
+    top: 0px;
+}
+
+section {
+    margin-bottom: 2rem;
+}
+
+.editable-item {
+    position: relative;
+}
+.editable-item:hover {
+    background-color: #eee
+}
+
+section#servings form { display: inline; }
+input[name="servings"] { width: 8rem; }
+
+@font-face {
+	font-family: 'Receptar Icons';
+	src:url('/fonts/receptar-icons.otf') format('opentype'),
+	    url('/fonts/receptar-icons.woff') format('woff'),
+	    url('/fonts/receptar-icons.ttf') format('truetype'),
+	    url('/fonts/receptar-icons.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
 }

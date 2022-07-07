@@ -167,7 +167,7 @@ defmodule ReceptarWeb.SingleTranslationLiveTest do
       translatable_id = session["translatable"].id
 
       assert view
-      |> element("form#edit-translation-#{translatable_id} button.cancel")
+      |> element("form#edit-translation-#{translatable_id} button.cancel-button")
       |> render_click()  # no assertion necessary (enforces phx-target={@myself})
     end
 

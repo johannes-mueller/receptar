@@ -10,22 +10,24 @@
 	<%= tr(@recipe.title) %>
     </h1>
 <% end %>
-<div>
-    <span>For <%= render_servings(@recipe) %>.</span>
-    <button type="button" id="edit-servings-button" phx-click="edit-servings">
-	Change
-    </button>
+<section class="servings editable-item">
+    <span>For</span>
     <%= if @edit_servings do %>
-	<form phx-submit="submit-servings">
-	    <input type="number" name="servings" value={@recipe.servings}><button type="submit">Submit</button>
-	    <button class="cancel" type="button" phx-click="cancel-edit-servings">
-		Cancel
-	    </button>
-	    <button type="reset">Reset</button>
-	</form>
+	<span>
+	    <form phx-submit="submit-servings">
+		<input type="number" name="servings" value={@recipe.servings}>
+		<button class="submit-button" type="submit"/>
+		<button class="cancel-button" type="button" phx-click="cancel-edit-servings"/>
+		<button class="reset-button" type="reset"/>
+	    </form>
+	    servings.
+	</span>
+    <% else %>
+	<span><%= render_servings(@recipe) %>.</span>
+	<button class="edit-button margin-button" type="button" phx-click="edit-servings"/>
     <% end %>
-</div>
-<div>
+</section>
+<section class="decription editable-item">
     <%= if @recipe.description do %>
 	<%= if @edit_description do %>
 	    <.live_component
@@ -37,43 +39,45 @@
 	    />
 	    <% else %>
 	    <p class="recipe-description"><%= tr(@recipe.description) %></p>
-	    <button class="edit-button" phx-click="edit-description">Edit</button>
-	    <button class="delete-button" phx-click="delete-description">Delete</button>
+	    <div class="edit-button-group">
+		<button class="edit-button" phx-click="edit-description"/>
+		<button class="delete-button" phx-click="delete-description"/>
+	    </div>
 	<% end %>
     <% else %>
 	<%= if @edit_description do %>
 	    <form phx-submit="submit-description">
 		<textarea name="description"></textarea>
-		<button type="submit">Submit</button>
-		<button type="button" phx-click="cancel-edit-description">Cancel</button>
+		<button class="submit-button" type="submit"/>
+		<button class="cancel-button" type="button" phx-click="cancel-edit-description"/>
 	    </form>
 	<% else %>
 	    <p class="no-recipe-description">no description available</p>
-	    <button class="add-button" phx-click="edit-description">Add</button>
+	    <button class="add-button margin-button" phx-click="edit-description"/>
 	<% end %>
     <% end %>
-</div>
-<div>
+</section>
+<section class="reference editable-item">
     <%= if @edit_reference do %>
 	<form phx-submit="submit-reference">
 	    <label for="reference">Reference:</label><input name="reference" value={@recipe.reference || ""}>
-	    <button class="cancel-button" type="button" phx-click="cancel-edit-reference">
-		Cancel
-	    </button>
-	    <button class="reset-button" type="reset">Reset</button>
-	    <button class="submit-button">Submit</button>
+	    <button class="submit-button" type="submit"/>
+	    <button class="cancel-button" type="button" phx-click="cancel-edit-reference"/>
+	    <button class="reset-button" type="reset"/>
 	</form>
     <% else %>
 	<%= if @recipe.reference do %>
 	    <span>Recipe reference:</span>
 	    <span class="recipe-reference"><%= render_reference(@recipe) %></span>
-	    <button class="edit-button" phx-click="edit-reference">Edit reference</button>
-	    <button type="button" class="delete-button" phx-click="delete-reference">Delete</button>
+	    <div class="edit-button-group">
+		<button class="edit-button" phx-click="edit-reference"></button>
+		<button type="button" class="delete-button" phx-click="delete-reference"/>
+	    </div>
 	<% else %>
-	    <span>No reference given</span><button class="add-button" phx-click="edit-reference">Add</button>
+	    <span>No reference given</span><button class="add-button margin-button" phx-click="edit-reference"/>
 	<% end %>
     <% end %>
-</div>
+</section>
 
 <.live_component
     module={IngredientsLive}

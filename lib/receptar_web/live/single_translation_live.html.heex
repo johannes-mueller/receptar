@@ -11,8 +11,8 @@
 	<% else %>
 	    <input name="content" class="edit-translation-input" value={@content}>
 	<% end %>
-	<button type="button" class="cancel" phx-click="cancel" phx-target={@myself}>Cancel</button>
-	<button type="submit">Submit</button>
-	<button type="Reset">Reset</button>
+	<button class="submit-button" type="submit"/>
+	<button class="cancel-button" type="button" phx-click="cancel" phx-target={@myself}/>
+	<button class="reset-button" type="reset"/>
     </form>
 </div>
