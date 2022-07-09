@@ -20,40 +20,17 @@
 		    <%= tr(instruction.content) %>
 		</span>
             <% end %>
-	    <div class="edit-button-group">
-		<button
-		    class="add-button"
-		    id={idfy("insert-instruction", instruction.number)}
-		    phx-click="insert-instruction"
-		    phx-target={@myself}
-		    phx-value-number={instruction.number}/>
-		<button
-		    class="delete-button"
-		    id={idfy("delete-instruction", instruction.number)}
-		    phx-click="delete-instruction"
-		    phx-target={@myself}
-		    phx-value-number={instruction.number}/>
-		<button
-		    class="down-button"
-		    id={idfy("push-instruction", instruction.number)}
-		    class="push-item-button"
-		    phx-click="push-instruction"
-		    phx-target={@myself}
-		    phx-value-number={instruction.number}/>
-		<button
-		    class="up-button"
-		    id={idfy("pull-instruction", instruction.number)}
-		    class="pull-item-button"
-		    phx-click="pull-instruction"
-		    phx-target={@myself}
-		    phx-value-number={instruction.number}/>
-	    </div>
+	    <%= render_edit_button_group("instruction", instruction, @myself) %>
         </li>
     <% end %>
   </ul>
-  <button
-      class="add-button"
-      id="append-instruction"
-      phx-click="append-instruction"
-      phx-target={@myself}/>
+  <%= render_tooltip_button(
+      %{
+	  "class" => "add-button",
+	  "id" => "append-instruction",
+	  "phx-click" => "append-instruction",
+	  "phx-target" => @myself,
+      },
+      "Adppend instruction"
+  ) %>
 </div>

@@ -723,6 +723,31 @@ ul.translations {
     cursor: pointer;
 }
 
+.tooltipped {
+    position: relative;
+}
+
+.tooltipped:hover {color: red;}
+.tooltipped:hover .tooltip { visibility: visible; }
+
+.tooltip {
+    position: absolute;
+    visibility: hidden;
+    transition-delay: 1s;
+    max-width: 20rem;
+    z-index: 1;
+    margin: 0px;
+    padding: 5px;
+    font-size: 1.5rem;
+    bottom: 100%;
+    left: 50%;
+    margin-right: -12rem;
+    display: inline;
+    color: black;
+    border: 0.1rem solid #000;
+    background-color: #ffffaa;
+}
+
 .add-button::before { content: "\e108"; }
 .edit-button::before { content: "\e041";}
 .delete-button::before { content: "\e12c"; }

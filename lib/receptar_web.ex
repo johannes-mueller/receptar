@@ -118,6 +118,63 @@ defmodule ReceptarWeb do
       def render_servings(%{servings: 1}), do: "one serving"
       def render_servings(%{servings: servings}), do: "#{servings} servings"
 
+      def render_tooltip_button(button_data, tooltip) do
+	{tooltip_span_class, button_data} = Map.pop(button_data, "outer-class")
+	tooltip_span_class = case tooltip_span_class do
+			       nil -> "\"tooltipped\""
+			       some_class -> "\"tooltipped #{some_class}\""
+			     end
+
+	button_attrs =
+	  button_data
+	|> Enum.reduce(
+	  "",
+	  fn {name, value}, acc ->
+	    acc <> " #{name}=\"#{value}\""
+	  end)
+
+	tooltip_span = "<span class=\"tooltip\">#{tooltip}</span>"
+	button_string = "<button #{button_attrs}></button>"
+	raw "<span class=#{tooltip_span_class}>#{button_string}#{tooltip_span}</span>"
+      end
+
+      def render_edit_button_group(item_name, item, target) do
+	add = safe_to_string render_tooltip_button(
+	  %{
+	    "class" => "add-button",
+	    "id" => idfy("insert-#{item_name}", item.number),
+	    "phx-click" => "insert-#{item_name}",
+	    "phx-target" => target,
+	    "phx-value-number" => item.number
+	  }, "Insert before")
+	delete = safe_to_string render_tooltip_button(
+	  %{
+	    "class" => "delete-button",
+	    "id" => idfy("delete-#{item_name}", item.number),
+	    "phx-click" => "delete-#{item_name}",
+	    "phx-target" => target,
+	    "phx-value-number" => item.number
+	  }, "Delete")
+	push = safe_to_string render_tooltip_button(
+	  %{
+	    "class" => "down-button",
+	    "id" => idfy("push-#{item_name}", item.number),
+	    "phx-click" => "push-#{item_name}",
+	    "phx-target" =>  target,
+	    "phx-value-number" => item.number
+	  }, "Move down")
+	pull = safe_to_string render_tooltip_button(
+	  %{
+	    "class" => "up-button",
+	    "id" => idfy("pull-#{item_name}", item.number),
+	    "phx-click" => "pull-#{item_name}",
+	    "phx-target" => target,
+	    "phx-value-number" => item.number
+	  }, "Move up")
+
+	raw "<div class=\"edit-button-group\">#{add}&nbsp;#{delete}&nbsp;#{push}&nbsp;#{pull}</div>"
+      end
+
       def maybe_add_to_list(number, list) do
 	case Integer.parse(number) do
 	  :error -> list

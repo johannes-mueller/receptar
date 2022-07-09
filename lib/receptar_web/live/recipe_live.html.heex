@@ -16,15 +16,37 @@
 	<span>
 	    <form phx-submit="submit-servings">
 		<input type="number" name="servings" value={@recipe.servings}>
-		<button class="submit-button" type="submit"/>
-		<button class="cancel-button" type="button" phx-click="cancel-edit-servings"/>
-		<button class="reset-button" type="reset"/>
+		<%= render_tooltip_button(
+		    %{"class" => "submit-button", "type" => "submit"}, "Confirm")
+		%>
+		<%= render_tooltip_button(
+		    %{
+			"class" => "cancel-button",
+			"type" => "button",
+			"phx-click" =>
+			"cancel-edit-servings"
+		    },
+		    "Cancel"
+		)
+		%>
+		<%= render_tooltip_button(
+		    %{"class" => "reset-button", "type" => "reset"}, "Reset")
+		%>
 	    </form>
 	    servings.
 	</span>
     <% else %>
 	<span><%= render_servings(@recipe) %>.</span>
-	<button class="edit-button margin-button" type="button" phx-click="edit-servings"/>
+	<%= render_tooltip_button(
+	    %{
+		"outer-class" => "margin-button",
+		"class" => "edit-button",
+		"type" => "button",
+		"phx-click" => "edit-servings"
+	    },
+	    "Edit number of servings"
+	)
+	%>
     <% end %>
 </section>
 <section class="decription editable-item">
@@ -40,20 +62,55 @@
 	    <% else %>
 	    <p class="recipe-description"><%= tr(@recipe.description) %></p>
 	    <div class="edit-button-group">
-		<button class="edit-button" phx-click="edit-description"/>
-		<button class="delete-button" phx-click="delete-description"/>
+		<%=  render_tooltip_button(
+		    %{
+			"class" => "edit-button",
+			"type" => "button",
+			"phx-click" => "edit-description"
+		    },
+		    "Edit description"
+		) %>
+		<%= render_tooltip_button(
+		    %{
+			"class" => "delete-button",
+			"type" => "button",
+			"phx-click" => "delete-description"
+		    },
+		    "Delete description"
+		) %>
 	    </div>
 	<% end %>
     <% else %>
 	<%= if @edit_description do %>
 	    <form phx-submit="submit-description">
 		<textarea name="description"></textarea>
-		<button class="submit-button" type="submit"/>
-		<button class="cancel-button" type="button" phx-click="cancel-edit-description"/>
+		<%=  render_tooltip_button(
+		    %{
+			"class" => "submit-button",
+			"type" => "submit",
+		    },
+		    "Confirm"
+		) %>
+		<%= render_tooltip_button(
+		    %{
+			"class" => "cancel-button",
+			"type" => "button",
+			"phx-click" => "cancel-edit-description"
+		    },
+		    "Cancel"
+		) %>
 	    </form>
 	<% else %>
 	    <p class="no-recipe-description">no description available</p>
-	    <button class="add-button margin-button" phx-click="edit-description"/>
+	    <%= render_tooltip_button(
+		%{
+		    "outer-class" => "margin-button",
+		    "class" => "add-button",
+		    "type" => "button",
+		    "phx-click" => "edit-description"
+		},
+		"Add description"
+	    ) %>
 	<% end %>
     <% end %>
 </section>
@@ -61,20 +118,56 @@
     <%= if @edit_reference do %>
 	<form phx-submit="submit-reference">
 	    <label for="reference">Reference:</label><input name="reference" value={@recipe.reference || ""}>
-	    <button class="submit-button" type="submit"/>
-	    <button class="cancel-button" type="button" phx-click="cancel-edit-reference"/>
-	    <button class="reset-button" type="reset"/>
+	    <%= render_tooltip_button(
+		%{"class" => "submit-button", "type" => "submit"}, "Confirm")
+	    %>
+	    <%= render_tooltip_button(
+		%{
+		    "class" => "cancel-button",
+		    "type" => "button",
+		    "phx-click" =>
+		    "cancel-edit-reference"
+		},
+		"Cancel"
+	    )
+	    %>
+	    <%= render_tooltip_button(
+		%{"class" => "reset-button", "type" => "reset"}, "Reset")
+	    %>
 	</form>
     <% else %>
 	<%= if @recipe.reference do %>
 	    <span>Recipe reference:</span>
 	    <span class="recipe-reference"><%= render_reference(@recipe) %></span>
 	    <div class="edit-button-group">
-		<button class="edit-button" phx-click="edit-reference"></button>
-		<button type="button" class="delete-button" phx-click="delete-reference"/>
+		<%= render_tooltip_button(
+		    %{
+			"class" => "edit-button",
+			"type" => "button",
+			"phx-click" => "edit-reference"
+		    },
+		    "Edit reference"
+		) %>
+		<%= render_tooltip_button(
+		    %{
+			"class" => "delete-button",
+			"type" => "button",
+			"phx-click" => "delete-reference"
+		    },
+		    "Delete reference"
+		) %>
 	    </div>
 	<% else %>
-	    <span>No reference given</span><button class="add-button margin-button" phx-click="edit-reference"/>
+	    <span>No reference given</span>
+	    <%= render_tooltip_button(
+		%{
+		    "outer-class" => "margin-button",
+		    "class" => "add-button",
+		    "type" => "button",
+		    "phx-click" => "edit-reference"
+		},
+		"Add reference"
+	    ) %>
 	<% end %>
     <% end %>
 </section>
