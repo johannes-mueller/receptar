@@ -1,0 +1,12 @@
+<form action="/search" method="get" phx-change="search-event" phx-debounce="500">
+    <div class="suggestions">
+	<input name="search-string" value={@unambigous |> IO.inspect(label: "unambigous")} autocomplete="off">
+	<%= for recipe <- @recipes do %>
+	    <div class="suggestion"
+		 phx-click="choose-suggestion"
+		 phx-value-recipe-id={recipe.id}>
+		 <%= recipe.title %>
+	    </div>
+	<% end %>
+    </div>
+</form>
