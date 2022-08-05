@@ -1,0 +1,15 @@
+<form class="search-bar-form" action="/search" method="get" phx-change="search-event" phx-debounce="500">
+    <input name="title" autocomplete="off">
+    <button class="inline-search-button" type="submit"/>
+    <%= if length(@recipes) > 0 do %>
+	<div class="suggestion-container">
+	    <div class="suggestions">
+		<%= for recipe <- @recipes do %>
+		    <a class="suggestion" href={recipe_path(recipe)}>
+			<%= highlight_search_string(recipe.title, @search_string) %>
+		    </a>
+		<% end %>
+	    </div>
+	</div>
+    <% end %>
+</form>

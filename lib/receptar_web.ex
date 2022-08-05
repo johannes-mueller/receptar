@@ -192,6 +192,8 @@ defmodule ReceptarWeb do
 	Map.filter(params, fn {k, _v} -> k in allowed_fields end)
       end
 
+      def recipe_path(%Receptar.Recipes.Recipe{id: id}), do: "/recipe/#{id}"
+
     end
   end
 

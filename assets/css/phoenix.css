@@ -709,7 +709,8 @@ ul.translations {
 .cancel-button,
 .reset-button,
 .up-button,
-.down-button {
+.down-button,
+.inline-search-button {
     font-size: 2rem;
     font-family: "Receptar Icons";
     font-weight: 400;
@@ -721,6 +722,12 @@ ul.translations {
     border-radius: 0.4rem;
     color: #fff;
     cursor: pointer;
+}
+
+.inline-search-button {
+    background-color: white;
+    display: inline;
+    color: black;
 }
 
 .tooltipped {
@@ -757,6 +764,15 @@ ul.translations {
 .down-button::before { content: "\e03a"; }
 .up-button::before { content: "\e039"; }
 
+.inline-search-button {
+    background: url(/icons/search.svg);
+    background-repeat: no-repeat;
+    background-size: 1em 1em;
+    background-position: center;
+    margin-bottom: 0;
+    width: 1.5em;
+}
+
 .margin-button,
 .edit-button-group
 {
@@ -787,4 +803,34 @@ input[name="servings"] { width: 8rem; }
 	    url('/fonts/receptar-icons.woff2') format('woff2');
 	font-weight: normal;
 	font-style: normal;
+}
+
+input[name="title"] {
+    margin-bottom: 0;
+    display: inline;
+    width: auto;
+}
+
+.suggestions.container {
+    position: relative;
+}
+
+.suggestions {
+    position: absolute;
+    z-index: 1;
+    background-color: white;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.suggestion {
+    padding: 1em 1em;
+}
+
+.suggestion:hover {
+    background-color: lightgray;
+}
+
+
+a.suggestion {
+    color: black;
 }

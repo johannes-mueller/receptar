@@ -204,6 +204,16 @@ defmodule Receptar.Seeder do
 	{2, "tinuso", 20, "gramo"},
       ],
       instructions: []
+    },
+    %{
+      translations: [eo: "Penne carbonara"],
+      ingredients: [],
+      instructions: []
+    },
+    %{
+      translations: [eo: "Penne arrabiata"],
+      ingredients: [],
+      instructions: []
     }
   ]
 
