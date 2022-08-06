@@ -1,11 +1,11 @@
-<form class="search-bar-form" action="/search" method="get" phx-change="search-event" phx-debounce="500">
-    <input name="title" autocomplete="off" phx-blur="blur" phx-focus="focus" value={@search_string}>
+<form class="search-bar-form" action="/search" method="get" phx-change="search-event" phx-window-keydown="key-event">
+    <input name="title" id="search-bar-input" autocomplete="off" phx-blur="blur" phx-focus="focus" value={@search_string} phx-debounce="100">
     <button class="inline-search-button" type="submit"/>
     <%= if length(@recipes) > 0 and @focused do %>
 	<div class="suggestion-container">
 	    <div class="suggestions">
 		<%= for recipe <- @recipes do %>
-		    <a class="suggestion" href={recipe_path(recipe)}>
+		    <a class="suggestion" id={idfy("suggestion", recipe.id)} href={recipe_path(recipe)}>
 			<%= highlight_search_string(recipe.title, @search_string) %>
 		    </a>
 		<% end %>

@@ -826,10 +826,13 @@ input[name="title"] {
     padding: 1em 1em;
 }
 
+.suggestion:focus {
+    border: 1px dashed black;
+}
+
 .suggestion:hover {
     background-color: lightgray;
 }
-
 
 a.suggestion {
     color: black;

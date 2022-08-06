@@ -132,8 +132,8 @@ defmodule ReceptarWeb.SearchBarTest do
       |> render_change(%{"title" => "sa"})
 
       for {search, title} <- [
-	    {"tinusa bulko", "Tinu<strong>sa</strong> bulko"},
 	    {"sardela pico", "<strong>Sa</strong>rdela pico"},
+	    {"tinusa bulko", "Tinu<strong>sa</strong> bulko"},
 	  ] do
 
 	  id = recipe_id(search)
@@ -144,7 +144,243 @@ defmodule ReceptarWeb.SearchBarTest do
 	  |> render() =~ title
       end
     end
-  end
+
+    test "hitting arrow down with no suggestions does not fail", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+    end
+
+    test "hitting arrow up with no suggestions does not fail", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowUp"})
+    end
+
+    test "hitting a letter key on search bar does not fail", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "a"})
+    end
+
+    test "hitting arrow down once on search bar form focuses first suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "s"})
+
+      id = recipe_id("sardela pico")
+      element_id = "suggestion-#{id}"
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "hitting arrow down once on search bar input focuses first suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "s"})
+
+      id = recipe_id("sardela pico")
+      element_id = "suggestion-#{id}"
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "hitting arrow down twice focuses second suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      id = recipe_id("tinusa bulko")
+      element_id = "suggestion-#{id}"
+
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "hitting arrow down once and arrow up once focuses input", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      id = recipe_id("sardela pico")
+      element_id = "suggestion-#{id}"
+
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowUp"})
+
+      assert_push_event(view, "focus-element", %{id: "search-bar-input"})
+    end
+
+    test "hitting arrow down twice and arrow up once focuses first suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      id = recipe_id("sardela pico")
+      element_id = "suggestion-#{id}"
+
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowUp"})
+
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "hitting arrow down beyond suggestions focuses last suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      element_id = "suggestion-#{recipe_id("sardela pico")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      element_id = "suggestion-#{recipe_id("tinusa bulko")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      element_id = "suggestion-#{recipe_id("tinusa bulko")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "hitting arrow down beyond suggestions and arrow up focuses before last suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      element_id = "suggestion-#{recipe_id("sardela pico")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      element_id = "suggestion-#{recipe_id("tinusa bulko")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowUp"})
+
+      element_id = "suggestion-#{recipe_id("sardela pico")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "hitting arrow down changing input and hitting arrow down focuses first suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "g"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      assert_push_event(view, "focus-element", %{})
+
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      element_id = "suggestion-#{recipe_id("sardela pico")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "hitting arrow down blurring refocusing and hitting arrow down focuses first suggestion", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      assert_push_event(view, "focus-element", %{})
+
+      view
+      |> element(@form_selector <> @input)
+      |> render_blur()
+      view
+      |> element(@form_selector <> @input)
+      |> render_focus()
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      element_id = "suggestion-#{recipe_id("sardela pico")}"
+      assert_push_event(view, "focus-element", %{id: ^element_id})
+    end
+
+    test "blurring search input when suggestion focused keeps suggestions", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "sa"})
+
+      view
+      |> element(@form_selector)
+      |> render_keydown(%{"key" => "ArrowDown"})
+
+      view
+      |> element(@form_selector <> @input)
+      |> render_blur(%{"value" => "sa"})
+
+      assert view |> has_element?(@form_selector <> ".suggestions .suggestion")
+    end
+end
 
   describe "Connection state in german" do
     setup %{conn: conn} do
