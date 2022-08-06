@@ -86,6 +86,46 @@ defmodule ReceptarWeb.SearchBarTest do
       refute view |> has_element?(@form_selector <> ".suggestions .suggestion")
     end
 
+    test "blurring search input results in no suggestions", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "g"})
+
+      view
+      |> element(@form_selector <> @input)
+      |> render_blur(%{"value" => "g"})
+
+      refute view |> has_element?(@form_selector <> ".suggestions .suggestion")
+    end
+
+    test "blurring search input keeps the input value", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "foo"})
+
+      view
+      |> element(@form_selector <> @input)
+      |> render_blur(%{"value" => "foo"})
+
+      assert view |> has_element?(@form_selector <> @input <> "[value=\"foo\"]")
+    end
+
+    test "refocusing search input results brings back suggestions", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"title" => "g"})
+
+      view
+      |> element(@form_selector <> @input)
+      |> render_blur(%{"value" => "g"})
+
+      view
+      |> element(@form_selector <> @input)
+      |> render_focus()
+
+      assert view |> has_element?(@form_selector <> ".suggestions .suggestion")
+    end
+
     test "typing `sa` into the search bar makes two recipes appear sa bold", %{view: view} do
       view
       |> element(@form_selector)

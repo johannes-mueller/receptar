@@ -9,6 +9,7 @@ defmodule ReceptarWeb.SearchBar do
       |> assign(recipes: [])
       |> assign(language: session["language"])
       |> assign(search_string: "")
+      |> assign(focused: true)
 
     {:ok, socket, layout: false}
   end
@@ -33,6 +34,14 @@ defmodule ReceptarWeb.SearchBar do
       |> assign(search_string: search_string)
 
     {:noreply, socket}
+  end
+
+  def handle_event("blur", %{}, socket) do
+    {:noreply, socket |> assign(focused: false)}
+  end
+
+  def handle_event("focus", %{}, socket) do
+    {:noreply, socket |> assign(focused: true)}
   end
 
   def highlight_search_string(title, search_string) do
