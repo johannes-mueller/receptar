@@ -1,0 +1,39 @@
+<div class="search-form-container">
+    <div class="main-container">
+	<form id="main-search-form" action="/search" method="get" phx-change="form-change">
+	    <label for="search-title">Recipe title</label>
+	    <input id="search-title" name="title" autocomplete="off" phx-debounce="100"/>
+	    <button type="submit">Go</button>
+	</form>
+    </div>
+    <form id="substance-search-form" phx-change="search-substance">
+	<label for="ingredient-search">Type ingredient</label>
+	<input id="ingredient-search" name="search_string" phx-debounce="500">
+    </form>
+    <div class="shown-substance-container">
+	<%= for {substance, checked} <- @shown_substances do %>
+	    <div class="shown-substance" id={idfy("shown-substance", substance.id)}>
+		<input form="main-search-form"
+		       id={idfy("substance", substance.id)}
+		       type="checkbox"
+		       name="substance[]"
+		       value={substance.id}
+		       checked={checked}
+		/>
+		<label form="main-search-form" for={idfy("substance", substance.id)}>
+		    <%= substance.name %>
+		</label>
+	    </div>
+	<% end %>
+    </div>
+</div>
+<h1><%= search_result_title(length(@recipes)) %></h1>
+<ul>
+    <%= for recipe <- @recipes do %>
+	<li>
+	    <a href={recipe_path(recipe)}>
+		<%= highlight_search_string(recipe.title, Map.get(@search_params, "title", "")) %>
+	    </a>
+	</li>
+    <% end %>
+</ul>

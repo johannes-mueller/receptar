@@ -42,7 +42,7 @@ defmodule Receptar.Ingredients.Ingredient do
   end
 
   defp cast_if_new_substance(%{substance_id: id}) do
-    Receptar.Substances.get_substance!(id)
+    Receptar.Substances.get!(id)
   end
 
   defp cast_if_new_substance(%{substance: substance, language: language}) do

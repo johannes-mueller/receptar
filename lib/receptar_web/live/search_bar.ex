@@ -29,13 +29,13 @@ defmodule ReceptarWeb.SearchBar do
     recipes = Recipes.search(%{"title" => search_string}, language)
     |> Recipes.translate(language)
 
-    socket =
+    {
+      :noreply,
       socket
       |> assign(recipes: recipes)
       |> assign(search_string: search_string)
       |> assign(focused_recipe: nil)
-
-    {:noreply, socket}
+    }
   end
 
   def handle_event("blur", %{}, socket) do
@@ -100,9 +100,4 @@ defmodule ReceptarWeb.SearchBar do
   end
 
   def handle_event("key-event", %{}, socket), do: {:noreply, socket}
-
-  def highlight_search_string(title, search_string) do
-    capitalized = Regex.run(~r/#{search_string}/i, title)
-    raw String.replace(title, capitalized, "<strong>#{capitalized}</strong>")
-  end
 end

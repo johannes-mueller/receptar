@@ -51,7 +51,7 @@ defmodule Receptar.TranslatablesTest do
 
       Translations.update_translations(substance, translations)
 
-      Substances.get_substance!(substance.id).translations
+      Substances.get!(substance.id).translations
       |> Enum.all?(fn
 	%{language: "de", content: "Salz"} -> true
 	%{language: "eo", content: "saaalo"} -> true
@@ -70,7 +70,7 @@ defmodule Receptar.TranslatablesTest do
 	%{language: "eo", content: "salo"},
 	%{language: "de", content: "Salz"},
 	%{language: "sk", content: "soľ"},
-      ] = Substances.get_substance!(substance.id).translations
+      ] = Substances.get!(substance.id).translations
     end
 
     test "update translations change translation" do
@@ -87,7 +87,7 @@ defmodule Receptar.TranslatablesTest do
       assert [
 	%{language: "de", content: "Salz"},
 	%{language: "eo", content: "saalo"},
-      ] = Enum.sort(Substances.get_substance!(substance.id).translations)
+      ] = Enum.sort(Substances.get!(substance.id).translations)
     end
 
     test "add a multiple translations to a substance actually adds them" do

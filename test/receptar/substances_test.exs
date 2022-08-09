@@ -279,20 +279,20 @@ defmodule Receptar.SubstancesTest do
     end
 
     test "get unknown substance raises Ecto.NoResultsError" do
-      assert_raise Ecto.NoResultsError, fn -> Substances.get_substance!(2342) end
+      assert_raise Ecto.NoResultsError, fn -> Substances.get!(2342) end
     end
 
     test "get known substance return substance" do
       substance = Substances.search("salo", "eo") |> List.first
 
-      fetched_substance = Substances.get_substance!(substance.id)
+      fetched_substance = Substances.get!(substance.id)
       assert substance == fetched_substance
     end
 
     for {name, kind} <- [{"salo", :vegan}, {"fromago", :vegetarian}, {"tinuso", :meat}] do
       test "get #{name} is #{kind}" do
 	substance = Substances.search(unquote(name), "eo") |> List.first
-	fetched_substance = Substances.get_substance!(substance.id)
+	fetched_substance = Substances.get!(substance.id)
 
 	assert fetched_substance.kind == unquote(kind)
       end
@@ -302,7 +302,7 @@ defmodule Receptar.SubstancesTest do
       substance = Substances.search("suko", "eo") |> List.first
 
       {:ok, %Substance{}} = Substances.delete_substance(substance)
-      assert_raise Ecto.NoResultsError, fn -> Substances.get_substance!(substance.id) end
+      assert_raise Ecto.NoResultsError, fn -> Substances.get!(substance.id) end
     end
 
     test "updating a known substance actually updates it" do
@@ -311,7 +311,7 @@ defmodule Receptar.SubstancesTest do
       {:ok, substance} = Substances.update_substance(substance, %{animal: :true})
 
       assert substance.animal == :true
-      assert Substances.get_substance!(substance.id).animal == :true
+      assert Substances.get!(substance.id).animal == :true
     end
 
     test "inserting a vegan non vegetarian substance fails" do

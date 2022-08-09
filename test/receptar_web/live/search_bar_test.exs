@@ -8,29 +8,6 @@ defmodule ReceptarWeb.SearchBarTest do
 
   alias ReceptarWeb.SearchBar
 
-  # describe "Socket state" do
-  #   setup do
-  #     insert_test_data()
-
-  #     {:ok, socket, layout: false} =
-  # 	SearchBar.mount(
-  # 	  %{},
-  # 	  %{"language" => "eo"},
-  # 	  %Phoenix.LiveView.Socket{}
-  # 	)
-
-  #     %{socket: socket}
-  #   end
-
-  #   test "initially suggestions are empty", %{socket: socket} do
-  #     assert socket.assigns.suggestions == []
-  #   end
-
-  #   # test "typing `granda` into the search bar returns [`Granda kino`]", %{socket: socket} do
-
-  #   # end
-  # end
-
   describe "Connection state" do
     @form_selector "form[action=\"/search\"][method=\"get\"] "
     @suggestion ".suggestion-container .suggestions a.suggestion"
@@ -39,7 +16,6 @@ defmodule ReceptarWeb.SearchBarTest do
     setup %{conn: conn} do
       insert_test_data()
       %{conn: conn} = register_and_log_in_user(%{conn: conn})
-
       session = %{"language" => "eo"}
 
       {:ok, view, _html} = live_isolated(conn, SearchBar, session: session)
@@ -47,7 +23,7 @@ defmodule ReceptarWeb.SearchBarTest do
     end
 
     test "search bar has a form which triggers a search", %{view: view} do
-      assert view |> has_element?("form[action=\"/search\"][method=\"get\"]")
+      assert view |> has_element?(@form_selector)
     end
 
     test "initially no suggestion divs are rendered", %{view: view} do

@@ -194,6 +194,14 @@ defmodule ReceptarWeb do
 
       def recipe_path(%Receptar.Recipes.Recipe{id: id}), do: "/recipe/#{id}"
 
+      def highlight_search_string(title, "") do
+	title
+      end
+
+      def highlight_search_string(title, search_string) do
+	capitalized = Regex.run(~r/#{search_string}/i, title)
+	raw String.replace(title, capitalized, "<strong>#{capitalized}</strong>")
+      end
     end
   end
 

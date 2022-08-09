@@ -36,8 +36,14 @@ defmodule Receptar.Substances do
     |> Repo.insert
   end
 
-  def get_substance!(id) do
+  def get!(id) do
     Repo.get!(Substance, id)
+    |> Repo.preload([:translations])
+    |> fill_kind_field
+  end
+
+  def get(id) do
+    Repo.get(Substance, id)
     |> Repo.preload([:translations])
     |> fill_kind_field
   end
@@ -52,6 +58,8 @@ defmodule Receptar.Substances do
     |> Repo.update
   end
 
+  def fill_kind_field(nil = _substance), do: nil
+
   def fill_kind_field(substance) do
     kind = case substance do
 	     %{meat: true} -> :meat
@@ -61,6 +69,12 @@ defmodule Receptar.Substances do
 	   end
     Map.put(substance, :kind, kind)
   end
+
+  def translate([substance | tail], language) do
+    [translate(substance, language) | translate(tail, language)]
+  end
+
+  def translate([], _language), do: []
 
   def translate(substance, language) do
     translation = Translations.translation_for_language(substance.translations, language)

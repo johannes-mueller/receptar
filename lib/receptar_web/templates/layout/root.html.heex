@@ -21,11 +21,7 @@
           </ul>
           <%= render "_user_menu.html", assigns %>
           <%= link "New recipe", to: "/recipe/new" %>
-          <!-- <%= form_for @conn, Routes.recipe_path(@conn, :search), [method: :get], fn f -> %>
-               <%= search_input f, :title %>
-               <%= submit "Go" %>
-               <% end %> -->
-	  <%= live_render @conn, ReceptarWeb.SearchBar, session: %{"language" => @language}, sticky: true %>
+          <%= live_render @conn, ReceptarWeb.SearchBar, session: %{"language" => @language}, sticky: true %>
 	  <form method="get">
 	      <select name="language" onchange="this.form.submit();">
 		  <%= for lang <- ReceptarWeb.Cldr.known_locale_names() do %>
