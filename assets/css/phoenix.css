@@ -837,3 +837,10 @@ input[name="title"] {
 a.suggestion {
     color: black;
 }
+
+table.recipe-search-hits-table td {
+    border: 0
+}
+table.recipe-search-hits-table tr:hover {
+    background-color: #eee
+}

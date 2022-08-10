@@ -7,7 +7,7 @@ defmodule ReceptarWeb.SearchOageTest do
   import Receptar.TestHelpers
 
   @form_selector "form[action=\"/search\"][method=\"get\"] "
-  @search_hit "ul li a"
+  @search_hit "table tr td.recipe-title-link a"
   @substance_search "form[phx-change=\"search-substance\"]"
 
   describe "Connection state empty form" do
@@ -31,8 +31,8 @@ defmodule ReceptarWeb.SearchOageTest do
     test "initially all 8 search results are available", %{view: view} do
       expected_number = length(Receptar.Recipes.search(%{}, language: "eo"))
 
-      assert view |> has_element?("li:nth-of-type(#{expected_number})")
-      refute view |> has_element?("li:nth-of-type(#{expected_number + 1})")
+      assert view |> has_element?("tr:nth-of-type(#{expected_number})")
+      refute view |> has_element?("tr:nth-of-type(#{expected_number + 1})")
     end
 
     test "initially no substances checkbox available in the form", %{view: view} do
@@ -138,7 +138,7 @@ defmodule ReceptarWeb.SearchOageTest do
     end
 
     test "initially all search results are available", %{view: view} do
-      html = view |> element("ul") |> render
+      html = view |> element("table") |> render
 
       assert html =~ "Großes Kino"
       assert html =~ "Thunfischbrötchen"
@@ -170,8 +170,8 @@ defmodule ReceptarWeb.SearchOageTest do
     test "title search 'sa' has two hits", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/search?title=sa")
 
-      assert view |> has_element?("li:nth-of-type(2)")
-      refute view |> has_element?("li:nth-of-type(3)")
+      assert view |> has_element?("tr:nth-of-type(2)")
+      refute view |> has_element?("tr:nth-of-type(3)")
     end
 
     test "title search 'foobar' has no hits", %{conn: conn} do
@@ -296,26 +296,22 @@ defmodule ReceptarWeb.SearchOageTest do
     test "render recipe description for granda kino", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/search?title=granda")
 
-      id = recipe_id("granda kino")
-
       assert view
-      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> element("td.recipe-description-search")
       |> render() =~ "Vere granda kino"
       refute view
-      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> element("td.recipe-description-search")
       |> render() =~ "Bedaŭrinde ne ĉiam havebla"
     end
 
     test "render recipe description for sukera bulko", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/search?title=sukera")
 
-      id = recipe_id("sukera bulko")
-
       assert view
-      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> element("td.recipe-description-search")
       |> render() =~ "Bedaŭrinde ne ĉiam havebla"
       refute view
-      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> element("td.recipe-description-search")
       |> render() =~ "Vere granda kino"
     end
   end

@@ -28,13 +28,15 @@
     </div>
 </div>
 <h1><%= search_result_title(length(@recipes)) %></h1>
-<ul>
+<table class="recipe-search-hits-table">
     <%= for recipe <- @recipes do %>
-	<li>
-	    <a href={recipe_path(recipe)}>
-		<%= highlight_search_string(recipe.title, Map.get(@search_params, "title", "")) %>
-	    </a>
-	    <span class="recipe-description-search"><%= recipe.description %></span>
-	</li>
+	<tr>
+	    <td class="recipe-title-link">
+		<a href={recipe_path(recipe)}>
+		    <%= highlight_search_string(recipe.title, Map.get(@search_params, "title", "")) %>
+		</a>
+	    </td>
+	    <td class="recipe-description-search"><%= recipe.description %></td>
+	</tr>
     <% end %>
-</ul>
+</table>
