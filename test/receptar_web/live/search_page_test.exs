@@ -293,5 +293,30 @@ defmodule ReceptarWeb.SearchOageTest do
       {:ok, _view, _html} = live(conn, "/search?foo=bar")
     end
 
+    test "render recipe description for granda kino", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/search?title=granda")
+
+      id = recipe_id("granda kino")
+
+      assert view
+      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> render() =~ "Vere granda kino"
+      refute view
+      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> render() =~ "Bedaŭrinde ne ĉiam havebla"
+    end
+
+    test "render recipe description for sukera bulko", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/search?title=sukera")
+
+      id = recipe_id("sukera bulko")
+
+      assert view
+      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> render() =~ "Bedaŭrinde ne ĉiam havebla"
+      refute view
+      |> element("a[href=\"/recipe/#{id}\"]+span.recipe-description-search")
+      |> render() =~ "Vere granda kino"
+    end
   end
 end

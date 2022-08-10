@@ -141,7 +141,6 @@ defmodule Receptar.Seeder do
 	{1, "nudeloj", 0.5, "kilogramo"},
 	{3, "salo", 1.3, "gramo"}
       ],
-
       instructions: [
 	%{
 	  number: 1,
@@ -190,6 +189,12 @@ defmodule Receptar.Seeder do
       translations: [eo: "Sukera bulko", de: "Zuckerbrötchen"],
       servings: 1,
       reference: "https://sukera-bulko.org",
+      recipe_description: %{
+	translations: [
+	  %{"language" => "eo", "content" => "Bedaŭrinde ne ĉiam havebla"},
+	  %{"language" => "de", "content" => "Leider nicht immer vorrätig"}
+	]
+      },
       ingredients: [
 	{1, "pasto", 200, "gramo"},
 	{2, "sukero", 20, "gramo"},
