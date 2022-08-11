@@ -314,5 +314,27 @@ defmodule ReceptarWeb.SearchOageTest do
       |> element("td.recipe-description-search")
       |> render() =~ "Vere granda kino"
     end
+
+    test "render recipe reference for granda kino", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/search?title=granda")
+
+      assert view
+      |> element("td.recipe-reference-search")
+      |> render() =~ "ia podkasto"
+      refute view
+      |> element("td.recipe-reference-search")
+      |> render() =~ "https://sukera-bulko.org"
+    end
+
+    test "render recipe reference for sukera bulko", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/search?title=sukera")
+
+      assert view
+      |> element("td.recipe-reference-search")
+      |> render() =~ "https://sukera-bulko.org"
+      refute view
+      |> element("td.recipe-reference-search")
+      |> render() =~ "ia podkasto"
+    end
   end
 end
