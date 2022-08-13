@@ -9,6 +9,7 @@ defmodule ReceptarWeb.SearchOageTest do
   @form_selector "form[action=\"/search\"][method=\"get\"] "
   @search_hit "table tr td.recipe-title-link a"
   @substance_search "form[phx-change=\"search-substance\"]"
+  @class_selector "input[form=\"main-search-form\"][type=\"radio\"][name=\"class\"]"
 
   describe "Connection state empty form" do
     setup %{conn: conn} do
@@ -123,6 +124,44 @@ defmodule ReceptarWeb.SearchOageTest do
       |> render_change(%{"search_string" => "sa"})
 
       refute view |> has_element?("input[name=\"substance\"]:nth-of-type(2)")
+    end
+
+    test "class selector 'vegan' is available", %{view: view} do
+      assert view |> has_element?(@class_selector <> "[value=\"vegan\"]")
+    end
+
+    test "class selector 'vegetarian' is available", %{view: view} do
+      assert view |> has_element?(@class_selector <> "[value=\"vegetarian\"]")
+    end
+
+    test "class selector 'all' is available", %{view: view} do
+      assert view |> has_element?(@class_selector <> "[value=\"all\"]")
+    end
+
+    test "only class selector 'all' is checked by default", %{view: view} do
+      assert view |> has_element?(@class_selector <> "[value=\"all\"][checked]")
+      refute view |> has_element?(@class_selector <> "[value=\"vegan\"][checked]")
+      refute view |> has_element?(@class_selector <> "[value=\"vegetarian\"][checked]")
+    end
+
+    test "selecting 'vegan' makes 'vegan' radio checked", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"class" => "vegan"})
+
+      assert view |> has_element?(@class_selector <> "[value=\"vegan\"][checked]")
+      refute view |> has_element?(@class_selector <> "[value=\"vegetarian\"][checked]")
+      refute view |> has_element?(@class_selector <> "[value=\"all\"][checked]")
+    end
+
+    test "selecting 'vegetarian' makes 'vegetarian' radio checked", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"class" => "vegetarian"})
+
+      assert view |> has_element?(@class_selector <> "[value=\"vegetarian\"][checked]")
+      refute view |> has_element?(@class_selector <> "[value=\"vegan\"][checked]")
+      refute view |> has_element?(@class_selector <> "[value=\"all\"][checked]")
     end
   end
 

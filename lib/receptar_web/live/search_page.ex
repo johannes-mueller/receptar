@@ -94,6 +94,12 @@ defmodule ReceptarWeb.SearchPage do
     |> Enum.map(& {&1, false})
   end
 
+  defp sanitize_parameters(%{} = params) do
+    params
+    |> Enum.map(&sanitize_parameters/1)
+    |> Enum.into(%{})
+  end
+
   defp sanitize_parameters({"substance", substance_list}) do
     substance_list = substance_list
     |> enforce_list
@@ -106,12 +112,6 @@ defmodule ReceptarWeb.SearchPage do
     |> Enum.filter(&(&1 != :error))
 
     {"substance", substance_list}
-  end
-
-  defp sanitize_parameters(%{} = params) do
-    params
-    |> Enum.map(&sanitize_parameters/1)
-    |> Enum.into(%{})
   end
 
   defp sanitize_parameters({some_key, "true"}), do: {some_key, true}
