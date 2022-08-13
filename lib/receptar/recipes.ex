@@ -11,6 +11,54 @@ defmodule Receptar.Recipes do
   alias Receptar.Substances
   alias Receptar.Translations
 
+  def search(criteria, language) do
+    base_query()
+    |> build_query(criteria, language)
+    |> Repo.all
+    |> preload_assocs
+    |> Enum.map(&fill_ingredients_kind_fields/1)
+  end
+
+  def get_recipe!(id) do
+    Repo.get!(Recipe, id)
+    |> preload_assocs
+    |> fill_ingredients_kind_fields
+  end
+
+  def create_recipe(attrs) do
+    %Recipe{}
+    |> Recipe.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_recipe(%Recipe{} = recipe, attrs) do
+    attrs = Map.put_new(attrs, :language, nil)
+
+    recipe
+    |> Recipe.update_changeset(attrs)
+    |> Repo.update
+  end
+
+  def delete_recipe(recipe) do
+    Repo.delete(recipe)
+  end
+
+  def translate([recipe | tail], language) do
+    [translate(recipe, language) | translate(tail, language)]
+  end
+
+  def translate([], _language), do: []
+
+  def translate(recipe, language) do
+    translation = Translations.translation_for_language(recipe.translations, language)
+
+    recipe
+    |> Map.put(:title, translation)
+    |> Map.put(:description, RecipeDescription.translate(recipe.recipe_description, language))
+    |> Map.put(:ingredients, Ingredients.translate(recipe.ingredients, language))
+    |> Map.put(:instructions, Instructions.translate(recipe.instructions, language))
+  end
+
   defp base_query do
     from rp in Recipe
   end
@@ -23,12 +71,7 @@ defmodule Receptar.Recipes do
 
   defp spread_language_parameter_to_all_criteria(criteria, language) do
     criteria
-    |> Enum.reduce([], fn el, acc ->
-      [
-	Enum.into([el], %{}) |> Map.put(:language, language) |
-	acc
-      ]
-    end)
+    |> Enum.map(fn el -> [el] |> Enum.into(%{}) |> Map.put(:language, language) end)
   end
 
   defp compose_query(%{"title" => title, language: language}, query) do
@@ -85,7 +128,7 @@ defmodule Receptar.Recipes do
     )
   end
 
-  def query_vegan do
+  defp query_vegan do
     from(i in Ingredient)
     |> join(:left, [i], s in assoc(i, :substance))
     |> group_by([i, s], [i.recipe_id])
@@ -97,54 +140,6 @@ defmodule Receptar.Recipes do
 	  s.animal)
       }
     )
-  end
-
-  def search(criteria, language) do
-    base_query()
-    |> build_query(criteria, language)
-    |> Repo.all
-    |> preload_assocs
-    |> Enum.map(&fill_ingredients_kind_fields/1)
-  end
-
-  def get_recipe!(id) do
-    Repo.get!(Recipe, id)
-    |> preload_assocs
-    |> fill_ingredients_kind_fields
-  end
-
-  def create_recipe(attrs) do
-    %Recipe{}
-    |> Recipe.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  def update_recipe(%Recipe{} = recipe, attrs) do
-    attrs = Map.put_new(attrs, :language, nil)
-
-    recipe
-    |> Recipe.update_changeset(attrs)
-    |> Repo.update
-  end
-
-  def delete_recipe(recipe) do
-    Repo.delete(recipe)
-  end
-
-  def translate([recipe | tail], language) do
-    [translate(recipe, language) | translate(tail, language)]
-  end
-
-  def translate([], _language), do: []
-
-  def translate(recipe, language) do
-    translation = Translations.translation_for_language(recipe.translations, language)
-
-    recipe
-    |> Map.put(:title, translation)
-    |> Map.put(:description, RecipeDescription.translate(recipe.recipe_description, language))
-    |> Map.put(:ingredients, Ingredients.translate(recipe.ingredients, language))
-    |> Map.put(:instructions, Instructions.translate(recipe.instructions, language))
   end
 
   defp preload_assocs(recipe_s) do
