@@ -24,7 +24,7 @@ defmodule ReceptarWeb.SearchPage do
     {
       :noreply,
       socket
-      |> assign_selected_shown_substances(params["substance"])
+      |> assign_selected_shown_substances(params)
       |> assign_recipes(params)
       |> assign(search_params: params)
     }
@@ -78,12 +78,21 @@ defmodule ReceptarWeb.SearchPage do
     socket |> assign(shown_substances: shown_substances)
   end
 
-  defp assign_selected_shown_substances(socket, selected) do
+  defp assign_selected_shown_substances(socket, %{"substance" => selected}) do
     shown_substances =
       socket.assigns.shown_substances
       |> Enum.map(fn {s, _} -> {s, s.id in selected} end)
 
     socket |> assign(shown_substances: shown_substances)
+  end
+
+  defp assign_selected_shown_substances(socket, %{}) do
+    all_unchecked =
+      socket.assigns.shown_substances
+      |> Enum.map(fn {s, _} -> {s, false} end)
+
+    socket
+    |> assign(shown_substances: all_unchecked)
   end
 
   defp query_newly_shown_substances("" = _search_string, _language), do: []

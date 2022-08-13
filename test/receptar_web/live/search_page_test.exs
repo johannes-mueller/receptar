@@ -294,6 +294,16 @@ defmodule ReceptarWeb.SearchOageTest do
       assert view |> has_element?(e2 <> "[checked]")
     end
 
+    test "uncheck last preselected substance leaves checkbox unchecked", %{conn: conn} do
+      sid = substance_by_name("tinuso").id
+      {:ok, view, _html} = live(conn, "/search?substance[]=#{sid}")
+
+      view |> element(@form_selector) |> render_change(%{})
+
+      assert view |> has_element?("input#substance-#{sid}")
+      refute view |> has_element?("input#substance-#{sid}[checked]")
+    end
+
     test "search an already selected substance does not make it appear twice", %{conn: conn} do
       sid = substance_by_name("tinuso").id
       {:ok, view, _html} = live(conn, "/search?substance[]=#{sid}")
