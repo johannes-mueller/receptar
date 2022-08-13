@@ -212,7 +212,6 @@ select {
   box-sizing: inherit;
   height: 3.8rem;
   padding: 0.6rem 1rem 0.7rem;
-  width: 100%;
 }
 input[type="color"]:focus,
 input[type="date"]:focus,
@@ -836,6 +835,16 @@ input[name="title"] {
 
 a.suggestion {
     color: black;
+}
+
+form#substance-search-form {
+    margin-bottom: 0;
+}
+
+div.class-selection-container {
+    margin: 1em 0;
+    display: flex;
+    gap: 3em;
 }
 
 table.recipe-search-hits-table td {

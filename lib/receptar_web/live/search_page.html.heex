@@ -9,7 +9,6 @@
 		    autocomplete="off"
 		phx-debounce="100"
 	    />
-	    <button type="submit">Go</button>
 	</form>
     </div>
     <form id="substance-search-form" phx-change="search-substance">
@@ -33,32 +32,39 @@
 	<% end %>
     </div>
     <div class="class-selection-container">
-	<input
-	    form="main-search-form"
-	    type="radio"
-	    id="radio-button-vegan"
-	    name="class"
-	    value="vegan"
-	    checked={Map.has_key?(@search_params, "class") and @search_params["class"] == "vegan"}
-	/>
-	<label form="main-search-form" for="radio-button-vegan">vegan</label>
-	<input
-	    form="main-search-form"
-	    type="radio"
-	    id="radio-button-vegetarian"
-	    name="class"
-	    value="vegetarian"
-	    checked={Map.has_key?(@search_params, "class") and @search_params["class"] == "vegetarian"}
-	/>
-	<label form="main-search-form" for="radio-button-vegetarian">vegetarian</label>
-	<input
-	    form="main-search-form"
-	    type="radio"
-	    id="radio-button-all"
-	    name="class"
-	    value="all"
-	    checked={not Map.has_key?(@search_params, "class") or @search_params["class"] == "all"}/>
-	<label form="main-search-form" for="radio-button-vegan">all</label>
+	<span>
+	    <input
+		form="main-search-form"
+		type="radio"
+		id="radio-button-vegan"
+		name="class"
+		value="vegan"
+		checked={Map.get(@search_params, "class") == "vegan"}
+	    />
+	    <label form="main-search-form" for="radio-button-vegan">vegan</label>
+	</span>
+	<span>
+	    <input
+		form="main-search-form"
+		type="radio"
+		id="radio-button-vegetarian"
+		name="class"
+		value="vegetarian"
+		checked={Map.get(@search_params, "class") == "vegetarian"}
+	    />
+	    <label form="main-search-form" for="radio-button-vegetarian">vegetarian</label>
+	</span>
+	<span>
+	    <input
+		form="main-search-form"
+		type="radio"
+		id="radio-button-all"
+		name="class"
+		value="all"
+		checked={Map.get(@search_params, "class", "all") == "all"}
+	    />
+	    <label form="main-search-form" for="radio-button-vegan">all</label>
+	</span>
     </div>
 </div>
 <h1><%= search_result_title(length(@recipes)) %></h1>
