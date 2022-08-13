@@ -25,8 +25,8 @@ defmodule ReceptarWeb.SearchOageTest do
       assert view |> has_element?(@form_selector)
     end
 
-    test "search page has an input field for title in the form", %{view: view} do
-      assert view |> has_element?(@form_selector <> "input[name=title]")
+    test "search page has an empty input field for title in the form", %{view: view} do
+      assert view |> has_element?(@form_selector <> "input[name=title][value=\"\"]")
     end
 
     test "initially all 8 search results are available", %{view: view} do
@@ -241,6 +241,12 @@ defmodule ReceptarWeb.SearchOageTest do
       {:ok, view, _html} = live(conn, "/search?title=sa")
 
       assert view |> element("h1") |> render() =~ "2 recipes found"
+    end
+
+    test "title search 'foo' leads to prefilled title search", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/search?title=foo")
+
+      assert view |> has_element?("input[name=\"title\"][value=\"foo\"]")
     end
 
     test "substance search 'tinuso' finds 2 recipes", %{conn: conn} do

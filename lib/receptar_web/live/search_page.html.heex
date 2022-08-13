@@ -2,7 +2,13 @@
     <div class="main-container">
 	<form id="main-search-form" action="/search" method="get" phx-change="form-change">
 	    <label for="search-title">Recipe title</label>
-	    <input id="search-title" name="title" autocomplete="off" phx-debounce="100"/>
+	    <input
+		id="search-title"
+		    name="title"
+		    value={Map.get(@search_params, "title", "")}
+		    autocomplete="off"
+		phx-debounce="100"
+	    />
 	    <button type="submit">Go</button>
 	</form>
     </div>
