@@ -55,6 +55,14 @@ defmodule ReceptarWeb.SearchOageTest do
       refute html =~ "<strong>G</strong>roßes Kino"
     end
 
+    test "typing `granda` into the search bar pushes url to ?title=granda", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"_target" => "title", "title" => "granda"})
+
+      view |> assert_patched("/search?title=granda")
+    end
+
     test "has an input so look for substances", %{view: view} do
       assert view |> has_element?(@substance_search)
     end
@@ -162,6 +170,14 @@ defmodule ReceptarWeb.SearchOageTest do
       assert view |> has_element?(@class_selector <> "[value=\"vegetarian\"][checked]")
       refute view |> has_element?(@class_selector <> "[value=\"vegan\"][checked]")
       refute view |> has_element?(@class_selector <> "[value=\"all\"][checked]")
+    end
+
+    test "selecting class 'all' does not make class=all appear in the uri", %{view: view} do
+      view
+      |> element(@form_selector)
+      |> render_change(%{"class" => "all"})
+
+      view |> assert_patched("/search?title=")
     end
   end
 

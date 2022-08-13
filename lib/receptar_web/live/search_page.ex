@@ -18,15 +18,23 @@ defmodule ReceptarWeb.SearchPage do
     }
   end
 
-  def handle_event("form-change", params, socket) do
-    params = sanitize_parameters(params)
-
+  def handle_params(params, _uri, socket) do
+     params = sanitize_parameters(params)
     {
       :noreply,
       socket
       |> assign_selected_shown_substances(params)
       |> assign_recipes(params)
       |> assign(search_params: params)
+    }
+  end
+
+  def handle_event("form-change", params, socket) do
+    params = sanitize_parameters(params)
+    {
+      :noreply,
+      socket
+      |> push_patch(to: Routes.live_path(socket, ReceptarWeb.SearchPage, params))
     }
   end
 
@@ -105,6 +113,8 @@ defmodule ReceptarWeb.SearchPage do
 
   defp sanitize_parameters(%{} = params) do
     params
+    |> Enum.filter(fn {k, _} -> k != "_target" end)
+    |> Enum.filter(fn {k, v} -> not (k == "class" and v == "all") end)
     |> Enum.map(&sanitize_parameters/1)
     |> Enum.into(%{})
   end
