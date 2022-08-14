@@ -14,7 +14,7 @@ defmodule Receptar.DataCase do
   this option is not recommended for other databases.
   """
 
-  use ExUnit.CaseTemplate
+  use ExUnit.CaseTemplate, async: false
 
   using do
     quote do
