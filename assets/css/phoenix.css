@@ -724,9 +724,10 @@ ul.translations {
 }
 
 .inline-search-button {
-    background-color: white;
-    display: inline;
-    color: black;
+    padding: 0.7rem 0.7rem;
+    height: 3.9rem;
+    width: 3.9rem;
+    margin: 0;
 }
 
 .tooltipped {
@@ -762,15 +763,7 @@ ul.translations {
 .reset-button::before { content: "\e10e"; }
 .down-button::before { content: "\e03a"; }
 .up-button::before { content: "\e039"; }
-
-.inline-search-button {
-    background: url(/icons/search.svg);
-    background-repeat: no-repeat;
-    background-size: 1em 1em;
-    background-position: center;
-    margin-bottom: 0;
-    width: 1.5em;
-}
+.inline-search-button::before { content: "\e410"; }
 
 .margin-button,
 .edit-button-group

@@ -18,6 +18,7 @@ glyphs = [
     ('user-add', 0xe403, 'person-add.svg'),
     ('login', 0xe404, 'login.svg'),
     ('logout', 0xe405, 'logout.svg'),
+    ('search', 0xe410, 'search.svg'),
     ('language', 0xe420, 'language.svg'),
     ('home', 0xe421, 'home.svg'),
     ('star', 0xe422, 'star.svg'),
