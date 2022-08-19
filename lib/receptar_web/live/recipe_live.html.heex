@@ -59,7 +59,7 @@
 	    textarea={true}
 	    language={@language}
 	    />
-	    <% else %>
+	<% else %>
 	    <p class="recipe-description"><%= tr(@recipe.description) %></p>
 	    <div class="edit-button-group">
 		<%=  render_tooltip_button(

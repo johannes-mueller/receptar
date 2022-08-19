@@ -810,7 +810,7 @@ input[name="title"] {
     width: auto;
 }
 
-.suggestions.container {
+.suggestions-container {
     position: relative;
 }
 
@@ -823,6 +823,7 @@ input[name="title"] {
 
 .suggestion {
     padding: 1em 1em;
+    border: 1px solid white;
 }
 
 .suggestion:focus {
@@ -835,6 +836,10 @@ input[name="title"] {
 
 a.suggestion {
     color: black;
+}
+
+div.search-form-container {
+    margin-bottom: 2em;
 }
 
 form#substance-search-form {
@@ -852,4 +857,9 @@ table.recipe-search-hits-table td {
 }
 table.recipe-search-hits-table tr:hover {
     background-color: #eee
+}
+
+form[action^="/users"] input:not([type="checkbox"]),
+form[action^="/users"] label {
+    width: 100%
 }

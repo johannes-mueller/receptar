@@ -238,25 +238,25 @@ defmodule ReceptarWeb.SearchOageTest do
     test "title search 'foobar' renders 'One recipe found'", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/search?title=foobar")
 
-      assert view |> element("h1") |> render() =~ "No recipes found"
+      assert view |> element("h2#search-results-heading") |> render() =~ "No recipes found"
     end
 
     test "title search 'foobar' renders 'No recipes found'", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/search?title=foobar")
 
-      assert view |> element("h1") |> render() =~ "No recipes found"
+      assert view |> element("h2#search-results-heading") |> render() =~ "No recipes found"
     end
 
     test "title search 'granda' renders 'One recipes found'", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/search?title=granda")
 
-      assert view |> element("h1") |> render() =~ "One recipe found"
+      assert view |> element("h2#search-results-heading") |> render() =~ "One recipe found"
     end
 
     test "title search 'sa' renders 'Two recipes found'", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/search?title=sa")
 
-      assert view |> element("h1") |> render() =~ "2 recipes found"
+      assert view |> element("h2#search-results-heading") |> render() =~ "2 recipes found"
     end
 
     test "title search 'foo' leads to prefilled title search", %{conn: conn} do
@@ -269,7 +269,7 @@ defmodule ReceptarWeb.SearchOageTest do
       sid = substance_by_name("tinuso").id
       {:ok, view, _html} = live(conn, "/search?substance[]=#{sid}")
 
-      assert view |> element("h1") |> render() =~ "2 recipes found"
+      assert view |> element("h2#search-results-heading") |> render() =~ "2 recipes found"
     end
 
     test "checkbox of preselected substances appear", %{conn: conn} do

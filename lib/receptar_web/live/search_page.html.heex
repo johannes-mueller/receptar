@@ -1,3 +1,4 @@
+<h2>Advanced recipe search</h2>
 <div class="search-form-container">
     <div class="main-container">
 	<form id="main-search-form" action="/search" method="get" phx-change="form-change">
@@ -67,7 +68,7 @@
 	</span>
     </div>
 </div>
-<h1><%= search_result_title(length(@recipes)) %></h1>
+<h2 id="search-results-heading"><%= search_result_title(length(@recipes)) %></h2>
 <table class="recipe-search-hits-table">
     <%= for recipe <- @recipes do %>
 	<tr>
